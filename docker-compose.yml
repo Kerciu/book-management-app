@@ -3,6 +3,9 @@ services:
     build: ./backend
     volumes:
       - ./backend:/app
+    environment:
+      - PYTHONPATH=/app
+      - DB_HOST=db
     ports:
       - "8000:8000"
     depends_on:
