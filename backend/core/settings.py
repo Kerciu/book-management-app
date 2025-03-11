@@ -20,6 +20,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'bookService.apps.BookserviceConfig',
     'rest_framework',
     'corsheaders',
     # Add your apps here
