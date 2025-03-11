@@ -9,3 +9,8 @@ class Categories(models.Model):
     id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=100, null=False, unique=True, default="")
 
+class Authors(models.Model):
+    id = models.AutoField(primary_key=True)
+    name = models.CharField(max_length=100, null=False)
+
+
