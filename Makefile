@@ -5,18 +5,28 @@ build:
 clean:
 	docker compose down -v
 
+docker_run:
+	@if [ -z "$(argument)" ]; then \
+		echo "Error: argument is required"; \
+		exit 1; \
+	fi
+	docker compose exec backend python manage.py $(argument) 
+
+
 migrate:
-	docker compose exec backend python manage.py migrate --verbosity 2
-
+	make docker_run argument="migrate"
+	
 makemigrations:
-	docker compose exec backend python manage.py makemigrations bookService --verbosity 2
+	make docker_run argument="makemigrations"
 
-createsuperuser:
-	docker compose exec backend python manage.py createsuperuser
+runserver:
+	make docker_run argument="runserver 0.0.0.0:8000"
 
 init:
 	make build
 	make makemigrations
 	make migrate
-	make createsuperuser
-
+	make runserver
+	
+backend_logs:
+	docker compose logs backend
