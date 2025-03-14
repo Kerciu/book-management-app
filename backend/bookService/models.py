@@ -5,14 +5,21 @@ class Users(models.Model):
     id = models.AutoField(primary_key=True)
     username = models.CharField(max_length=100, unique=True, null=False, default="")
     created_at = models.DateField(auto_now_add=True)
+    def __str__(self):
+        return f"{self.username}"
 
 class Categories(models.Model):
     id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=100, null=False, unique=True, default="")
+    def __str__(self):
+        return f"{self.name}"
+
 
 class Authors(models.Model):
     id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=100, null=False)
+    def __str__(self):
+        return f"{self.name}"
 
 class Books(models.Model):
     id = models.AutoField(primary_key=True)
@@ -20,11 +27,16 @@ class Books(models.Model):
     published_at = models.DateField(null=False)
     author_id = models.ForeignKey(Authors, on_delete=models.CASCADE)
     categories = models.ManyToManyField(Categories)
+    def __str__(self):
+        return f"{self.title}"
 
 class BookCollections(models.Model): 
     id = models.AutoField(primary_key=True)
+    name = models.CharField(max_length=100, null=False)
     user_id = models.ForeignKey(Users, on_delete=models.CASCADE)
     book_id = models.ManyToManyField(Books)
+    def __str__(self):
+        return f"{self.name}"
 
 class BookRatings(models.Model):
     user_id = models.ForeignKey(Users, on_delete=models.CASCADE)
