@@ -39,15 +39,14 @@ class BookCollections(models.Model):
         return f"{self.name}"
 
 class BookRatings(models.Model):
+    id = models.AutoField(primary_key=True)
     user_id = models.ForeignKey(Users, on_delete=models.CASCADE)
     book_id = models.ForeignKey(Books, on_delete=models.CASCADE)
     rating = models.IntegerField(
         null=False,
         validators=[
             MinValueValidator(1), MaxValueValidator(5)
-        ]
-    )
-
+        ])
 class BookReviews(models.Model):
     user_id = models.ForeignKey(Users, on_delete=models.CASCADE)
     book_id = models.ForeignKey(Books, on_delete=models.CASCADE)
