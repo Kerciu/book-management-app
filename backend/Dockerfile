@@ -1,4 +1,4 @@
-FROM python:3.11-slim
+FROM python:3.13-slim
 
 ENV PYTHONPATH=/app
 ENV DJANGO_SETTINGS_MODULE=core.settings
@@ -6,6 +6,8 @@ ENV DJANGO_SETTINGS_MODULE=core.settings
 
 
 RUN apt-get update && apt-get install -y \
+    gcc \
+    python3-dev \
     libpq-dev \
     postgresql-client \
     && rm -rf /var/lib/apt/lists/*
