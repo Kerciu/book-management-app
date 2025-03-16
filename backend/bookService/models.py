@@ -3,14 +3,15 @@ from django.core.validators import MinValueValidator, MaxValueValidator
 
 class Users(models.Model):
     id = models.AutoField(primary_key=True)
-    username = models.CharField(max_length=100, unique=True, null=False, default="")
+    username = models.CharField(max_length=100, unique=True, null=False)
     created_at = models.DateField(auto_now_add=True)
+    password_hash = models.CharField(null=False)
     def __str__(self):
         return f"{self.username}"
 
 class Categories(models.Model):
     id = models.AutoField(primary_key=True)
-    name = models.CharField(max_length=100, null=False, unique=True, default="")
+    name = models.CharField(max_length=100, null=False, unique=True)
     def __str__(self):
         return f"{self.name}"
 
@@ -47,8 +48,13 @@ class BookRatings(models.Model):
         validators=[
             MinValueValidator(1), MaxValueValidator(5)
         ])
+
 class BookReviews(models.Model):
+    id = models.AutoField(primary_key=True)
     user_id = models.ForeignKey(Users, on_delete=models.CASCADE)
     book_id = models.ForeignKey(Books, on_delete=models.CASCADE)
     review = models.TextField(null=False)
 
+# TODO Users BookCollections relationship straightening out 
+# TODO Author Books relationship update in dbdiagram
+#
