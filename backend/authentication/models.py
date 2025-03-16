@@ -5,7 +5,7 @@ from .managers import UserManager
 # Create your models here.
 
 
-class CustomBaseUser(AbstractUser):
+class CustomUser(AbstractUser):
 
     email = models.EmailField(unique=True, max_length=255)
     first_name = models.CharField(max_length=150)
