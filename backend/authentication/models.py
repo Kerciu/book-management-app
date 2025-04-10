@@ -28,3 +28,11 @@ class CustomUser(AbstractUser):
 
     def get_full_name(self):
         return f'{self.first_name.capitalize()} {self.last_name.capitalize()}'
+
+
+class OneTimePassword(models.Model):
+    user = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
+    code = models.CharField(max_length=6, unique=True)
+
+    def __str__(self):
+        return f'{self.user.first_name}-passcode'
