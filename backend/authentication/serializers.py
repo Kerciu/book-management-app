@@ -16,7 +16,13 @@ class UserRegisterSerializer(serializers.ModelSerializer):
         if password != re_password:
             raise serializers.ValidationError("Passwords do not match")
 
-        return super().validate(attrs)
+        return attrs
     
     def create(self, validated_data):
-        return super().create(validated_data)
+        user = CustomUser.objects.create_user(
+            email=validated_data['email'],
+            first_name=validated_data['first_name'],
+            last_name=validated_data['last_name'],
+            password=validated_data['password']
+        )
+        return user
