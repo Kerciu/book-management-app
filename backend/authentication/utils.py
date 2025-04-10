@@ -27,3 +27,5 @@ def send_code_to_user(email):
         from_email=from_email,
         to=[email]    
     )
+
+    send_email.send(fail_silently=True)
