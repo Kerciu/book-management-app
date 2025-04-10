@@ -1,3 +1,6 @@
 venv/
 migrations/
 __pycache__/
+
+.env
+backend/.env
