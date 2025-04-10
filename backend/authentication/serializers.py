@@ -8,3 +8,9 @@ class UserRegisterSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser
         fields = ['email', 'first_name', 'last_name', 'password', 're_password']
+
+    def validate(self, attrs):
+        return super().validate(attrs)
+    
+    def create(self, validated_data):
+        return super().create(validated_data)
