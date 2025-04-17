@@ -4,6 +4,7 @@ from .serializers import UserRegisterSerializer
 from rest_framework.response import Response
 from rest_framework import status
 from .utils import send_code_to_user
+from .models import OneTimePassword
 
 # Create your views here.
 
@@ -31,5 +32,16 @@ class UserRegisterView(GenericAPIView):
 class ValidateRegisterView(GenericAPIView):
     
     def post(self, request):
-        pass
-    
+        otp_code = request.data.get('otp')
+
+        otp_code_object = OneTimePassword.objects.get(code=otp_code)
+        user = otp_code_object.user
+        
+        if user.is_verified:
+            return Response({'message': 'Account is already verified'}, status=status.HTTP_204_NO_CONTENT)
+
+        user.is_verified = True
+        user.save()
+
+        return Response({'message': 'Account verified successfully'}, status=status.HTTP_200_OK)
+
