@@ -39,4 +39,10 @@ class UserLoginSerializer(serializers.ModelSerializer):
         fields = ['email', 'password', 'full_name', 'access_token', 'refresh_token']
 
         def validate(self, attrs):
+            email = attrs.get('email')
+            password = attrs.get('password')
+
+            request = self.context.get('request')
+            # user = authenticate()
+
             return super().validate(attrs)

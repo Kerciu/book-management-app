@@ -52,3 +52,7 @@ class ValidateRegisterView(GenericAPIView):
 
 class LoginUserView(GenericAPIView):
     serializer_class=UserLoginSerializer
+
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data, context={'request': request})
+        serializer.is_valid(raise_exception=True)
