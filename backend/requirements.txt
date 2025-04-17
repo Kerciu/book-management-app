@@ -5,3 +5,7 @@ django-cors-headers
 gunicorn
 python-dotenv
 django-sendgrid-v5
+pytest
+pytest-django
+pytest-cov
+factory-boy
