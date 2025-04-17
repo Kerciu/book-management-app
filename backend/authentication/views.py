@@ -26,4 +26,10 @@ class UserRegisterView(GenericAPIView):
             }, status=status.HTTP_201_CREATED)
         
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class ValidateRegisterView(GenericAPIView):
+    
+    def post(self, request):
+        pass
     
