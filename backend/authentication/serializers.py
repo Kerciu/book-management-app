@@ -37,3 +37,6 @@ class UserLoginSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser
         fields = ['email', 'password', 'full_name', 'access_token', 'refresh_token']
+
+        def validate(self, attrs):
+            return super().validate(attrs)
