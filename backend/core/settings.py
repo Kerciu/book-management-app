@@ -1,8 +1,11 @@
 import os
 from pathlib import Path
+from dotenv import load_dotenv
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+load_dotenv(dotenv_path=os.path.join(BASE_DIR, '.env'))
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-key-for-development')
@@ -24,6 +27,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'corsheaders',
     # Add your apps here
+    'authentication'
 ]
 
 MIDDLEWARE = [
@@ -64,10 +68,14 @@ DATABASES = {
         'NAME': os.environ.get('DB_NAME', 'postgres'),
         'USER': os.environ.get('DB_USER', 'postgres'),
         'PASSWORD': os.environ.get('DB_PASSWORD', 'postgres'),
-        'HOST': os.environ.get('DB_HOST', 'db'),
+        'HOST': os.environ.get('DB_HOST', 'localhost'),
         'PORT': os.environ.get('DB_PORT', '5432'),
     }
 }
+
+print(DATABASES)
+
+AUTH_USER_MODEL = 'authentication.CustomUser'
 
 # Password validation
 AUTH_PASSWORD_VALIDATORS = [
@@ -114,3 +122,11 @@ REST_FRAMEWORK = {
         'rest_framework.authentication.SessionAuthentication',
     ],
 }
+
+EMAIL_HOST_USER = os.getenv('EMAIL_BACKEND')
+EMAIL_HOST_USER = os.getenv('EMAIL_HOST')
+EMAIL_HOST_USER = os.getenv('EMAIL_PORT')
+EMAIL_HOST_USER = os.getenv('EMAIL_USE_TLS')
+EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
+DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL')
