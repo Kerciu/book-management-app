@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from django.contrib.auth import authenticate
 from .models import CustomUser
 
 class UserRegisterSerializer(serializers.ModelSerializer):
@@ -43,6 +44,6 @@ class UserLoginSerializer(serializers.ModelSerializer):
             password = attrs.get('password')
 
             request = self.context.get('request')
-            # user = authenticate()
+            user = authenticate(request, email=email, password=password)
 
             return super().validate(attrs)
