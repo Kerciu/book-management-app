@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from rest_framework.generics import GenericAPIView
-from .serializers import UserRegisterSerializer
+from .serializers import UserLoginSerializer, UserRegisterSerializer
 from rest_framework.response import Response
 from rest_framework import status
 from .utils import send_code_to_user
@@ -51,4 +51,4 @@ class ValidateRegisterView(GenericAPIView):
 
 
 class LoginUserView(GenericAPIView):
-    pass
+    serializer_class=UserLoginSerializer
