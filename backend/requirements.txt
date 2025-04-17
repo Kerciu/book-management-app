@@ -1,7 +1,7 @@
-Django==5.2b.1
-djangorestframework==3.14.0
-psycopg2==3.1.18
-django-cors-headers==4.3.1
-gunicorn==21.2.0
+Django
+djangorestframework
+psycopg2-binary
+django-cors-headers
+gunicorn
 python-dotenv
 django-sendgrid-v5
