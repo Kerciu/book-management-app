@@ -30,3 +30,4 @@ class UserRegisterSerializer(serializers.ModelSerializer):
 class UserLoginSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser
+        fields = ['email', 'password']
