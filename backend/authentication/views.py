@@ -34,14 +34,17 @@ class ValidateRegisterView(GenericAPIView):
     def post(self, request):
         otp_code = request.data.get('otp')
 
-        otp_code_object = OneTimePassword.objects.get(code=otp_code)
-        user = otp_code_object.user
-        
-        if user.is_verified:
-            return Response({'message': 'Account is already verified'}, status=status.HTTP_204_NO_CONTENT)
+        try:
+            otp_code_object = OneTimePassword.objects.get(code=otp_code)
+            user = otp_code_object.user
+            
+            if user.is_verified:
+                return Response({'message': 'Account is already verified'}, status=status.HTTP_204_NO_CONTENT)
 
-        user.is_verified = True
-        user.save()
+            user.is_verified = True
+            user.save()
 
-        return Response({'message': 'Account verified successfully'}, status=status.HTTP_200_OK)
+            return Response({'message': 'Account verified successfully'}, status=status.HTTP_200_OK)
 
+        except OneTimePassword.DoesNotExist:
+            return Response({'message': 'Passcode not provided'}, status=status.HTTP_404_NOT_FOUND)
