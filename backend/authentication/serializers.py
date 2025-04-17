@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from django.contrib.auth import authenticate
 from rest_framework.exceptions import AuthenticationFailed
+from rest_framework_simplejwt.tokens import RefreshToken
 from .models import CustomUser
 
 class UserRegisterSerializer(serializers.ModelSerializer):
@@ -48,3 +49,10 @@ class UserLoginSerializer(serializers.ModelSerializer):
             user = authenticate(request, email=email, password=password)
 
             if not user: raise AuthenticationFailed("Invalid credentials, please try again")
+
+            user_tokens = user.tokens()
+
+            return {
+                'email': user.email,
+                'password': user.password
+            }

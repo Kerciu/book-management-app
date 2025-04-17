@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
+from rest_framework_simplejwt.tokens import RefreshToken
 from .managers import UserManager
 
 # Create your models here.
@@ -26,8 +27,17 @@ class CustomUser(AbstractUser):
     def __str__(self):
         return self.email
 
+    @property
     def get_full_name(self):
         return f'{self.first_name.capitalize()} {self.last_name.capitalize()}'
+    
+    def tokens(self):
+        refresh = RefreshToken.for_user(self)
+
+        return {
+            'refresh': str(refresh),
+            'access': str(refresh.access_token)
+        }
 
 
 class OneTimePassword(models.Model):
