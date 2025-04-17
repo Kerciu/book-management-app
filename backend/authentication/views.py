@@ -48,3 +48,7 @@ class ValidateRegisterView(GenericAPIView):
 
         except OneTimePassword.DoesNotExist:
             return Response({'message': 'Passcode not provided'}, status=status.HTTP_404_NOT_FOUND)
+
+
+class LoginUserView(GenericAPIView):
+    pass
