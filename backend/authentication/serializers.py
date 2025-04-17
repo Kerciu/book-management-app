@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from django.contrib.auth import authenticate
+from rest_framework.exceptions import AuthenticationFailed
 from .models import CustomUser
 
 class UserRegisterSerializer(serializers.ModelSerializer):
@@ -46,4 +47,4 @@ class UserLoginSerializer(serializers.ModelSerializer):
             request = self.context.get('request')
             user = authenticate(request, email=email, password=password)
 
-            return super().validate(attrs)
+            if not user: raise AuthenticationFailed("Invalid credentials, please try again")
