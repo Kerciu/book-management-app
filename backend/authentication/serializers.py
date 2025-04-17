@@ -28,6 +28,12 @@ class UserRegisterSerializer(serializers.ModelSerializer):
         return user
 
 class UserLoginSerializer(serializers.ModelSerializer):
+    email = serializers.EmailField(max_length=255, min_length=6)
+    password = serializers.CharField(max_length=68, write_only=True)
+    full_name = serializers.CharField(max_length=255, read_only=True)
+    access_token = serializers.CharField(max_length=255, read_only=True)
+    refresh_token = serializers.CharField(max_length=255, read_only=True)
+
     class Meta:
         model = CustomUser
-        fields = ['email', 'password']
+        fields = ['email', 'password', 'full_name', 'access_token', 'refresh_token']
