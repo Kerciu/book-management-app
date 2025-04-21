@@ -65,3 +65,7 @@ class UserLoginSerializer(serializers.ModelSerializer):
                 'refresh': str(user_tokens.get('refresh')),
                 'access': str(user_tokens.get('access'))
             }
+
+
+class OTPSerializer(serializers.Serializer):
+    otp = serializers.CharField(max_length=6)
