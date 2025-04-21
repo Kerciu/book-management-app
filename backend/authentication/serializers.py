@@ -10,7 +10,12 @@ class UserRegisterSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = CustomUser
-        fields = ['email', 'first_name', 'last_name', 'password', 're_password']
+        fields = ['username', 'email', 'first_name', 'last_name', 'password', 're_password']
+
+    def validate_username(self, value):
+        if CustomUser.objects.filter(username=value).exists():
+            raise serializers.ValidationError("This username is already taken")
+        return value
 
     def validate(self, attrs):
 
@@ -20,9 +25,10 @@ class UserRegisterSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("Passwords do not match")
 
         return attrs
-    
+
     def create(self, validated_data):
         user = CustomUser.objects.create_user(
+            username=validated_data['username'],
             email=validated_data['email'],
             first_name=validated_data['first_name'],
             last_name=validated_data['last_name'],
