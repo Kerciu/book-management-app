@@ -7,6 +7,7 @@ from .models import OneTimePassword
 
 # Create your views here.
 
+
 class UserRegisterView(GenericAPIView):
     serializer_class = UserRegisterSerializer
 
@@ -50,12 +51,18 @@ class ValidateRegisterView(GenericAPIView):
             return Response({'message': 'Passcode not provided'}, status=status.HTTP_404_NOT_FOUND)
 
 
-
 class LoginUserView(GenericAPIView):
-    serializer_class=UserLoginSerializer
+
+    serializer_class = UserLoginSerializer
 
     def post(self, request):
         serializer = self.serializer_class(data=request.data, context={'request': request})
-        serializer.is_valid(raise_exception=True)
 
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        if serializer.is_valid(raise_exception=True):
+            user_data = serializer.validated_data
+            return Response({
+                'message': 'Logged in successfully',
+                'user': user_data
+            }, status=status.HTTP_200_OK)
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
