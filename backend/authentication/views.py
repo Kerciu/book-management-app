@@ -1,11 +1,12 @@
 from rest_framework.generics import GenericAPIView
-from .serializers import UserLoginSerializer, UserRegisterSerializer
+from .serializers import UserLoginSerializer, UserRegisterSerializer, OTPSerializer
 from rest_framework.response import Response
 from rest_framework import status
 from .utils import send_code_to_user
 from .models import OneTimePassword
 
 # Create your views here.
+
 
 class UserRegisterView(GenericAPIView):
     serializer_class = UserRegisterSerializer
@@ -24,19 +25,20 @@ class UserRegisterView(GenericAPIView):
                 'data': user_data,
                 'message': "Check your email for your verification passcode"
             }, status=status.HTTP_201_CREATED)
-        
+
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class ValidateRegisterView(GenericAPIView):
-    
+    serializer_class = OTPSerializer
+
     def post(self, request):
         otp_code = request.data.get('otp')
 
         try:
             otp_code_object = OneTimePassword.objects.get(code=otp_code)
             user = otp_code_object.user
-            
+
             if user.is_verified:
                 return Response({'message': 'Account is already verified'}, status=status.HTTP_204_NO_CONTENT)
 
@@ -50,10 +52,17 @@ class ValidateRegisterView(GenericAPIView):
 
 
 class LoginUserView(GenericAPIView):
-    serializer_class=UserLoginSerializer
+
+    serializer_class = UserLoginSerializer
 
     def post(self, request):
         serializer = self.serializer_class(data=request.data, context={'request': request})
-        serializer.is_valid(raise_exception=True)
 
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        if serializer.is_valid(raise_exception=True):
+            user_data = serializer.validated_data
+            return Response({
+                'message': 'Logged in successfully',
+                'user': user_data
+            }, status=status.HTTP_200_OK)
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

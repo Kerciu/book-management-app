@@ -25,7 +25,7 @@ def send_code_to_user(email):
         subject=SUBJECT,
         body='\n'.join([BODY, PASSCODE_PART]),
         from_email=from_email,
-        to=[email]    
+        to=[email]
     )
 
-    send_email.send(fail_silently=True)
+    send_email.send(fail_silently=False)
