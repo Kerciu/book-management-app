@@ -4,3 +4,4 @@ __pycache__/
 
 .env
 backend/.env
+db.sqlite3
