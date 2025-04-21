@@ -4,6 +4,7 @@ from rest_framework.exceptions import AuthenticationFailed
 from rest_framework_simplejwt.tokens import RefreshToken
 from .models import CustomUser
 
+
 class UserRegisterSerializer(serializers.ModelSerializer):
     password = serializers.CharField(max_length=68, min_length=6, write_only=True)
     re_password = serializers.CharField(max_length=68, min_length=6, write_only=True)
@@ -36,6 +37,7 @@ class UserRegisterSerializer(serializers.ModelSerializer):
         )
         return user
 
+
 class UserLoginSerializer(serializers.ModelSerializer):
     email = serializers.EmailField(max_length=255, min_length=6)
     password = serializers.CharField(max_length=68, write_only=True)
@@ -47,24 +49,27 @@ class UserLoginSerializer(serializers.ModelSerializer):
         model = CustomUser
         fields = ['email', 'password', 'full_name', 'access_token', 'refresh_token']
 
-        def validate(self, attrs):
-            email = attrs.get('email')
-            password = attrs.get('password')
+    def validate(self, attrs):
+        email = attrs.get('email')
+        password = attrs.get('password')
 
-            request = self.context.get('request')
-            user = authenticate(request, email=email, password=password)
+        request = self.context.get('request')
+        user = authenticate(request, email=email, password=password)
 
-            if not user: raise AuthenticationFailed("Invalid credentials, please try again")
-            if not user.is_verified: raise AuthenticationFailed("Email is not verified")
+        if not user:
+            raise AuthenticationFailed("Invalid credentials, please try again")
 
-            user_tokens = user.tokens()
+        if not user.is_verified:
+            raise AuthenticationFailed("Email is not verified")
 
-            return {
-                'email': user.email,
-                'password': user.password,
-                'refresh': str(user_tokens.get('refresh')),
-                'access': str(user_tokens.get('access'))
-            }
+        user_tokens = user.tokens()
+
+        return {
+            'email': user.email,
+            'password': user.password,
+            'refresh': str(user_tokens.get('refresh')),
+            'access': str(user_tokens.get('access'))
+        }
 
 
 class OTPSerializer(serializers.Serializer):
