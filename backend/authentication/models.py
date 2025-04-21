@@ -20,7 +20,7 @@ class CustomUser(AbstractUser):
     last_login = models.DateTimeField(auto_now=True)
 
     USERNAME_FIELD = "email"
-    REQUIRED_FIELDS = ['username', 'first_name', 'last_name', 'password']
+    REQUIRED_FIELDS = ['username', 'first_name', 'last_name']
 
     objects = UserManager()
 
@@ -30,7 +30,7 @@ class CustomUser(AbstractUser):
     @property
     def get_full_name(self):
         return f'{self.first_name.capitalize()} {self.last_name.capitalize()}'
-    
+
     def tokens(self):
         refresh = RefreshToken.for_user(self)
 
