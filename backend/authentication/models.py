@@ -28,7 +28,7 @@ class CustomUser(AbstractUser):
         return self.email
 
     @property
-    def get_full_name(self):
+    def full_name(self):
         return f'{self.first_name.capitalize()} {self.last_name.capitalize()}'
 
     def tokens(self):
