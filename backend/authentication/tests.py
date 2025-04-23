@@ -14,6 +14,7 @@ class ResendEmailSerializerTest(TestCase):
             password="2137abcAA!"
         )
 
-    def test_is_valid_email(self):
-        pass
+    def test_valid_email(self):
+        serializer = ResendEmailSerializer.create(data={ "email": "kerciu@gmail.com"})
+        self.assertTrue(serializer.is_valid())
     
