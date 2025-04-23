@@ -86,7 +86,13 @@ class ResendEmailView(GenericAPIView):
             email = serialzier.validated_data['email']
             try:
                 user = CustomUser.objects.get(email=email)
-                
+
+                send_code_to_user(email, resending=True)
+
+                return Response({
+                    "message": "New verification code has been sent to your email"
+                }, status=status.HTTP_200_OK)
+
             except CustomUser.DoesNotExist:
                 return Response({
                     "message": "User with this email does not exist!"
