@@ -16,11 +16,11 @@ class ResendEmailSerializerTest(TestCase):
         )
 
     def test_valid_email(self):
-        serializer = ResendEmailSerializer.create(data={ "email": "kerciu@gmail.com"})
+        serializer = ResendEmailSerializer(data={ "email": "kacper@gmail.com"})
         self.assertTrue(serializer.is_valid())
     
     def test_invalid_email(self):
-        serializer = ResendEmailSerializer.create(data={ "email": "this is invalid for sure"})
+        serializer = ResendEmailSerializer(data={ "email": "this is invalid for sure"})
         self.assertFalse(serializer.is_valid())
         self.assertIn('email', serializer.errors)
 
