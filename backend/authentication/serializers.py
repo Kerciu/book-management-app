@@ -74,3 +74,8 @@ class UserLoginSerializer(serializers.ModelSerializer):
 
 class OTPSerializer(serializers.Serializer):
     otp = serializers.CharField(max_length=6)
+
+
+class ResendEmailSerializer(serializers.Serializer):
+    email = serializers.EmailField(max_length=255, min_length=6)
+
