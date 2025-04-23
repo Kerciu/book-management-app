@@ -6,11 +6,15 @@ from .models import CustomUser, OneTimePassword
 def generate_otp():
     return "".join(([str(random.randint(0, 9)) for i in range(6)]))
 
-def send_code_to_user(email):
+def send_code_to_user(email, resending = False):
     user = CustomUser.objects.get(email=email)
 
     SUBJECT = "One time passcode for email verification"
-    BODY = f"Thank you {user.first_name.capitalize()} for registering to the book management application!"
+    if resending:
+        BODY = f"Thank you {user.first_name.capitalize()} for registering to the book management application!"
+    else:
+        BODY = f"We resend you this email to enable you to register to the book management application!"
+        
     OTP_CODE = generate_otp()
     PASSCODE_PART = f"Please verify your email with your one time passcode: {OTP_CODE}"
 
