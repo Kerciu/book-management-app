@@ -79,3 +79,8 @@ class OTPSerializer(serializers.Serializer):
 class ResendEmailSerializer(serializers.Serializer):
     email = serializers.EmailField(max_length=255, min_length=6)
 
+    def validate_email(self, value):
+        if not CustomUser.objects.filter(email=value).exists():
+            raise serializers.ValidationError("User with such email does not exist")
+        
+        return value
