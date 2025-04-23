@@ -1,5 +1,11 @@
 from rest_framework.generics import GenericAPIView
-from .serializers import UserLoginSerializer, UserRegisterSerializer, OTPSerializer
+from .serializers import (
+    UserLoginSerializer,
+    UserRegisterSerializer,
+    OTPSerializer,
+    ResendEmailSerializer
+)
+
 from rest_framework.response import Response
 from rest_framework import status
 from .utils import send_code_to_user
@@ -66,3 +72,12 @@ class LoginUserView(GenericAPIView):
             }, status=status.HTTP_200_OK)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class ResendEmailView(GenericAPIView):
+
+    serializer_class = ResendEmailSerializer
+
+    def post(self, request):
+        pass
+    
