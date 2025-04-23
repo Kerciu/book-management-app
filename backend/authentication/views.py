@@ -86,6 +86,8 @@ class ResendEmailView(GenericAPIView):
             email = serialzier.validated_data['email']
             try:
                 user = CustomUser.objects.get(email=email)
+                
+                OneTimePassword.objects.filter(user=user).delete()
 
                 send_code_to_user(email, resending=True)
 
