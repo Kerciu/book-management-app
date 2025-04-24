@@ -1,9 +1,15 @@
 from rest_framework.generics import GenericAPIView
-from .serializers import UserLoginSerializer, UserRegisterSerializer, OTPSerializer
+from .serializers import (
+    UserLoginSerializer,
+    UserRegisterSerializer,
+    OTPSerializer,
+    ResendEmailSerializer
+)
+
 from rest_framework.response import Response
 from rest_framework import status
 from .utils import send_code_to_user
-from .models import OneTimePassword
+from .models import OneTimePassword, CustomUser
 
 # Create your views here.
 
@@ -66,3 +72,30 @@ class LoginUserView(GenericAPIView):
             }, status=status.HTTP_200_OK)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class ResendEmailView(GenericAPIView):
+
+    serializer_class = ResendEmailSerializer
+
+    def post(self, request):
+        
+        serialzier = self.serializer_class(data=request.data)
+        if serialzier.is_valid(raise_exception=True):
+            
+            email = serialzier.validated_data['email']
+            try:
+                user = CustomUser.objects.get(email=email)
+                
+                OneTimePassword.objects.filter(user=user).delete()
+
+                send_code_to_user(email, resending=True)
+
+                return Response({
+                    "message": "New verification code has been sent to your email"
+                }, status=status.HTTP_200_OK)
+
+            except CustomUser.DoesNotExist:
+                return Response({
+                    "message": "User with this email does not exist!"
+                }, status=status.HTTP_404_NOT_FOUND)
