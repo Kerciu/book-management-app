@@ -1,7 +1,9 @@
 from rest_framework import serializers
 from django.contrib.auth import authenticate
 from rest_framework.exceptions import AuthenticationFailed
-from rest_framework_simplejwt.tokens import RefreshToken
+from django.contrib.auth.tokens import PasswordResetTokenGenerator
+from django.utils.http import urlsafe_base64_encode
+from django.utils.encoding import smart_bytes
 from .models import CustomUser
 
 
@@ -91,3 +93,24 @@ class PasswordResetRequestSerializer(serializers.Serializer):
 
     class Meta:
         fields = ['email']
+    
+    def validate(self, attrs):
+        email = attrs.get('email')
+
+        if CustomUser.objects.filter(email=email).exists():
+
+            user = CustomUser.objects.get(email=email)
+
+            uid = urlsafe_base64_encode(smart_bytes(user))
+            token = PasswordResetTokenGenerator().make_token(uid)
+
+            attrs['user'] = user
+            attrs['uid'] = uid
+            attrs['token'] = token
+
+            return attrs
+
+
+        raise serializers.ValidationError(
+            {'email': 'No account exists with this email address.'}
+        )
