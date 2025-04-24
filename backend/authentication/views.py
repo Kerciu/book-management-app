@@ -1,4 +1,5 @@
 from rest_framework.generics import GenericAPIView
+from rest_framework.throttling import AnonRateThrottle
 from rest_framework.permissions import AllowAny
 from .serializers import (
     UserLoginSerializer,
@@ -110,8 +111,8 @@ class ResendEmailView(GenericAPIView):
 class PasswordResetView(GenericAPIView):
 
     serializer_class = PasswordResetRequestSerializer
-
     permission_classes = [AllowAny]
+    throttle_classes = [AnonRateThrottle]
 
     def post(self, request):
         serializer = self.get_serializer(data=request.data)
