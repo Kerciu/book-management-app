@@ -1,3 +1,6 @@
+from django.contrib.auth.tokens import PasswordResetTokenGenerator
+from django.utils.http import urlsafe_base64_encode
+from django.utils.encoding import smart_bytes
 import random
 from django.core.mail import EmailMessage
 from django.conf import settings
@@ -33,3 +36,9 @@ def send_code_to_user(email, resending = False):
     )
 
     send_email.send(fail_silently=False)
+
+def generate_password_reset_tokens(user):
+    uid = urlsafe_base64_encode(smart_bytes(user))
+    token = PasswordResetTokenGenerator().make_token(uid)
+
+    return uid, token
