@@ -48,7 +48,7 @@ def generate_password_reset_tokens(user):
 
 def send_password_reset_email(user, uid, token, request):
     site_domain = Site.objects.get_current(request).domain
-    relative_link = reverse('confirm-password-reset', kwargs={'uid': uid, 'token': token})
+    relative_link = reverse('password-reset-confirm', kwargs={'uid': uid, 'token': token})
     abs_link = f'http://{site_domain}{relative_link}'
     
     subject = "Password Reset Request"
