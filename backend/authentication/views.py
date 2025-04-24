@@ -3,7 +3,8 @@ from .serializers import (
     UserLoginSerializer,
     UserRegisterSerializer,
     OTPSerializer,
-    ResendEmailSerializer
+    ResendEmailSerializer,
+    PasswordResetRequestSerializer
 )
 
 from rest_framework.response import Response
@@ -99,3 +100,11 @@ class ResendEmailView(GenericAPIView):
                 return Response({
                     "message": "User with this email does not exist!"
                 }, status=status.HTTP_404_NOT_FOUND)
+
+
+class PasswordResetView(GenericAPIView):
+
+    serializer_class = PasswordResetRequestSerializer
+
+    def post(self, request):
+        pass
