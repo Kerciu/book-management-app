@@ -107,4 +107,6 @@ class PasswordResetView(GenericAPIView):
     serializer_class = PasswordResetRequestSerializer
 
     def post(self, request):
-        pass
+        serializer = self.serializer_class(data=request.data, context={'request': request})
+        serializer.is_valid(raise_exception=True)
+
