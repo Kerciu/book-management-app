@@ -95,3 +95,10 @@ class PasswordResetRequestSerializer(serializers.Serializer):
         if not CustomUser.objects.filter(email=value).exists():
             raise serializers.ValidationError("No account exists with this email address.")
         return value
+
+
+class SetNewPasswordSerializer(serializers.Serializer):
+    password = serializers.CharField(max_length=68, min_length=6, write_only=True)
+    confirm_password = serializers.CharField(max_length=68, min_length=6, write_only=True)
+    uid = serializers.CharField(write_only=True)
+    token = serializers.CharField(write_only=True)

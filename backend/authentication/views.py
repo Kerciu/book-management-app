@@ -6,7 +6,8 @@ from .serializers import (
     UserRegisterSerializer,
     OTPSerializer,
     ResendEmailSerializer,
-    PasswordResetRequestSerializer
+    PasswordResetRequestSerializer,
+    SetNewPasswordSerializer
 )
 
 from rest_framework.response import Response
@@ -175,5 +176,8 @@ class PasswordResetConfirmView(GenericAPIView):
 
 
 class SetNewPasswordView(GenericAPIView):
+
+    serializer_class = SetNewPasswordSerializer
+
     def post(self, request):
         pass
