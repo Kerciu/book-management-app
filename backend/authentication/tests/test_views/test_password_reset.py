@@ -45,3 +45,8 @@ class PasswordResetViewTest(TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data['message'], "If this email exists, a reset link has been sent")
+
+    def test_missing_email_field(self):
+        response = self.client.post(self.url, {})
+        self.assertEqual(response.status_code, 400)
+        self.assertIn('email', response.data)
