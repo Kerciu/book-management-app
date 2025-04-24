@@ -1,4 +1,5 @@
 from rest_framework.generics import GenericAPIView
+from rest_framework.permissions import AllowAny
 from .serializers import (
     UserLoginSerializer,
     UserRegisterSerializer,
@@ -15,9 +16,9 @@ from .utils import (
     send_password_reset_email
 )
 from .models import OneTimePassword, CustomUser
+import logging
 
-# Create your views here.
-
+logger = logging.getLogger(__name__)
 
 class UserRegisterView(GenericAPIView):
     serializer_class = UserRegisterSerializer
@@ -110,15 +111,24 @@ class PasswordResetView(GenericAPIView):
 
     serializer_class = PasswordResetRequestSerializer
 
+    permission_classes = [AllowAny]
+
     def post(self, request):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         
-        user = CustomUser.objects.get(email=serializer.validated_data['email'])
-        uid, token = generate_password_reset_tokens(user)
-        send_password_reset_email(user, uid, token, request)
-        
-        return Response(
-            {"message": "Password reset link sent to email"},
-            status=status.HTTP_200_OK
-        )
+        try:
+            user = CustomUser.objects.get(email=serializer.validated_data['email'])
+            uid, token = generate_password_reset_tokens(user)
+            send_password_reset_email(user, uid, token, request)
+
+            return Response(
+                {"message": "If this email exists, a reset link has been sent"},
+                status=status.HTTP_200_OK
+            )
+        except Exception as e:
+            logger.error(f"Password reset error: {str(e)}")
+            return Response(
+                {"message": "If this email exists, a reset link has been sent"},
+                status=status.HTTP_200_OK
+            )
