@@ -156,3 +156,12 @@ class PasswordResetConfirmView(GenericAPIView):
                 status=status.HTTP_401_UNAUTHORIZED
             )
 
+        return Response(
+            {
+                "success": True,
+                "message": "Credentials are valid",
+                "uid": current_uid,
+                "token": token,
+            },
+            status=status.HTTP_200_OK
+        )
