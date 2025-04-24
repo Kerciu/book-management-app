@@ -1,6 +1,9 @@
 from rest_framework import serializers
 from django.contrib.auth import authenticate
 from rest_framework.exceptions import AuthenticationFailed
+from django.utils.http import urlsafe_base64_decode
+from django.contrib.auth.tokens import PasswordResetTokenGenerator
+from django.utils.encoding import force_str
 from .models import CustomUser
 
 
@@ -105,3 +108,22 @@ class SetNewPasswordSerializer(serializers.Serializer):
 
     class Meta:
         fields = ['password', 'confirm_password', 'uid', 'token']
+
+    def validate(self, attrs):
+        password = attrs.get('password')
+        confirm_password = attrs.get('confirm_password')
+        uid = attrs.get('uid')
+        token = attrs.get('token')
+
+        user_id = force_str(urlsafe_base64_decode(uid))
+        user = CustomUser.objects.get(id=user_id)
+
+        if not PasswordResetTokenGenerator.check_token(user, token):
+            raise AuthenticationFailed("Reset link is invalid or expired", 401)
+        
+        if password != confirm_password:
+            raise AuthenticationFailed("Passwords do not match")
+        
+        user.set_password(password)
+        user.save()
+        return user
