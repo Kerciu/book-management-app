@@ -19,6 +19,15 @@ from .utils import (
 from .models import OneTimePassword, CustomUser
 import logging
 
+# TODO: implement all this in utils file
+from django.utils.http import urlsafe_base64_decode
+from django.utils.encoding import (
+    smart_str,
+    DjangoUnicodeDecodeError
+)
+from django.contrib.auth.tokens import PasswordResetTokenGenerator
+# TODO
+
 logger = logging.getLogger(__name__)
 
 class UserRegisterView(GenericAPIView):
