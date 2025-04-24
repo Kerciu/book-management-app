@@ -4,6 +4,7 @@ from rest_framework.exceptions import AuthenticationFailed
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from django.utils.http import urlsafe_base64_encode
 from django.utils.encoding import smart_bytes
+from django.contrib.sites.models import Site
 from .models import CustomUser
 
 
@@ -103,6 +104,9 @@ class PasswordResetRequestSerializer(serializers.Serializer):
 
             uid = urlsafe_base64_encode(smart_bytes(user))
             token = PasswordResetTokenGenerator().make_token(uid)
+
+            request = self.context.get('request')
+            site_domain = Site.objects.get_current(request).domain
 
             attrs['user'] = user
             attrs['uid'] = uid
