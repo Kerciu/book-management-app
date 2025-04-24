@@ -17,3 +17,13 @@ class PasswordResetViewTest(TestCase):
         )
         self.url = reverse('password-reset')
 
+    @patch('authentication.utils.send_password_reset_email')
+    @patch('authentication.utils.generate_password_reset_tokens')
+    def test_successful_reset_request(self, mock_tokens, mock_email):
+        mock_tokens.return_value = ('test-uid', 'test-email')
+
+        response = self.client.post(self.url, { 'email': 'test@example.com' })
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data['message'], "If this email exists, a reset link has been sent")
+        mock_email.assert_called_once()
