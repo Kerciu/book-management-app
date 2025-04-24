@@ -9,7 +9,11 @@ from .serializers import (
 
 from rest_framework.response import Response
 from rest_framework import status
-from .utils import send_code_to_user
+from .utils import (
+    send_code_to_user,
+    generate_password_reset_tokens,
+    send_password_reset_email
+)
 from .models import OneTimePassword, CustomUser
 
 # Create your views here.
@@ -107,9 +111,14 @@ class PasswordResetView(GenericAPIView):
     serializer_class = PasswordResetRequestSerializer
 
     def post(self, request):
-        serializer = self.serializer_class(data=request.data, context={'request': request})
+        serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
+        
+        user = CustomUser.objects.get(email=serializer.validated_data['email'])
+        uid, token = generate_password_reset_tokens(user)
+        send_password_reset_email(user, uid, token, request)
+        
         return Response(
-            {"message": "A link has been sent to your email address to reset your password"},
+            {"message": "Password reset link sent to email"},
             status=status.HTTP_200_OK
         )

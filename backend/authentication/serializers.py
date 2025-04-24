@@ -1,9 +1,7 @@
 from rest_framework import serializers
 from django.contrib.auth import authenticate
 from rest_framework.exceptions import AuthenticationFailed
-from django.contrib.sites.models import Site
 from .models import CustomUser
-from .utils import generate_password_reset_tokens
 
 
 class UserRegisterSerializer(serializers.ModelSerializer):
@@ -93,34 +91,7 @@ class PasswordResetRequestSerializer(serializers.Serializer):
     class Meta:
         fields = ['email']
     
-    def validate(self, attrs):
-        email = attrs.get('email')
-
-        if not CustomUser.objects.filter(email=email).exists():
-            raise serializers.ValidationError(
-                {'email': 'No account exists with this email address.'}
-            )
-
-        user = CustomUser.objects.get(email=email)
-
-        uid, token = generate_password_reset_tokens(user)
-
-        # request = self.context.get('request')
-        # site_domain = Site.objects.get_current(request).domain
-
-        # relative_link = reverse('confirm-password-reset', kwargs={'uid': uid, 'token': token})
-        # abs_link = f'http://{site_domain}{relative_link}'
-
-        # email_body = f"Hello {user.first_name.capitalize()}! Use this link to reset your password\n{abs_link}"
-
-        # data ={
-
-        # }
-
-        # send_normal_email()
-
-        attrs['user'] = user
-        attrs['uid'] = uid
-        attrs['token'] = token
-
-        return attrs
+    def validate_email(self, value):
+        if not CustomUser.objects.filter(email=value).exists():
+            raise serializers.ValidationError("No account exists with this email address.")
+        return value
