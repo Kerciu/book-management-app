@@ -133,3 +133,9 @@ class PasswordResetView(GenericAPIView):
                 {"message": "If this email exists, a reset link has been sent"},
                 status=status.HTTP_200_OK
             )
+
+
+class PasswordResetConfirmView(GenericAPIView):
+
+    def get(self, request, uid, token):
+        pass
