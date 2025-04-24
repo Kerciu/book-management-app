@@ -84,3 +84,10 @@ class ResendEmailSerializer(serializers.Serializer):
             raise serializers.ValidationError("User with such email does not exist")
         
         return value
+
+
+class PasswordResetRequestSerializer(serializers.Serializer):
+    email = serializers.EmailField(max_length=255, min_length=6)
+
+    class Meta:
+        fields = ['email']
