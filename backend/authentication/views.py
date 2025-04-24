@@ -179,5 +179,5 @@ class SetNewPasswordView(GenericAPIView):
 
     serializer_class = SetNewPasswordSerializer
 
-    def post(self, request):
+    def patch(self, request):
         pass
