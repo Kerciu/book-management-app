@@ -148,29 +148,30 @@ class PasswordResetConfirmView(GenericAPIView):
 
     def get(self, request, uid, token):
         try:
-            current_uid = smart_str(urlsafe_base64_decode(uid))
-            user = CustomUser.objects.get(id=current_uid)
+            user_id = smart_str(urlsafe_base64_decode(uid))
+            user = CustomUser.objects.get(id=user_id)
 
             if not PasswordResetTokenGenerator().check_token(user, token):
-                return Response(
-                    {"message": "Token is invalid or has expired"},
-                    status=status.HTTP_401_UNAUTHORIZED
-                )
+                return self._invalid_token_response()
 
             return Response(
                 {
                     "success": True,
                     "message": "Credentials are valid",
-                    "uid": current_uid,
+                    "uid": uid,
                     "token": token,
                 },
                 status=status.HTTP_200_OK
             )
-        except DjangoUnicodeDecodeError:
-            return Response(
-                {"message": "Token is invalid or has expired"},
-                status=status.HTTP_401_UNAUTHORIZED
-            )
+            
+        except (DjangoUnicodeDecodeError, CustomUser.DoesNotExist, ValueError):
+            return self._invalid_token_response()
+    
+    def _invalid_token_response(self):
+        return Response(
+            {"success": False, "message": "Token is invalid or has expired"},
+            status=status.HTTP_401_UNAUTHORIZED
+        )
 
 
 class SetNewPasswordView(GenericAPIView):
