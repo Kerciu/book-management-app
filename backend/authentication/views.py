@@ -171,3 +171,8 @@ class PasswordResetConfirmView(GenericAPIView):
                 {"message": "Token is invalid or has expired"},
                 status=status.HTTP_401_UNAUTHORIZED
             )
+
+
+class SetNewPasswordView(GenericAPIView):
+    def post(self, request):
+        pass
