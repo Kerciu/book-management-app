@@ -110,20 +110,24 @@ class SetNewPasswordSerializer(serializers.Serializer):
         fields = ['password', 'confirm_password', 'uid', 'token']
 
     def validate(self, attrs):
-        password = attrs.get('password')
-        confirm_password = attrs.get('confirm_password')
-        uid = attrs.get('uid')
-        token = attrs.get('token')
+        try:
+            password = attrs.get('password')
+            confirm_password = attrs.get('confirm_password')
+            uid = attrs.get('uid')
+            token = attrs.get('token')
 
-        user_id = force_str(urlsafe_base64_decode(uid))
-        user = CustomUser.objects.get(id=user_id)
+            user_id = force_str(urlsafe_base64_decode(uid))
+            user = CustomUser.objects.get(id=user_id)
 
-        if not PasswordResetTokenGenerator.check_token(user, token):
+            if not PasswordResetTokenGenerator.check_token(user, token):
+                raise AuthenticationFailed("Reset link is invalid or expired", 401)
+            
+            if password != confirm_password:
+                raise AuthenticationFailed("Passwords do not match")
+            
+            user.set_password(password)
+            user.save()
+            return user
+
+        except Exception as e:
             raise AuthenticationFailed("Reset link is invalid or expired", 401)
-        
-        if password != confirm_password:
-            raise AuthenticationFailed("Passwords do not match")
-        
-        user.set_password(password)
-        user.save()
-        return user
