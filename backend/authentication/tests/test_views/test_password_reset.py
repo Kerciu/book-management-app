@@ -28,6 +28,7 @@ class PasswordResetViewTest(TestCase):
         self.assertEqual(response.data['message'], "If this email exists, a reset link has been sent")
         mock_email.assert_called_once()
 
+
     def test_nonexistent_email_response(self):
         response = self.client.post(self.url, { 'email': 'non existent email' })
 
@@ -35,3 +36,12 @@ class PasswordResetViewTest(TestCase):
         # the view returns HTTP 200 with the same message
         # (to prevent email enumeration attacks)
         self.assertEqual(response.status_code, 200)
+
+    @patch('authentication.utils.send_password_reset_email')
+    def test_email_sending_failure(self, mock_email):
+        mock_email.side_effect = Exception("Email error")
+        
+        response = self.client.post(self.url, { 'email': 'test@example.com' })
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data['message'], "If this email exists, a reset link has been sent")
