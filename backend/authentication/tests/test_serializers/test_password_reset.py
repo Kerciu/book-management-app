@@ -8,7 +8,7 @@ from unittest.mock import patch
 CustomUser = get_user_model()
 
 
-class PasswordResetTest(TestCase):
+class PasswordResetSerializerTest(TestCase):
 
     def setUp(self):
         self.client = APIClient()
