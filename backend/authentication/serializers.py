@@ -102,3 +102,6 @@ class SetNewPasswordSerializer(serializers.Serializer):
     confirm_password = serializers.CharField(max_length=68, min_length=6, write_only=True)
     uid = serializers.CharField(write_only=True)
     token = serializers.CharField(write_only=True)
+
+    class Meta:
+        fields = ['password', 'confirm_password', 'uid', 'token']
