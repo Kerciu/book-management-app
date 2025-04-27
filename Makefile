@@ -33,3 +33,6 @@ runserver:
 	
 backend_logs:
 	docker compose logs backend
+
+createsuperuser:
+	docker compose exec backend python manage.py createsuperuser
