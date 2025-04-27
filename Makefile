@@ -1,3 +1,9 @@
+init:
+	make build
+	docker compose exec backend python manage.py makemigrations authentication
+	make makemigrations
+	make migrate
+	
 build:
 	docker compose up -d --build
 
@@ -21,12 +27,6 @@ makemigrations:
 
 runserver:
 	make docker_run argument="runserver 0.0.0.0:8000"
-
-init:
-	make build
-	make makemigrations
-	make migrate
-	make runserver
 	
 backend_logs:
 	docker compose logs backend
