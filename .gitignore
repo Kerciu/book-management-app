@@ -1,6 +1,14 @@
 venv/
+.venv/
 migrations/
 __pycache__/
 
 .env
 backend/.env
+
+target/
+Cargo.lock
+dist/
+
+.nvim.lua
+.vscode/
