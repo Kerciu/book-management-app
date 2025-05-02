@@ -1,5 +1,7 @@
 use leptos::prelude::*;
 
+mod components;
+
 /// TODO: Replace with env String
 const BACKEND: &'static str = "http://localhost:8000";
 
