@@ -36,5 +36,11 @@ services:
     ports:
       - "5432:5432"
 
+  # frontend:
+  #   build: ./frontend
+  #   ports:
+  #    - 8080:8080
+  #   command: python3 -m http.server 8080
+
 volumes:
   postgres_data:
