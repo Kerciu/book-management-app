@@ -41,13 +41,13 @@ class UserRegisterSerializer(serializers.ModelSerializer):
         return value
 
     def validate_password(self, value):
-        validate_password(value)  # używa validatorów Django
+        validate_password(value)
         return value
 
     def validate(self, attrs):
         if attrs.get('password') != attrs.get('re_password'):
             raise serializers.ValidationError("Passwords do not match.")
-        attrs.pop('re_password')  # usuwamy, niepotrzebne w create()
+        attrs.pop('re_password')
         return attrs
 
     def create(self, validated_data):
