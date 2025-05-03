@@ -195,4 +195,7 @@ class LogoutUserView(GenericAPIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
-        pass
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(status=status.HTTP_205_RESET_CONTENT)
