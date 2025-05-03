@@ -1,0 +1,65 @@
+name: Docker Build Test
+
+on:
+  push:
+    branches: [ docker_fixed]
+  pull_request:
+    branches: [ docker_fixed ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+      
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v2
+      
+    - name: Create .env file
+      run: |
+        cat > .env << EOF
+        DB_NAME=testdb
+        DB_USER=testuser
+        DB_PASSWORD=testpassword
+        DB_HOST=db
+        DEBUG=True
+        EOF
+        cat .env
+  
+    - name: Docker Compose Build
+      run: docker compose build
+      
+    - name: Docker Compose Up
+      run: docker compose up -d
+      
+    - name: Wait for database to be ready
+      run: |
+        timeout=60
+        elapsed=0
+        echo "Waiting for database to be ready..."
+        while ! docker compose exec -T db pg_isready -U testuser -d testdb; do
+          if [ $elapsed -ge $timeout ]; then
+            echo "Timeout waiting for database"
+            exit 1
+          fi
+          sleep 5
+          elapsed=$((elapsed+5))
+          echo "Still waiting for database... ($elapsed seconds)"
+        done
+        echo "Database is ready"
+      
+    - name: Run initialization process
+      run: make init
+      
+    - name: Check backend service is running
+      run: |
+        if [ $(docker compose ps -q backend | wc -l) -eq 0 ]; then
+          echo "Backend service is not running"
+          docker compose logs backend
+          exit 1
+        fi
+        
+    - name: Docker Compose Down
+      run: docker compose down -v

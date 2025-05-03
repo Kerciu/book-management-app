@@ -1,18 +1,36 @@
 from rest_framework.generics import GenericAPIView
+from rest_framework.throttling import AnonRateThrottle
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from .serializers import (
     UserLoginSerializer,
     UserRegisterSerializer,
     OTPSerializer,
-    ResendEmailSerializer
+    ResendEmailSerializer,
+    PasswordResetRequestSerializer,
+    SetNewPasswordSerializer,
+    LogoutUserSerializer
 )
 
 from rest_framework.response import Response
 from rest_framework import status
-from .utils import send_code_to_user
+from .utils import (
+    send_code_to_user,
+    generate_password_reset_tokens,
+    send_password_reset_email
+)
 from .models import OneTimePassword, CustomUser
+import logging
 
-# Create your views here.
+# TODO: implement all this in utils file
+from django.utils.http import urlsafe_base64_decode
+from django.utils.encoding import (
+    smart_str,
+    DjangoUnicodeDecodeError
+)
+from django.contrib.auth.tokens import PasswordResetTokenGenerator
+# TODO
 
+logger = logging.getLogger(__name__)
 
 class UserRegisterView(GenericAPIView):
     serializer_class = UserRegisterSerializer
@@ -79,14 +97,14 @@ class ResendEmailView(GenericAPIView):
     serializer_class = ResendEmailSerializer
 
     def post(self, request):
-        
+
         serialzier = self.serializer_class(data=request.data)
         if serialzier.is_valid(raise_exception=True):
-            
+
             email = serialzier.validated_data['email']
             try:
                 user = CustomUser.objects.get(email=email)
-                
+
                 OneTimePassword.objects.filter(user=user).delete()
 
                 send_code_to_user(email, resending=True)
@@ -99,3 +117,85 @@ class ResendEmailView(GenericAPIView):
                 return Response({
                     "message": "User with this email does not exist!"
                 }, status=status.HTTP_404_NOT_FOUND)
+
+
+class PasswordResetView(GenericAPIView):
+
+    serializer_class = PasswordResetRequestSerializer
+    permission_classes = [AllowAny]
+    throttle_classes = [AnonRateThrottle]
+
+    def post(self, request):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        try:
+            user = CustomUser.objects.get(email=serializer.validated_data['email'])
+            uid, token = generate_password_reset_tokens(user)
+            send_password_reset_email(user, uid, token, request)
+
+            return Response(
+                {"message": "If this email exists, a reset link has been sent"},
+                status=status.HTTP_200_OK
+            )
+        except Exception as e:
+            logger.error(f"Password reset error: {str(e)}")
+            return Response(
+                {"message": "If this email exists, a reset link has been sent"},
+                status=status.HTTP_200_OK
+            )
+
+
+class PasswordResetConfirmView(GenericAPIView):
+
+    def get(self, request, uid, token):
+        try:
+            user_id = smart_str(urlsafe_base64_decode(uid))
+            user = CustomUser.objects.get(id=user_id)
+
+            if not PasswordResetTokenGenerator().check_token(user, token):
+                return self._invalid_token_response()
+
+            return Response(
+                {
+                    "success": True,
+                    "message": "Credentials are valid",
+                    "uid": uid,
+                    "token": token,
+                },
+                status=status.HTTP_200_OK
+            )
+
+        except (DjangoUnicodeDecodeError, CustomUser.DoesNotExist, ValueError):
+            return self._invalid_token_response()
+
+    def _invalid_token_response(self):
+        return Response(
+            {"success": False, "message": "Token is invalid or has expired"},
+            status=status.HTTP_401_UNAUTHORIZED
+        )
+
+
+class SetNewPasswordView(GenericAPIView):
+
+    serializer_class = SetNewPasswordSerializer
+
+    def patch(self, request):
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        return Response(
+            {"message": "Password reset sucessfully"},
+            status=status.HTTP_200_OK
+        )
+
+
+class LogoutUserView(GenericAPIView):
+    serializer_class = LogoutUserSerializer
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(status=status.HTTP_205_RESET_CONTENT)
