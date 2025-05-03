@@ -1,33 +1,49 @@
 from rest_framework import serializers
+from django.contrib.auth.password_validation import validate_password
 from django.contrib.auth import authenticate
 from rest_framework.exceptions import AuthenticationFailed
 from rest_framework_simplejwt.tokens import RefreshToken, TokenError
 from django.utils.http import urlsafe_base64_decode
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from django.utils.encoding import force_str
+from django.conf import settings
 from .models import CustomUser
+from .providers import GoogleAuth, OAuth2Registerer
 
 
 class UserRegisterSerializer(serializers.ModelSerializer):
-    password = serializers.CharField(max_length=68, min_length=6, write_only=True)
-    re_password = serializers.CharField(max_length=68, min_length=6, write_only=True)
+    password = serializers.CharField(
+        max_length=68, min_length=6, write_only=True
+    )
+    re_password = serializers.CharField(
+        max_length=68, min_length=6, write_only=True
+    )
 
     class Meta:
         model = CustomUser
         fields = ['username', 'email', 'first_name', 'last_name', 'password', 're_password']
+        extra_kwargs = {
+            're_password': {'write_only': True},
+        }
 
     def validate_username(self, value):
         if CustomUser.objects.filter(username=value).exists():
             raise serializers.ValidationError("This username is already taken")
         return value
 
+    def validate_email(self, value):
+        if CustomUser.objects.filter(email=value).exists():
+            raise serializers.ValidationError("This email is already in use")
+        return value
+
+    def validate_password(self, value):
+        validate_password(value)  # używa validatorów Django
+        return value
+
     def validate(self, attrs):
-
-        password = attrs.get('password', '')
-        re_password = attrs.get('re_password', '')
-        if password != re_password:
-            raise serializers.ValidationError("Passwords do not match")
-
+        if attrs.get('password') != attrs.get('re_password'):
+            raise serializers.ValidationError("Passwords do not match.")
+        attrs.pop('re_password')  # usuwamy, niepotrzebne w create()
         return attrs
 
     def create(self, validated_data):
@@ -149,3 +165,30 @@ class LogoutUserSerializer(serializers.Serializer):
             token.blacklist()
         except TokenError:
             return self.fail('bad_token')
+
+
+class GoogleSignInSerializer(serializers.Serializer):
+    access_token = serializers.CharField(min_length=6)
+
+    def validate_access_token(self, access_token):
+        google_user_data = GoogleAuth.validate(access_token)
+
+        if not isinstance(google_user_data, dict):
+            raise serializers.ValidationError("This token is invalid or has expired")
+
+        if google_user_data['aud'] != settings.GOOGLE_CLIENT_ID:
+            raise AuthenticationFailed(detail="Could not authenticate user", code=401)
+
+        email = google_user_data['email']
+        first_name = google_user_data['given_name']
+        last_name = google_user_data['family_name']
+        provider = 'google'
+        username = google_user_data['sub']
+
+        return OAuth2Registerer.register_user(
+            provider=provider,
+            email=email,
+            username=username,
+            first_name=first_name,
+            last_name=last_name
+        )

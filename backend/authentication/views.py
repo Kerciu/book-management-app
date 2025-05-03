@@ -8,7 +8,8 @@ from .serializers import (
     ResendEmailSerializer,
     PasswordResetRequestSerializer,
     SetNewPasswordSerializer,
-    LogoutUserSerializer
+    LogoutUserSerializer,
+    GoogleSignInSerializer
 )
 
 from rest_framework.response import Response
@@ -199,3 +200,15 @@ class LogoutUserView(GenericAPIView):
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(status=status.HTTP_205_RESET_CONTENT)
+
+
+class GoogleSignInView(GenericAPIView):
+    serializer_class = GoogleSignInSerializer
+
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        data = ((serializer.validated_data)['access_token'])
+
+        return Response(data, status=status.HTTP_200_OK)
