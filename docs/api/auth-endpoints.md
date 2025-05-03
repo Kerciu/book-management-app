@@ -28,7 +28,7 @@ Registers a new user and sends an OTP via email for verification.
 | Status Code | Description | Example Response |
 |-------------|-------------|------------------|
 | `201 Created` | User created successfully | `{ "data": {"username": "kerciu", "email": "kacpergorski@example.com", "first_name": "Kacper", "last_name": "Gorski", "password": "securepassword123", "re_password": "securepassword123"}, "message": "Check your email for verification passcode" }` |
-| `400 Bad Request` | Validation error (e.g., passwords mismatch, email exists) | `{ "error": "Passwords do not match" }` |
+| `400 Bad Request` | Validation error (e.g., passwords mismatch, email exists) | `{ "error": "Some first error that occurs" }` |
 
 ---
 
