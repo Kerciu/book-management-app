@@ -141,7 +141,7 @@ SIMPLE_JWT = {
     "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
     "AUTH_HEADER_TYPES": ("Bearer",),
     "BLACKLIST_AFTER_ROTATION": True,
-
+    "ROTATE_REFRESH_TOKENS": True,
 }
 
 EMAIL_BACKEND = os.getenv('EMAIL_BACKEND')
