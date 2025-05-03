@@ -27,9 +27,12 @@ INSTALLED_APPS = [
     'bookService.apps.BookserviceConfig',
     'rest_framework',
     'corsheaders',
+    'django.contrib.sites',
     # Add your apps here
     'authentication'
 ]
+
+SITE_ID = 1
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
