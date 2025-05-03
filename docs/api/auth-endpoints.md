@@ -27,14 +27,7 @@ Registers a new user and sends an OTP via email for verification.
 #### Responses:
 | Status Code | Description | Example Response |
 |-------------|-------------|------------------|
-| `201 Created` | User created successfully | `{ "data": {
-  "username": "kerciu",
-  "email": "kacpergorski@example.com",
-  "first_name": "Kacper",
-  "last_name": "Gorski",
-  "password": "securepassword123",
-  "re_password": "securepassword123"
-}, "message": "Check your email for verification passcode" }` |
+| `201 Created` | User created successfully | `{ "data": {"username": "kerciu", "email": "kacpergorski@example.com", "first_name": "Kacper", "last_name": "Gorski", "password": "securepassword123", "re_password": "securepassword123"}, "message": "Check your email for verification passcode" }` |
 | `400 Bad Request` | Validation error (e.g., passwords mismatch, email exists) | `{ "error": "Passwords do not match" }` |
 
 ---
@@ -53,7 +46,7 @@ Validates the OTP sent to the user's email.
 | Status Code | Description | Example Response |
 |-------------|-------------|------------------|
 | `200 OK` | Account verified | `{ "message": "Account verified successfully" }` |
-| `204 No Content` | Account already verified | `{'message': 'Account is already verified'}` |
+| `208 Already Reported` | Account already verified | `{'message': 'Account is already verified'}` |
 | `404 Not Found` | Invalid OTP | `{ "message": "Passcode not provided" }` |
 
 ---
