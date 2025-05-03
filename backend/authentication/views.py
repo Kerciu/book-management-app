@@ -8,7 +8,9 @@ from .serializers import (
     ResendEmailSerializer,
     PasswordResetRequestSerializer,
     SetNewPasswordSerializer,
-    LogoutUserSerializer
+    LogoutUserSerializer,
+    GoogleSignInSerializer,
+    GithubSignInSerializer,
 )
 
 from rest_framework.response import Response
@@ -32,6 +34,7 @@ from django.contrib.auth.tokens import PasswordResetTokenGenerator
 
 logger = logging.getLogger(__name__)
 
+
 class UserRegisterView(GenericAPIView):
     serializer_class = UserRegisterSerializer
 
@@ -46,7 +49,12 @@ class UserRegisterView(GenericAPIView):
             send_code_to_user(user['email'])
 
             return Response({
-                'data': user_data,
+                'data': {
+                    'username': user.username,
+                    'email': user.email,
+                    'first_name': user.first_name,
+                    'last_name': user.last_name
+                },
                 'message': "Check your email for your verification passcode"
             }, status=status.HTTP_201_CREATED)
 
@@ -64,7 +72,10 @@ class ValidateRegisterView(GenericAPIView):
             user = otp_code_object.user
 
             if user.is_verified:
-                return Response({'message': 'Account is already verified'}, status=status.HTTP_204_NO_CONTENT)
+                return Response(
+                    {'message': 'Account was already verified'},
+                    status=status.HTTP_208_ALREADY_REPORTED
+                )
 
             user.is_verified = True
             user.save()
@@ -199,3 +210,30 @@ class LogoutUserView(GenericAPIView):
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(status=status.HTTP_205_RESET_CONTENT)
+
+
+class GoogleSignInView(GenericAPIView):
+    serializer_class = GoogleSignInSerializer
+
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        data = ((serializer.validated_data)['access_token'])
+
+        return Response(data, status=status.HTTP_200_OK)
+
+
+class GithubSignInView(GenericAPIView):
+    serializer_class = GithubSignInSerializer
+
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+        if serializer.is_valid(raise_exception=True):
+            data = ((serializer.validated_data)['code'])
+            return Response(data, status=status.HTTP_200_OK)
+
+        return Response(
+            data=serializer.errors,
+            status=status.HTTP_400_BAD_REQUEST
+        )
