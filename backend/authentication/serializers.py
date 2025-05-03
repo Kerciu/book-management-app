@@ -12,26 +12,38 @@ from .providers import GoogleAuth, OAuth2Registerer
 
 
 class UserRegisterSerializer(serializers.ModelSerializer):
-    password = serializers.CharField(max_length=68, min_length=6, write_only=True)
-    re_password = serializers.CharField(max_length=68, min_length=6, write_only=True)
+    password = serializers.CharField(
+        max_length=68, min_length=6, write_only=True
+    )
+    re_password = serializers.CharField(
+        max_length=68, min_length=6, write_only=True
+    )
 
     class Meta:
         model = CustomUser
         fields = ['username', 'email', 'first_name', 'last_name', 'password', 're_password']
+        extra_kwargs = {
+            're_password': {'write_only': True},
+        }
 
     def validate_username(self, value):
         if CustomUser.objects.filter(username=value).exists():
             raise serializers.ValidationError("This username is already taken")
         return value
 
+    def validate_email(self, value):
+        if CustomUser.objects.filter(email=value).exists():
+            raise serializers.ValidationError("This email is already in use")
+        return value
+
     def validate_password(self, value):
-        validate_password(value)
+        validate_password(value)  # używa validatorów Django
         return value
 
     def validate(self, attrs):
-        if attrs['password'] != attrs['re_password']:
+        if attrs.get('password') != attrs.get('re_password'):
             raise serializers.ValidationError("Passwords do not match.")
-        attrs.pop('re_password')
+        attrs.pop('re_password')  # usuwamy, niepotrzebne w create()
         return attrs
 
     def create(self, validated_data):
