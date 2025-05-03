@@ -26,8 +26,10 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'bookService.apps.BookserviceConfig',
     'rest_framework',
+    'rest_framework_simplejwt.token_blacklist',
     'corsheaders',
     'django.contrib.sites',
+
     # Add your apps here
     'authentication'
 ]
