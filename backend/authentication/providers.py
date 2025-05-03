@@ -46,8 +46,20 @@ class GithubAuth():
 
     @staticmethod
     def retrieve_user_info(access_token):
-        pass
+        headers = {
+            'Authorization': f'Bearer {access_token}',
+        }
 
+        try:
+            res = requests.get(
+                settings.GITHUB_USER_URL,
+                headers=headers
+            )
+
+            return res.json()
+
+        except Exception as e:
+            return AuthenticationFailed("Token is invalid or has expired", str(e))
 
 class OAuth2Registerer():
 
