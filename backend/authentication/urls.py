@@ -10,6 +10,7 @@ from .views import (
     SetNewPasswordView,
     LogoutUserView,
     GoogleSignInView,
+    GithubSignInView,
 )
 
 urlpatterns = [
@@ -23,4 +24,5 @@ urlpatterns = [
     path('set-new-password/', SetNewPasswordView.as_view(), name='set-new-password'),
     path('logout/', LogoutUserView.as_view(), name='logout'),
     path('google-auth/', GoogleSignInView.as_view(), name='google-auth'),
+    path('github-auth/', GithubSignInView.as_view(), name='github-auth'),
 ]
