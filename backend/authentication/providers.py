@@ -4,6 +4,7 @@ from .models import CustomUser
 from django.contrib.auth import authenticate
 from django.conf import settings
 from rest_framework.exceptions import AuthenticationFailed
+import requests
 
 
 class GoogleAuth():
@@ -28,7 +29,20 @@ class GithubAuth():
 
     @staticmethod
     def exchange_code_for_token(code):
-        pass
+        param_payload = {
+            'client_id': settings.GITHUB_CLIENT_ID,
+            'client_secret': settings.GITHUB_CLIENT_SECRET,
+            'code': code
+        }
+
+        res = requests.post(
+            settings.GITHUB_TOKEN_URL,
+            data=param_payload,
+            headers={'Accept': 'application/json'}
+        )
+
+        payload = res.json()
+        return payload.get('access_token')
 
     @staticmethod
     def retrieve_user_info(access_token):
