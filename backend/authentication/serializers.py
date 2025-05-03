@@ -8,7 +8,11 @@ from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from django.utils.encoding import force_str
 from django.conf import settings
 from .models import CustomUser
-from .providers import GoogleAuth, OAuth2Registerer
+from .providers import (
+    GoogleAuth,
+    GithubAuth,
+    OAuth2Registerer
+)
 
 
 class UserRegisterSerializer(serializers.ModelSerializer):
@@ -198,4 +202,23 @@ class GithubSignInSerializer(serializers.Serializer):
     code = serializers.CharField(min_length=2)
 
     def validate_code(self, code):
-        pass
+        access_token = GithubAuth.exchange_code_for_token(code)
+        if access_token is None:
+            raise serializers.ValidationError("This token is invalid or has expired")
+
+        user_info = GithubAuth.retrieve_user_info(access_token)
+
+        full_name = user_info.get('name')
+        email = user_info.get('email')
+        username = user_info.get('login')
+        provider = 'github'
+
+        first_name, last_name = full_name.split(' ') if full_name else ('', '')
+
+        return OAuth2Registerer.register_user(
+            provider=provider,
+            email=email,
+            username=username,
+            first_name=first_name,
+            last_name=last_name
+        )
