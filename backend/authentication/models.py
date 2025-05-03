@@ -1,10 +1,15 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from rest_framework_simplejwt.tokens import RefreshToken
-from .utils import AUTH_PROVIDERS
 from .managers import UserManager
 
 # Create your models here.
+
+AUTH_PROVIDERS = {
+    'email': 'email',
+    'google': 'google',
+    'github': 'github'
+}
 
 
 class CustomUser(AbstractUser):
