@@ -12,3 +12,4 @@ pytest-cov
 factory-boy
 google-api-python-client
 requests
+drf-spectacular
