@@ -9,10 +9,17 @@ from django.core.mail import send_mail
 from django.contrib.sites.models import Site
 from django.urls import reverse
 
-def generate_otp():
-    return "".join(([str(random.randint(0, 9)) for i in range(6)]))
+AUTH_PROVIDERS = {
+    'email': 'email',
+    'google': 'google',
+}
 
-def send_code_to_user(email, resending = False):
+
+def generate_otp():
+    return "".join(([str(random.randint(0, 9)) for _ in range(6)]))
+
+
+def send_code_to_user(email, resending=False):
     user = CustomUser.objects.get(email=email)
 
     SUBJECT = "One time passcode for email verification"
@@ -20,7 +27,7 @@ def send_code_to_user(email, resending = False):
         BODY = f"Thank you {user.first_name.capitalize()} for registering to the book management application!"
     else:
         BODY = f"We resend you this email to enable you to register to the book management application!"
-        
+
     OTP_CODE = generate_otp()
     PASSCODE_PART = f"Please verify your email with your one time passcode: {OTP_CODE}"
 
@@ -40,21 +47,23 @@ def send_code_to_user(email, resending = False):
 
     send_email.send(fail_silently=False)
 
+
 def generate_password_reset_tokens(user):
     uid = urlsafe_base64_encode(smart_bytes(user))
     token = PasswordResetTokenGenerator().make_token(uid)
 
     return uid, token
 
+
 def send_password_reset_email(user, uid, token, request):
     site_domain = Site.objects.get_current(request).domain
     relative_link = reverse('password-reset-confirm', kwargs={'uid': uid, 'token': token})
     abs_link = f'http://{site_domain}{relative_link}'
-    
+
     subject = "Password Reset Request"
     message = f"Hello {user.first_name.capitalize()}! Use this link to reset your password:\n{abs_link}"
     from_email = settings.DEFAULT_FROM_EMAIL
-   
+
     send_email = EmailMessage(
         subject=subject,
         body=message,

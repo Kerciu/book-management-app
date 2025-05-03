@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from rest_framework_simplejwt.tokens import RefreshToken
+from .utils import AUTH_PROVIDERS
 from .managers import UserManager
 
 # Create your models here.
@@ -18,6 +19,8 @@ class CustomUser(AbstractUser):
     is_active = models.BooleanField(default=True)
     date_joined = models.DateTimeField(auto_now_add=True)
     last_login = models.DateTimeField(auto_now=True)
+
+    auth_provider = models.CharField(max_length=255, default=AUTH_PROVIDERS.get('email'))
 
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = ['username', 'first_name', 'last_name']
