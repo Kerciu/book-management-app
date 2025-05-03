@@ -45,7 +45,7 @@ class CustomUser(AbstractUser):
 
 class OneTimePassword(models.Model):
     user = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
-    code = models.CharField(max_length=6, unique=True)
+    code = models.CharField(max_length=6, db_index=True)
 
     def __str__(self):
         return f'{self.user.first_name}-passcode'
