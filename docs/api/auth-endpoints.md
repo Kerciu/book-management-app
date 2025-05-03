@@ -194,7 +194,8 @@ Authenticates a user using Google OAuth2.
 #### Responses:
 | Status Code | Description | Example Response |
 |-------------|-------------|------------------|
-| `200 OK` | Login success | `{ "email": "...", "access": "...", "refresh": "..." }` |
+| `200 OK` | Login success | `{ "email": "...", "full_name": "...", "access": "...", "refresh": "..." }` |
+| `403 Unauthorized` | Provider conflict | `{ "detail": "Please continue your login using <different auth method>" }` |
 | `401 Unauthorized` | Invalid token | `{ "error": "Token is invalid" }` |
 
 ---
@@ -212,5 +213,6 @@ Authenticates a user using GitHub OAuth2.
 #### Responses:
 | Status Code | Description | Example Response |
 |-------------|-------------|------------------|
-| `200 OK` | Login success | `{ "email": "...", "access": "...", "refresh": "..." }` |
+| `200 OK` | Login success | `{ "email": "...", "full_name": "...", "access": "...", "refresh": "..." }` |
+| `403 Unauthorized` | Provider conflict | `{ "detail": "Please continue your login using <different auth method>" }` |
 | `400 Bad Request` | Invalid code | `{ "error": "Invalid code" }` |
