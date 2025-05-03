@@ -34,6 +34,7 @@ from django.contrib.auth.tokens import PasswordResetTokenGenerator
 
 logger = logging.getLogger(__name__)
 
+
 class UserRegisterView(GenericAPIView):
     serializer_class = UserRegisterSerializer
 
@@ -48,7 +49,12 @@ class UserRegisterView(GenericAPIView):
             send_code_to_user(user['email'])
 
             return Response({
-                'data': user_data,
+                'data': {
+                    'username': user.username,
+                    'email': user.email,
+                    'first_name': user.first_name,
+                    'last_name': user.last_name
+                },
                 'message': "Check your email for your verification passcode"
             }, status=status.HTTP_201_CREATED)
 
@@ -66,7 +72,10 @@ class ValidateRegisterView(GenericAPIView):
             user = otp_code_object.user
 
             if user.is_verified:
-                return Response({'message': 'Account is already verified'}, status=status.HTTP_204_NO_CONTENT)
+                return Response(
+                    {'message': 'Account was already verified'},
+                    status=status.HTTP_208_ALREADY_REPORTED
+                )
 
             user.is_verified = True
             user.save()
