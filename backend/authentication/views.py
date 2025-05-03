@@ -58,11 +58,7 @@ class UserRegisterView(GenericAPIView):
                 'message': "Check your email for your verification passcode"
             }, status=status.HTTP_201_CREATED)
 
-        errors = list(serializer.errors.values())[0]
-        return Response(
-            {"error": errors[0]},
-            status=status.HTTP_400_BAD_REQUEST
-        )
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class ValidateRegisterView(GenericAPIView):
