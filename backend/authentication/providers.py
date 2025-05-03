@@ -27,23 +27,30 @@ class GoogleAuth():
 class OAuth2Registerer():
 
     @staticmethod
+    def login_user(email, password):
+        user = authenticate(
+            email=email,
+            password=password
+        )
+        tokens = user.tokens()
+
+        return {
+            'email': user.email,
+            'full_name': user.full_name,
+            'refresh': str(tokens.get('refresh')),
+            'access': str(tokens.get('access'))
+        }
+
+    @staticmethod
     def register_user(provider, email, username, first_name, last_name):
         user = CustomUser.objects.filter(email=email)
 
         if user.exists():
             if provider == user[0].auth_provider:
-                login_user = authenticate(
-                    email=email,
-                    password=settings.SOCIAL_AUTH_PASSWORD
+                return OAuth2Registerer.login_user(
+                    email,
+                    settings.SOCIAL_AUTH_PASSWORD
                 )
-                user_tokens = login_user.tokens()
-
-                return {
-                    'email': login_user.email,
-                    'full_name': login_user.full_name,
-                    'refresh': str(user_tokens.get('refresh')),
-                    'access': str(user_tokens.get('access'))
-                }
 
             else:
                 raise AuthenticationFailed(
@@ -64,15 +71,7 @@ class OAuth2Registerer():
             registered_user.auth_provider = provider
             registered_user.is_verified = True
 
-            login_user = authenticate(
-                email=email,
+            return OAuth2Registerer.login_user(
+                email=registered_user.email,
                 password=settings.SOCIAL_AUTH_PASSWORD
             )
-            user_tokens = login_user.tokens()
-
-            return {
-                'email': login_user.email,
-                'full_name': login_user.full_name,
-                'refresh': str(user_tokens.get('refresh')),
-                'access': str(user_tokens.get('access'))
-            }
