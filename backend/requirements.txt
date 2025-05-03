@@ -10,4 +10,4 @@ pytest
 pytest-django
 pytest-cov
 factory-boy
-google-python-api-client
+google-api-python-client
