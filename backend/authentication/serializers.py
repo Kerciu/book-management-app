@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from django.contrib.auth.password_validation import validate_password
 from django.contrib.auth import authenticate
 from rest_framework.exceptions import AuthenticationFailed
 from rest_framework_simplejwt.tokens import RefreshToken, TokenError
@@ -23,13 +24,14 @@ class UserRegisterSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("This username is already taken")
         return value
 
+    def validate_password(self, value):
+        validate_password(value)
+        return value
+
     def validate(self, attrs):
-
-        password = attrs.get('password', '')
-        re_password = attrs.get('re_password', '')
-        if password != re_password:
-            raise serializers.ValidationError("Passwords do not match")
-
+        if attrs['password'] != attrs['re_password']:
+            raise serializers.ValidationError("Passwords do not match.")
+        attrs.pop('re_password')
         return attrs
 
     def create(self, validated_data):
