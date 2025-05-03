@@ -84,7 +84,7 @@ class ResendEmailSerializer(serializers.Serializer):
     def validate_email(self, value):
         if not CustomUser.objects.filter(email=value).exists():
             raise serializers.ValidationError("User with such email does not exist")
-        
+
         return value
 
 
@@ -93,7 +93,7 @@ class PasswordResetRequestSerializer(serializers.Serializer):
 
     class Meta:
         fields = ['email']
-    
+
     def validate_email(self, value):
         if not CustomUser.objects.filter(email=value).exists():
             raise serializers.ValidationError("No account exists with this email address.")
@@ -121,13 +121,17 @@ class SetNewPasswordSerializer(serializers.Serializer):
 
             if not PasswordResetTokenGenerator.check_token(user, token):
                 raise AuthenticationFailed("Reset link is invalid or expired", 401)
-            
+
             if password != confirm_password:
                 raise AuthenticationFailed("Passwords do not match")
-            
+
             user.set_password(password)
             user.save()
             return user
 
         except Exception as e:
             raise AuthenticationFailed("Reset link is invalid or expired", 401)
+
+
+class LogoutUserSerializer(serializers.Serializer):
+    pass

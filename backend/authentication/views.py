@@ -1,13 +1,14 @@
 from rest_framework.generics import GenericAPIView
 from rest_framework.throttling import AnonRateThrottle
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from .serializers import (
     UserLoginSerializer,
     UserRegisterSerializer,
     OTPSerializer,
     ResendEmailSerializer,
     PasswordResetRequestSerializer,
-    SetNewPasswordSerializer
+    SetNewPasswordSerializer,
+    LogoutUserSerializer
 )
 
 from rest_framework.response import Response
@@ -96,14 +97,14 @@ class ResendEmailView(GenericAPIView):
     serializer_class = ResendEmailSerializer
 
     def post(self, request):
-        
+
         serialzier = self.serializer_class(data=request.data)
         if serialzier.is_valid(raise_exception=True):
-            
+
             email = serialzier.validated_data['email']
             try:
                 user = CustomUser.objects.get(email=email)
-                
+
                 OneTimePassword.objects.filter(user=user).delete()
 
                 send_code_to_user(email, resending=True)
@@ -127,7 +128,7 @@ class PasswordResetView(GenericAPIView):
     def post(self, request):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        
+
         try:
             user = CustomUser.objects.get(email=serializer.validated_data['email'])
             uid, token = generate_password_reset_tokens(user)
@@ -164,10 +165,10 @@ class PasswordResetConfirmView(GenericAPIView):
                 },
                 status=status.HTTP_200_OK
             )
-            
+
         except (DjangoUnicodeDecodeError, CustomUser.DoesNotExist, ValueError):
             return self._invalid_token_response()
-    
+
     def _invalid_token_response(self):
         return Response(
             {"success": False, "message": "Token is invalid or has expired"},
@@ -187,3 +188,11 @@ class SetNewPasswordView(GenericAPIView):
             {"message": "Password reset sucessfully"},
             status=status.HTTP_200_OK
         )
+
+
+class LogoutUserView(GenericAPIView):
+    serializer_class = LogoutUserSerializer
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        pass
