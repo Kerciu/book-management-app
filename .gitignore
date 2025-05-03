@@ -12,3 +12,4 @@ dist/
 
 .nvim.lua
 .vscode/
+db.sqlite3
