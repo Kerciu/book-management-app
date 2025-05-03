@@ -4,22 +4,17 @@ from django.utils.encoding import smart_bytes
 import random
 from django.core.mail import EmailMessage
 from django.conf import settings
-from .models import CustomUser, OneTimePassword
+from .models import OneTimePassword
 from django.core.mail import send_mail
 from django.contrib.sites.models import Site
 from django.urls import reverse
-
-AUTH_PROVIDERS = {
-    'email': 'email',
-    'google': 'google',
-}
-
 
 def generate_otp():
     return "".join(([str(random.randint(0, 9)) for _ in range(6)]))
 
 
 def send_code_to_user(email, resending=False):
+    from .models import CustomUser
     user = CustomUser.objects.get(email=email)
 
     SUBJECT = "One time passcode for email verification"
