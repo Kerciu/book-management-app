@@ -53,6 +53,7 @@ Validates the OTP sent to the user's email.
 | Status Code | Description | Example Response |
 |-------------|-------------|------------------|
 | `200 OK` | Account verified | `{ "message": "Account verified successfully" }` |
+| `204 No Content` | Account already verified | `{'message': 'Account is already verified'}` |
 | `404 Not Found` | Invalid OTP | `{ "message": "Passcode not provided" }` |
 
 ---
@@ -91,7 +92,7 @@ Authenticates a user and returns JWT tokens.
 #### Responses:
 | Status Code | Description | Example Response |
 |-------------|-------------|------------------|
-| `200 OK` | Login success | `{ "email": "...", "full_name": "...", "access_token": "...", "refresh_token": "..." }` |
+| `200 OK` | Login success | `{ "email": "...", "full_name": "...", "access": "...", "refresh": "..." }` |
 | `400 Bad Request` | Invalid credentials | `{ "error": "Invalid credentials" }` |
 | `401 Unauthorized` | Email not verified | `{ "error": "Email is not verified" }` |
 
@@ -140,7 +141,7 @@ Validates the password reset token.
 #### Responses:
 | Status Code | Description | Example Response |
 |-------------|-------------|------------------|
-| `200 OK` | Valid token | `{ "success": true, "message": "Credentials are valid" }` |
+| `200 OK` | Valid token | `{ "success": true, "message": "Credentials are valid", "uid": uid, "token": token, }` |
 | `401 Unauthorized` | Invalid/expired token | `{ "success": false, "message": "Token is invalid or expired" }` |
 
 ---
@@ -200,7 +201,7 @@ Authenticates a user using Google OAuth2.
 #### Responses:
 | Status Code | Description | Example Response |
 |-------------|-------------|------------------|
-| `200 OK` | Login success | `{ "email": "...", "access_token": "...", "refresh_token": "..." }` |
+| `200 OK` | Login success | `{ "email": "...", "access": "...", "refresh": "..." }` |
 | `401 Unauthorized` | Invalid token | `{ "error": "Token is invalid" }` |
 
 ---
@@ -218,5 +219,5 @@ Authenticates a user using GitHub OAuth2.
 #### Responses:
 | Status Code | Description | Example Response |
 |-------------|-------------|------------------|
-| `200 OK` | Login success | `{ "email": "...", "access_token": "...", "refresh_token": "..." }` |
+| `200 OK` | Login success | `{ "email": "...", "access": "...", "refresh": "..." }` |
 | `400 Bad Request` | Invalid code | `{ "error": "Invalid code" }` |
