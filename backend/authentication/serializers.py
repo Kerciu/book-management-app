@@ -192,3 +192,10 @@ class GoogleSignInSerializer(serializers.Serializer):
             first_name=first_name,
             last_name=last_name
         )
+
+
+class GithubSignInSerializer(serializers.Serializer):
+    code = serializers.CharField(min_length=2)
+
+    def validate_code(self, code):
+        pass
