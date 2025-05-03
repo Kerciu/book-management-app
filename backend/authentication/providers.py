@@ -24,6 +24,17 @@ class GoogleAuth():
             return "Token is invalid or has expired", str(e)
 
 
+class GithubAuth():
+
+    @staticmethod
+    def exchange_code_for_token(code):
+        pass
+
+    @staticmethod
+    def retrieve_user_info(access_token):
+        pass
+
+
 class OAuth2Registerer():
 
     @staticmethod
