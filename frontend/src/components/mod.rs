@@ -1,8 +1,6 @@
 pub mod registraction_form;
 pub mod login_form;
 
-pub use registraction_form::*;
-
 use gloo_net::http::{Request, Response};
 use crate::BACKEND;
 
