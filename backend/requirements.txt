@@ -13,3 +13,7 @@ factory-boy
 google-api-python-client
 requests
 drf-spectacular
+pre-commit
+black
+isort
+flake8
