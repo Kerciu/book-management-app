@@ -34,15 +34,11 @@ class UserRegisterView(GenericAPIView):
     serializer_class = UserRegisterSerializer
 
     def post(self, request):
-
-        user_data = request.data
-        serializer = self.serializer_class(data=user_data)
+        serializer = self.serializer_class(data=request.data)
 
         if serializer.is_valid(raise_exception=True):
-            serializer.save()
-            user = serializer.data
-            send_code_to_user(user["email"])
-
+            user = serializer.save()
+            send_code_to_user(user.email)
             return Response(
                 {
                     "data": {
@@ -112,28 +108,23 @@ class ResendEmailView(GenericAPIView):
     serializer_class = ResendEmailSerializer
 
     def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        email = serializer.validated_data["email"]
 
-        serialzier = self.serializer_class(data=request.data)
-        if serialzier.is_valid(raise_exception=True):
-
-            email = serialzier.validated_data["email"]
-            try:
-                user = CustomUser.objects.get(email=email)
-
-                OneTimePassword.objects.filter(user=user).delete()
-
-                send_code_to_user(email, resending=True)
-
-                return Response(
-                    {"message": "New verification code has been sent to your email"},
-                    status=status.HTTP_200_OK,
-                )
-
-            except CustomUser.DoesNotExist:
-                return Response(
-                    {"message": "User with this email does not exist!"},
-                    status=status.HTTP_404_NOT_FOUND,
-                )
+        try:
+            user = CustomUser.objects.get(email=email)
+            OneTimePassword.objects.filter(user=user).delete()
+            send_code_to_user(email, resending=True)
+            return Response(
+                {"message": "New verification code has been sent to your email"},
+                status=status.HTTP_200_OK,
+            )
+        except CustomUser.DoesNotExist:
+            return Response(
+                {"message": "User with this email does not exist!"},
+                status=status.HTTP_404_NOT_FOUND,
+            )
 
 
 class PasswordResetView(GenericAPIView):
@@ -145,22 +136,20 @@ class PasswordResetView(GenericAPIView):
     def post(self, request):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
+        email = serializer.validated_data["email"]
 
         try:
-            user = CustomUser.objects.get(email=serializer.validated_data["email"])
+            user = CustomUser.objects.get(email=email)
             uid, token = generate_password_reset_tokens(user)
             send_password_reset_email(user, uid, token, request)
 
-            return Response(
-                {"message": "If this email exists, a reset link has been sent"},
-                status=status.HTTP_200_OK,
-            )
-        except Exception as e:
-            logger.error(f"Password reset error: {str(e)}")
-            return Response(
-                {"message": "If this email exists, a reset link has been sent"},
-                status=status.HTTP_200_OK,
-            )
+        except CustomUser.DoesNotExist:
+            pass  # still returns 200
+
+        return Response(
+            {"message": "If this email exists, a reset link has been sent"},
+            status=status.HTTP_200_OK,
+        )
 
 
 class PasswordResetConfirmView(GenericAPIView):

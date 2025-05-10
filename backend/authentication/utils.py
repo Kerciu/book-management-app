@@ -51,7 +51,7 @@ def send_code_to_user(email, resending=False):
 
 def generate_password_reset_tokens(user):
     uid = urlsafe_base64_encode(smart_bytes(user))
-    token = PasswordResetTokenGenerator().make_token(uid)
+    token = PasswordResetTokenGenerator().make_token(user)
 
     return uid, token
 

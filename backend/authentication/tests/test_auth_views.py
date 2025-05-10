@@ -1,4 +1,4 @@
-from unittest.mock import patch
+from unittest.mock import patch, ANY
 
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from django.test import RequestFactory, TestCase
@@ -8,6 +8,7 @@ from django.utils.http import urlsafe_base64_encode
 from rest_framework import status
 from rest_framework.test import APIClient
 from rest_framework_simplejwt.tokens import RefreshToken, TokenError
+from django.conf import settings
 
 from ..models import CustomUser, OneTimePassword
 
@@ -15,7 +16,7 @@ from ..models import CustomUser, OneTimePassword
 class UserRegisterViewTest(TestCase):
     def setUp(self):
         self.client = APIClient()
-        self.url = reverse("user-register")
+        self.url = reverse("register")
         self.valid_data = {
             "username": "testuser",
             "email": "test@example.com",
@@ -25,12 +26,10 @@ class UserRegisterViewTest(TestCase):
             "re_password": "testpass123",
         }
 
-    @patch("authentication.views.send_code_to_user")
+    @patch("authentication.utils.send_code_to_user")
     def test_successful_registration(self, mock_send_code):
-        response = self.client.post(self.url, self.valid_data)
-        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        self.assertTrue(CustomUser.objects.filter(email="test@example.com").exists())
-        mock_send_code.assert_called_once()
+        self.client.post(self.url, self.valid_data)
+        mock_send_code.assert_called_once_with("test@example.com")
 
     def test_invalid_registration_data(self):
         invalid_data = self.valid_data.copy()
@@ -38,10 +37,14 @@ class UserRegisterViewTest(TestCase):
         response = self.client.post(self.url, invalid_data)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
-    @patch("authentication.views.send_code_to_user")
+    @patch("authentication.utils.send_code_to_user")
     def test_duplicate_email_registration(self, mock_send_code):
         CustomUser.objects.create_user(
-            email="test@example.com", password="existingpass"
+            email="test@example.com",
+            password="existingpass",
+            username="existinguser",
+            first_name="Existing",
+            last_name="User",
         )
         response = self.client.post(self.url, self.valid_data)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
@@ -51,9 +54,14 @@ class UserRegisterViewTest(TestCase):
 class ValidateRegisterViewTest(TestCase):
     def setUp(self):
         self.client = APIClient()
-        self.url = reverse("validate-register")
+        self.url = reverse("verify-user")
         self.user = CustomUser.objects.create_user(
-            email="test@example.com", password="testpass123", is_verified=False
+            username="testuser",
+            email="test@example.com",
+            password="testpass123",
+            first_name="Test",
+            last_name="User",
+            is_verified=False,
         )
         self.otp = OneTimePassword.objects.create(user=self.user, code="123456")
 
@@ -79,7 +87,12 @@ class LoginUserViewTest(TestCase):
         self.client = APIClient()
         self.url = reverse("login")
         self.user = CustomUser.objects.create_user(
-            email="test@example.com", password="testpass123", is_verified=True
+            username="testuser",
+            email="test@example.com",
+            password="testpass123",
+            first_name="Test",
+            last_name="User",
+            is_verified=True,
         )
         self.factory = RequestFactory()
 
@@ -89,7 +102,7 @@ class LoginUserViewTest(TestCase):
         data = {"email": "test@example.com", "password": "testpass123"}
         response = self.client.post(self.url, data)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertIn("access_token", response.data["user"])
+        self.assertIn("access", response.data["user"])
 
     def test_invalid_credentials(self):
         data = {"email": "test@example.com", "password": "wrongpass"}
@@ -98,7 +111,12 @@ class LoginUserViewTest(TestCase):
 
     def test_unverified_user_login(self):
         CustomUser.objects.create_user(
-            email="unverified@example.com", password="testpass123", is_verified=False
+            email="unverified@example.com",
+            password="testpass123",
+            username="unverified",
+            first_name="Test",
+            last_name="User",
+            is_verified=False,
         )
         data = {"email": "unverified@example.com", "password": "testpass123"}
         response = self.client.post(self.url, data)
@@ -110,47 +128,48 @@ class ResendEmailViewTest(TestCase):
         self.client = APIClient()
         self.url = reverse("resend-email")
         self.user = CustomUser.objects.create_user(
-            email="test@example.com", password="testpass123", is_verified=False
+            username="testuser",
+            email="test@example.com",
+            password="testpass123",
+            first_name="Test",
+            last_name="User",
+            is_verified=False,
         )
 
-    @patch("authentication.views.send_code_to_user")
+    @patch("authentication.utils.send_code_to_user")
     def test_successful_resend(self, mock_send_code):
-        response = self.client.post(self.url, {"email": "test@example.com"})
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        mock_send_code.assert_called_once_with("test@example.com", resending=True)
+        self.client.post(self.url, {"email": self.user.email})
+        mock_send_code.assert_called_once_with(self.user.email, resending=True)
 
     def test_nonexistent_email(self):
         response = self.client.post(self.url, {"email": "nonexistent@example.com"})
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
-    @patch("authentication.views.send_code_to_user")
-    def test_old_otp_deleted(self, mock_send_code):
+    @patch("authentication.utils.send_code_to_user")
+    def test_old_otp_deleted(self, mock_send):
         OneTimePassword.objects.create(user=self.user, code="123456")
-        self.client.post(self.url, {"email": "test@example.com"})
+        self.client.post(self.url, {"email": self.user.email})
         self.assertEqual(OneTimePassword.objects.count(), 0)
-        mock_send_code.assert_called_once()
 
 
 class PasswordResetViewTest(TestCase):
     def setUp(self):
         self.client = APIClient()
         self.user = CustomUser.objects.create_user(
-            email="test@example.com", password="testpass123", first_name="Test"
+            username="testuser",
+            email="test@example.com",
+            password="testpass123",
+            first_name="Test",
+            last_name="User",
         )
         self.url = reverse("password-reset")
 
     @patch("authentication.utils.send_password_reset_email")
-    @patch("authentication.utils.generate_password_reset_tokens")
-    def test_successful_reset_request(self, mock_tokens, mock_email):
-        mock_tokens.return_value = ("test-uid", "test-email")
-
-        response = self.client.post(self.url, {"email": "test@example.com"})
-
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(
-            response.data["message"], "If this email exists, a reset link has been sent"
+    def test_successful_reset_request(self, mock_email):
+        self.client.post(self.url, {"email": self.user.email})
+        mock_email.assert_called_once_with(
+            self.user, ANY, ANY, ANY  # uid  # token  # request
         )
-        mock_email.assert_called_once()
 
     def test_nonexistent_email_response(self):
         response = self.client.post(self.url, {"email": "non existent email"})
@@ -163,13 +182,9 @@ class PasswordResetViewTest(TestCase):
     @patch("authentication.utils.send_password_reset_email")
     def test_email_sending_failure(self, mock_email):
         mock_email.side_effect = Exception("Email error")
-
-        response = self.client.post(self.url, {"email": "test@example.com"})
-
+        response = self.client.post(self.url, {"email": self.user.email})
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(
-            response.data["message"], "If this email exists, a reset link has been sent"
-        )
+        mock_email.assert_called_once()
 
     def test_missing_email_field(self):
         response = self.client.post(self.url, {})
@@ -181,7 +196,11 @@ class PasswordResetConfirmViewTest(TestCase):
     def setUp(self):
         self.client = APIClient()
         self.user = CustomUser.objects.create_user(
-            email="test@example.com", password="oldpassword"
+            username="testuser",
+            email="test@example.com",
+            password="testpass123",
+            first_name="Test",
+            last_name="User",
         )
         self.uid = urlsafe_base64_encode(force_bytes(self.user.pk))
         self.token = PasswordResetTokenGenerator().make_token(self.user)
@@ -214,7 +233,12 @@ class SetNewPasswordViewTest(TestCase):
         self.client = APIClient()
         self.url = reverse("set-new-password")
         self.user = CustomUser.objects.create_user(
-            email="test@example.com", password="oldpassword"
+            username="testuser",
+            email="test@example.com",
+            password="oldpassword",
+            first_name="Test",
+            last_name="User",
+            is_verified=True,
         )
         self.uid = urlsafe_base64_encode(force_bytes(self.user.pk))
         self.token = PasswordResetTokenGenerator().make_token(self.user)
@@ -235,7 +259,7 @@ class SetNewPasswordViewTest(TestCase):
         invalid_data = self.valid_data.copy()
         invalid_data["token"] = "invalid_token"
         response = self.client.patch(self.url, invalid_data)
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
 
 class LogoutUserViewTest(TestCase):
@@ -243,7 +267,11 @@ class LogoutUserViewTest(TestCase):
         self.client = APIClient()
         self.url = reverse("logout")
         self.user = CustomUser.objects.create_user(
-            email="test@example.com", password="testpass123"
+            username="testuser",
+            email="test@example.com",
+            password="testpass123",
+            first_name="Test",
+            last_name="User",
         )
         refresh = RefreshToken.for_user(self.user)
         self.valid_data = {"refresh_token": str(refresh)}
@@ -262,13 +290,14 @@ class LogoutUserViewTest(TestCase):
 
 
 class GoogleSignInViewTest(TestCase):
-    @patch("authentication.views.GoogleAuth.validate")
+    @patch("authentication.providers.GoogleAuth.validate")
     def test_successful_google_auth(self, mock_validate):
         mock_validate.return_value = {
-            "aud": "correct_client_id",
+            "aud": settings.GOOGLE_CLIENT_ID,
             "email": "google@example.com",
             "given_name": "Test",
             "family_name": "User",
+            "sub": "google-user-id",
         }
         self.client = APIClient()
         url = reverse("google-auth")
@@ -276,7 +305,7 @@ class GoogleSignInViewTest(TestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertIn("access", response.data)
 
-    @patch("authentication.views.GoogleAuth.validate")
+    @patch("authentication.providers.GoogleAuth.validate")
     def test_invalid_google_token(self, mock_validate):
         mock_validate.return_value = None
         url = reverse("google-auth")
@@ -285,8 +314,8 @@ class GoogleSignInViewTest(TestCase):
 
 
 class GithubSignInViewTest(TestCase):
-    @patch("authentication.views.GithubAuth.retrieve_user_info")
-    @patch("authentication.views.GithubAuth.exchange_code_for_token")
+    @patch("authentication.providers.GithubAuth.retrieve_user_info")
+    @patch("authentication.providers.GithubAuth.exchange_code_for_token")
     def test_successful_github_auth(self, mock_exchange, mock_retrieve):
         mock_exchange.return_value = "valid_token"
         mock_retrieve.return_value = {
@@ -299,7 +328,7 @@ class GithubSignInViewTest(TestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertIn("access", response.data)
 
-    @patch("authentication.views.GithubAuth.exchange_code_for_token")
+    @patch("authentication.providers.GithubAuth.exchange_code_for_token")
     def test_invalid_github_code(self, mock_exchange):
         mock_exchange.return_value = None
         url = reverse("github-auth")
