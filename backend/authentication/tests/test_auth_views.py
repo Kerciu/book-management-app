@@ -1,9 +1,13 @@
 from unittest.mock import patch
 
+from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from django.test import RequestFactory, TestCase
 from django.urls import reverse
+from django.utils.encoding import force_bytes
+from django.utils.http import urlsafe_base64_encode
 from rest_framework import status
 from rest_framework.test import APIClient
+from rest_framework_simplejwt.tokens import RefreshToken, TokenError
 
 from ..models import CustomUser, OneTimePassword
 
@@ -171,3 +175,133 @@ class PasswordResetViewTest(TestCase):
         response = self.client.post(self.url, {})
         self.assertEqual(response.status_code, 400)
         self.assertIn("email", response.data)
+
+
+class PasswordResetConfirmViewTest(TestCase):
+    def setUp(self):
+        self.client = APIClient()
+        self.user = CustomUser.objects.create_user(
+            email="test@example.com", password="oldpassword"
+        )
+        self.uid = urlsafe_base64_encode(force_bytes(self.user.pk))
+        self.token = PasswordResetTokenGenerator().make_token(self.user)
+        self.url = reverse(
+            "password-reset-confirm", kwargs={"uid": self.uid, "token": self.token}
+        )
+
+    def test_valid_reset_confirm(self):
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertTrue(response.data["success"])
+
+    def test_invalid_uid(self):
+        invalid_url = reverse(
+            "password-reset-confirm", kwargs={"uid": "invalid_uid", "token": self.token}
+        )
+        response = self.client.get(invalid_url)
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+    def test_invalid_token(self):
+        invalid_url = reverse(
+            "password-reset-confirm", kwargs={"uid": self.uid, "token": "invalid_token"}
+        )
+        response = self.client.get(invalid_url)
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+
+class SetNewPasswordViewTest(TestCase):
+    def setUp(self):
+        self.client = APIClient()
+        self.url = reverse("set-new-password")
+        self.user = CustomUser.objects.create_user(
+            email="test@example.com", password="oldpassword"
+        )
+        self.uid = urlsafe_base64_encode(force_bytes(self.user.pk))
+        self.token = PasswordResetTokenGenerator().make_token(self.user)
+        self.valid_data = {
+            "password": "newpassword123",
+            "confirm_password": "newpassword123",
+            "uid": self.uid,
+            "token": self.token,
+        }
+
+    def test_successful_password_reset(self):
+        response = self.client.patch(self.url, self.valid_data)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.user.refresh_from_db()
+        self.assertTrue(self.user.check_password("newpassword123"))
+
+    def test_invalid_token(self):
+        invalid_data = self.valid_data.copy()
+        invalid_data["token"] = "invalid_token"
+        response = self.client.patch(self.url, invalid_data)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+
+class LogoutUserViewTest(TestCase):
+    def setUp(self):
+        self.client = APIClient()
+        self.url = reverse("logout")
+        self.user = CustomUser.objects.create_user(
+            email="test@example.com", password="testpass123"
+        )
+        refresh = RefreshToken.for_user(self.user)
+        self.valid_data = {"refresh_token": str(refresh)}
+
+    def test_successful_logout(self):
+        self.client.force_authenticate(user=self.user)
+        response = self.client.post(self.url, self.valid_data)
+        self.assertEqual(response.status_code, status.HTTP_205_RESET_CONTENT)
+
+        with self.assertRaises(TokenError):
+            RefreshToken(self.valid_data["refresh_token"]).verify()
+
+    def test_unauthenticated_logout(self):
+        response = self.client.post(self.url, self.valid_data)
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+
+class GoogleSignInViewTest(TestCase):
+    @patch("authentication.views.GoogleAuth.validate")
+    def test_successful_google_auth(self, mock_validate):
+        mock_validate.return_value = {
+            "aud": "correct_client_id",
+            "email": "google@example.com",
+            "given_name": "Test",
+            "family_name": "User",
+        }
+        self.client = APIClient()
+        url = reverse("google-auth")
+        response = self.client.post(url, {"access_token": "valid_token"})
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertIn("access", response.data)
+
+    @patch("authentication.views.GoogleAuth.validate")
+    def test_invalid_google_token(self, mock_validate):
+        mock_validate.return_value = None
+        url = reverse("google-auth")
+        response = self.client.post(url, {"access_token": "invalid_token"})
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+
+class GithubSignInViewTest(TestCase):
+    @patch("authentication.views.GithubAuth.retrieve_user_info")
+    @patch("authentication.views.GithubAuth.exchange_code_for_token")
+    def test_successful_github_auth(self, mock_exchange, mock_retrieve):
+        mock_exchange.return_value = "valid_token"
+        mock_retrieve.return_value = {
+            "login": "githubuser",
+            "email": "github@example.com",
+            "name": "GitHub User",
+        }
+        url = reverse("github-auth")
+        response = self.client.post(url, {"code": "valid_code"})
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertIn("access", response.data)
+
+    @patch("authentication.views.GithubAuth.exchange_code_for_token")
+    def test_invalid_github_code(self, mock_exchange):
+        mock_exchange.return_value = None
+        url = reverse("github-auth")
+        response = self.client.post(url, {"code": "invalid_code"})
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
