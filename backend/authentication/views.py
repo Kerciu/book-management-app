@@ -141,7 +141,10 @@ class PasswordResetView(GenericAPIView):
         try:
             user = CustomUser.objects.get(email=email)
             uid, token = generate_password_reset_tokens(user)
-            send_password_reset_email(user, uid, token, request)
+            try:
+                send_password_reset_email(user, uid, token, request)
+            except Exception as e:
+                logger.error(f"Failed to send password reset email: {str(e)}")
 
         except CustomUser.DoesNotExist:
             pass  # still returns 200

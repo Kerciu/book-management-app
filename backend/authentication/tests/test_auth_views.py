@@ -26,7 +26,7 @@ class UserRegisterViewTest(TestCase):
             "re_password": "testpass123",
         }
 
-    @patch("authentication.utils.send_code_to_user")
+    @patch("authentication.views.send_code_to_user")
     def test_successful_registration(self, mock_send_code):
         self.client.post(self.url, self.valid_data)
         mock_send_code.assert_called_once_with("test@example.com")
@@ -37,7 +37,7 @@ class UserRegisterViewTest(TestCase):
         response = self.client.post(self.url, invalid_data)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
-    @patch("authentication.utils.send_code_to_user")
+    @patch("authentication.views.send_code_to_user")
     def test_duplicate_email_registration(self, mock_send_code):
         CustomUser.objects.create_user(
             email="test@example.com",
@@ -136,7 +136,7 @@ class ResendEmailViewTest(TestCase):
             is_verified=False,
         )
 
-    @patch("authentication.utils.send_code_to_user")
+    @patch("authentication.views.send_code_to_user")
     def test_successful_resend(self, mock_send_code):
         self.client.post(self.url, {"email": self.user.email})
         mock_send_code.assert_called_once_with(self.user.email, resending=True)
@@ -145,7 +145,7 @@ class ResendEmailViewTest(TestCase):
         response = self.client.post(self.url, {"email": "nonexistent@example.com"})
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
-    @patch("authentication.utils.send_code_to_user")
+    @patch("authentication.views.send_code_to_user")
     def test_old_otp_deleted(self, mock_send):
         OneTimePassword.objects.create(user=self.user, code="123456")
         self.client.post(self.url, {"email": self.user.email})
@@ -164,7 +164,7 @@ class PasswordResetViewTest(TestCase):
         )
         self.url = reverse("password-reset")
 
-    @patch("authentication.utils.send_password_reset_email")
+    @patch("authentication.views.send_password_reset_email")
     def test_successful_reset_request(self, mock_email):
         self.client.post(self.url, {"email": self.user.email})
         mock_email.assert_called_once_with(
@@ -172,17 +172,19 @@ class PasswordResetViewTest(TestCase):
         )
 
     def test_nonexistent_email_response(self):
-        response = self.client.post(self.url, {"email": "non existent email"})
+        response = self.client.post(self.url, {"email": "nonexistentemail@example.com"})
 
         # even for nonexistent emails,
         # the view returns HTTP 200 with the same message
         # (to prevent email enumeration attacks)
         self.assertEqual(response.status_code, 200)
 
-    @patch("authentication.utils.send_password_reset_email")
+    @patch("authentication.views.send_password_reset_email")
     def test_email_sending_failure(self, mock_email):
         mock_email.side_effect = Exception("Email error")
+
         response = self.client.post(self.url, {"email": self.user.email})
+
         self.assertEqual(response.status_code, 200)
         mock_email.assert_called_once()
 
