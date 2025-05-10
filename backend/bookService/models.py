@@ -32,7 +32,7 @@ class Books(models.Model):
     id = models.AutoField(primary_key=True)
     title = models.CharField(max_length=255, null=False)
     published_at = models.DateField(null=False)
-    author_id = models.ForeignKey(Authors, on_delete=models.CASCADE)
+    author = models.ForeignKey(Authors, on_delete=models.CASCADE)
     categories = models.ManyToManyField(Categories)
 
     def __str__(self):
@@ -42,28 +42,37 @@ class Books(models.Model):
 class BookCollections(models.Model):
     id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=100, null=False)
-    user_id = models.ForeignKey(Users, on_delete=models.CASCADE)
-    book_id = models.ManyToManyField(Books)
+    user = models.ForeignKey(Users, on_delete=models.CASCADE)
+    books = models.ManyToManyField(Books)
 
     def __str__(self):
         return f"{self.name}"
 
 
 class BookRatings(models.Model):
-    user_id = models.ForeignKey(Users, on_delete=models.CASCADE)
-    book_id = models.ForeignKey(Books, on_delete=models.CASCADE)
-    pk = models.CompositePrimaryKey("user_id", "book_id")
+    user = models.ForeignKey(Users, on_delete=models.CASCADE)
+    book = models.ForeignKey(Books, on_delete=models.CASCADE)
     rating = models.IntegerField(
         null=False, validators=[MinValueValidator(1), MaxValueValidator(5)]
     )
 
+    class Meta:
+        unique_together = [["user", "book"]]
+
+    def __str__(self):
+        return f"{self.user.username}'s rating for {self.book.title}"
+
 
 class BookReviews(models.Model):
-    user_id = models.ForeignKey(Users, on_delete=models.CASCADE)
-    book_id = models.ForeignKey(Books, on_delete=models.CASCADE)
-    pk = models.CompositePrimaryKey("user_id", "book_id")
-
+    user = models.ForeignKey(Users, on_delete=models.CASCADE)
+    book = models.ForeignKey(Books, on_delete=models.CASCADE)
     review = models.TextField(null=False)
+
+    class Meta:
+        unique_together = [["user", "book"]]
+
+    def __str__(self):
+        return f"{self.user.username}'s review of {self.book.title}"
 
 
 # TODO Users BookCollections relationship straightening out
