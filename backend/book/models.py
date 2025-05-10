@@ -46,3 +46,22 @@ class Book(models.Model):
 
     def __str__(self):
         return self.title
+
+
+class Rating(models.Model):
+    pass
+
+
+class Review(models.Model):
+    pass
+
+
+class Collection(models.Model):
+    pass
+
+
+class Genre(models.Model):
+    name = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.name
