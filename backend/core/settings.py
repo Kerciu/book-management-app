@@ -31,6 +31,7 @@ INSTALLED_APPS = [
     "corsheaders",
     "django.contrib.sites",
     # Add your apps here
+    "book",
 ]
 
 SITE_ID = 1
