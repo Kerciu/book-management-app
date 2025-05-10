@@ -65,7 +65,6 @@ Resends a new OTP to the user's email.
 | Status Code | Description | Example Response |
 |-------------|-------------|------------------|
 | `200 OK` | New OTP sent | `{ "message": "New verification code has been sent" }` |
-| `404 Not Found` | Email not registered | `{ "message": "User with this email does not exist!" }` |
 
 ---
 
