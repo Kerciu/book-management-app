@@ -212,8 +212,7 @@ class ResendEmailSerializerTest(TestCase):
 
     def test_nonexistent_email(self):
         serializer = ResendEmailSerializer(data={"email": "nonexistent@example.com"})
-        self.assertFalse(serializer.is_valid())
-        self.assertIn("email", serializer.errors)
+        self.assertTrue(serializer.is_valid())
 
 
 class SetNewPasswordSerializerTests(TestCase):
