@@ -37,5 +37,3 @@ POST REQUESTS:
   }'`
 GET REQUESTS:
   - `curl -X GET http://localhost:8000/api/TableName/`
-
-

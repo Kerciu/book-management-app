@@ -2,6 +2,7 @@ Django
 djangorestframework
 djangorestframework-simplejwt
 psycopg2-binary
+dj-database-url
 django-cors-headers
 gunicorn
 python-dotenv
@@ -10,3 +11,10 @@ pytest
 pytest-django
 pytest-cov
 factory-boy
+google-api-python-client
+requests
+drf-spectacular
+pre-commit
+black
+isort
+flake8
