@@ -10,12 +10,18 @@ class Author(models.Model):
 
     bio = models.TextField(blank=True)
 
+    birth_date = models.DateField(null=True, blank=True)
+    death_date = models.DateField(null=True, blank=True)
+
     def __str__(self):
         return f"{self.first_name} {self.last_name}"
 
 
 class Publisher(models.Model):
     name = models.CharField(max_length=255)
+
+    website = models.URLField(blank=True)
+    description = models.TextField(blank=True)
 
     def __str__(self):
         return self.name
