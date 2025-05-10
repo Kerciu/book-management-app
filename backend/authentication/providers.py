@@ -101,6 +101,8 @@ class OAuth2Registerer:
             registered_user.auth_provider = provider
             registered_user.is_verified = True
 
+            registered_user.save()
+
             return OAuth2Registerer.login_user(
                 email=registered_user.email, password=settings.SOCIAL_AUTH_PASSWORD
             )

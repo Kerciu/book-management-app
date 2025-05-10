@@ -1,6 +1,7 @@
 from django.conf import settings
 from django.contrib.auth import authenticate
-from django.contrib.auth.password_validation import validate_password
+
+# from django.contrib.auth.password_validation import validate_password
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from django.utils.encoding import force_str
 from django.utils.http import urlsafe_base64_decode
@@ -27,6 +28,8 @@ class UserRegisterSerializer(serializers.ModelSerializer):
             "re_password",
         ]
         extra_kwargs = {
+            "username": {"validators": []},
+            "email": {"validators": []},
             "re_password": {"write_only": True},
         }
 
@@ -40,14 +43,13 @@ class UserRegisterSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("This email is already in use")
         return value
 
-    def validate_password(self, value):
-        validate_password(value)
-        return value
+    # def validate_password(self, value):
+    #     validate_password(value)
+    #     return value
 
     def validate(self, attrs):
         if attrs.get("password") != attrs.get("re_password"):
-            raise serializers.ValidationError("Passwords do not match.")
-        attrs.pop("re_password")
+            raise serializers.ValidationError({"password": ["Passwords do not match."]})
         return attrs
 
     def create(self, validated_data):
@@ -65,12 +67,12 @@ class UserLoginSerializer(serializers.ModelSerializer):
     email = serializers.EmailField(max_length=255, min_length=6)
     password = serializers.CharField(max_length=68, write_only=True)
     full_name = serializers.CharField(max_length=255, read_only=True)
-    access_token = serializers.CharField(max_length=255, read_only=True)
-    refresh_token = serializers.CharField(max_length=255, read_only=True)
+    access = serializers.CharField(max_length=255, read_only=True)
+    refresh = serializers.CharField(max_length=255, read_only=True)
 
     class Meta:
         model = CustomUser
-        fields = ["email", "password", "full_name", "access_token", "refresh_token"]
+        fields = ["email", "password", "full_name", "access", "refresh"]
 
     def validate(self, attrs):
         email = attrs.get("email")
@@ -80,10 +82,10 @@ class UserLoginSerializer(serializers.ModelSerializer):
         user = authenticate(request, email=email, password=password)
 
         if not user:
-            raise AuthenticationFailed("Invalid credentials, please try again")
+            raise serializers.ValidationError("Invalid credentials, please try again")
 
         if not user.is_verified:
-            raise AuthenticationFailed("Email is not verified")
+            raise serializers.ValidationError("Email is not verified")
 
         user_tokens = user.tokens()
 
@@ -135,26 +137,26 @@ class SetNewPasswordSerializer(serializers.Serializer):
         fields = ["password", "confirm_password", "uid", "token"]
 
     def validate(self, attrs):
-        try:
-            password = attrs.get("password")
-            confirm_password = attrs.get("confirm_password")
-            uid = attrs.get("uid")
-            token = attrs.get("token")
+        password = attrs.get("password")
+        confirm_password = attrs.get("confirm_password")
 
-            user_id = force_str(urlsafe_base64_decode(uid))
+        if password != confirm_password:
+            raise serializers.ValidationError(
+                {"non_field_errors": ["Passwords do not match."]}
+            )
+
+        try:
+            user_id = force_str(urlsafe_base64_decode(attrs["uid"]))
+            user_id = int(user_id)
             user = CustomUser.objects.get(id=user_id)
 
-            if not PasswordResetTokenGenerator.check_token(user, token):
+            if not PasswordResetTokenGenerator().check_token(user, attrs["token"]):
                 raise AuthenticationFailed("Reset link is invalid or expired", 401)
 
-            if password != confirm_password:
-                raise AuthenticationFailed("Passwords do not match")
-
-            user.set_password(password)
+            user.set_password(attrs["password"])
             user.save()
             return user
-
-        except Exception:
+        except (TypeError, ValueError, OverflowError, CustomUser.DoesNotExist):
             raise AuthenticationFailed("Reset link is invalid or expired", 401)
 
 
@@ -212,12 +214,20 @@ class GithubSignInSerializer(serializers.Serializer):
 
         user_info = GithubAuth.retrieve_user_info(access_token)
 
-        full_name = user_info.get("name")
         email = user_info.get("email")
+        if not email:
+            raise serializers.ValidationError("Email is required for registration")
+
         username = user_info.get("login")
         provider = "github"
 
-        first_name, last_name = full_name.split(" ") if full_name else ("", "")
+        full_name = user_info.get("name", "")
+        if full_name:
+            name_parts = full_name.split(" ", 1)
+            first_name = name_parts[0]
+            last_name = name_parts[1] if len(name_parts) > 1 else ""
+        else:
+            first_name = last_name = ""
 
         return OAuth2Registerer.register_user(
             provider=provider,
