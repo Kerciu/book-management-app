@@ -1,36 +1,31 @@
-from rest_framework.generics import GenericAPIView
-from rest_framework.throttling import AnonRateThrottle
-from rest_framework.permissions import AllowAny, IsAuthenticated
-from .serializers import (
-    UserLoginSerializer,
-    UserRegisterSerializer,
-    OTPSerializer,
-    ResendEmailSerializer,
-    PasswordResetRequestSerializer,
-    SetNewPasswordSerializer,
-    LogoutUserSerializer,
-    GoogleSignInSerializer,
-    GithubSignInSerializer,
-)
-
-from rest_framework.response import Response
-from rest_framework import status
-from .utils import (
-    send_code_to_user,
-    generate_password_reset_tokens,
-    send_password_reset_email
-)
-from .models import OneTimePassword, CustomUser
 import logging
 
-# TODO: implement all this in utils file
-from django.utils.http import urlsafe_base64_decode
-from django.utils.encoding import (
-    smart_str,
-    DjangoUnicodeDecodeError
-)
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
-# TODO
+from django.utils.encoding import DjangoUnicodeDecodeError, smart_str
+from django.utils.http import urlsafe_base64_decode
+from rest_framework import status
+from rest_framework.generics import GenericAPIView
+from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.response import Response
+from rest_framework.throttling import AnonRateThrottle
+
+from .models import CustomUser, OneTimePassword
+from .serializers import (
+    GithubSignInSerializer,
+    GoogleSignInSerializer,
+    LogoutUserSerializer,
+    OTPSerializer,
+    PasswordResetRequestSerializer,
+    ResendEmailSerializer,
+    SetNewPasswordSerializer,
+    UserLoginSerializer,
+    UserRegisterSerializer,
+)
+from .utils import (
+    generate_password_reset_tokens,
+    send_code_to_user,
+    send_password_reset_email,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -46,17 +41,20 @@ class UserRegisterView(GenericAPIView):
         if serializer.is_valid(raise_exception=True):
             serializer.save()
             user = serializer.data
-            send_code_to_user(user['email'])
+            send_code_to_user(user["email"])
 
-            return Response({
-                'data': {
-                    'username': user.username,
-                    'email': user.email,
-                    'first_name': user.first_name,
-                    'last_name': user.last_name
+            return Response(
+                {
+                    "data": {
+                        "username": user.username,
+                        "email": user.email,
+                        "first_name": user.first_name,
+                        "last_name": user.last_name,
+                    },
+                    "message": "Check your email for your verification passcode",
                 },
-                'message': "Check your email for your verification passcode"
-            }, status=status.HTTP_201_CREATED)
+                status=status.HTTP_201_CREATED,
+            )
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -65,7 +63,7 @@ class ValidateRegisterView(GenericAPIView):
     serializer_class = OTPSerializer
 
     def post(self, request):
-        otp_code = request.data.get('otp')
+        otp_code = request.data.get("otp")
 
         try:
             otp_code_object = OneTimePassword.objects.get(code=otp_code)
@@ -73,17 +71,21 @@ class ValidateRegisterView(GenericAPIView):
 
             if user.is_verified:
                 return Response(
-                    {'message': 'Account was already verified'},
-                    status=status.HTTP_208_ALREADY_REPORTED
+                    {"message": "Account was already verified"},
+                    status=status.HTTP_208_ALREADY_REPORTED,
                 )
 
             user.is_verified = True
             user.save()
 
-            return Response({'message': 'Account verified successfully'}, status=status.HTTP_200_OK)
+            return Response(
+                {"message": "Account verified successfully"}, status=status.HTTP_200_OK
+            )
 
         except OneTimePassword.DoesNotExist:
-            return Response({'message': 'Passcode not provided'}, status=status.HTTP_404_NOT_FOUND)
+            return Response(
+                {"message": "Passcode not provided"}, status=status.HTTP_404_NOT_FOUND
+            )
 
 
 class LoginUserView(GenericAPIView):
@@ -91,14 +93,16 @@ class LoginUserView(GenericAPIView):
     serializer_class = UserLoginSerializer
 
     def post(self, request):
-        serializer = self.serializer_class(data=request.data, context={'request': request})
+        serializer = self.serializer_class(
+            data=request.data, context={"request": request}
+        )
 
         if serializer.is_valid(raise_exception=True):
             user_data = serializer.validated_data
-            return Response({
-                'message': 'Logged in successfully',
-                'user': user_data
-            }, status=status.HTTP_200_OK)
+            return Response(
+                {"message": "Logged in successfully", "user": user_data},
+                status=status.HTTP_200_OK,
+            )
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -112,7 +116,7 @@ class ResendEmailView(GenericAPIView):
         serialzier = self.serializer_class(data=request.data)
         if serialzier.is_valid(raise_exception=True):
 
-            email = serialzier.validated_data['email']
+            email = serialzier.validated_data["email"]
             try:
                 user = CustomUser.objects.get(email=email)
 
@@ -120,14 +124,16 @@ class ResendEmailView(GenericAPIView):
 
                 send_code_to_user(email, resending=True)
 
-                return Response({
-                    "message": "New verification code has been sent to your email"
-                }, status=status.HTTP_200_OK)
+                return Response(
+                    {"message": "New verification code has been sent to your email"},
+                    status=status.HTTP_200_OK,
+                )
 
             except CustomUser.DoesNotExist:
-                return Response({
-                    "message": "User with this email does not exist!"
-                }, status=status.HTTP_404_NOT_FOUND)
+                return Response(
+                    {"message": "User with this email does not exist!"},
+                    status=status.HTTP_404_NOT_FOUND,
+                )
 
 
 class PasswordResetView(GenericAPIView):
@@ -141,19 +147,19 @@ class PasswordResetView(GenericAPIView):
         serializer.is_valid(raise_exception=True)
 
         try:
-            user = CustomUser.objects.get(email=serializer.validated_data['email'])
+            user = CustomUser.objects.get(email=serializer.validated_data["email"])
             uid, token = generate_password_reset_tokens(user)
             send_password_reset_email(user, uid, token, request)
 
             return Response(
                 {"message": "If this email exists, a reset link has been sent"},
-                status=status.HTTP_200_OK
+                status=status.HTTP_200_OK,
             )
         except Exception as e:
             logger.error(f"Password reset error: {str(e)}")
             return Response(
                 {"message": "If this email exists, a reset link has been sent"},
-                status=status.HTTP_200_OK
+                status=status.HTTP_200_OK,
             )
 
 
@@ -174,7 +180,7 @@ class PasswordResetConfirmView(GenericAPIView):
                     "uid": uid,
                     "token": token,
                 },
-                status=status.HTTP_200_OK
+                status=status.HTTP_200_OK,
             )
 
         except (DjangoUnicodeDecodeError, CustomUser.DoesNotExist, ValueError):
@@ -183,7 +189,7 @@ class PasswordResetConfirmView(GenericAPIView):
     def _invalid_token_response(self):
         return Response(
             {"success": False, "message": "Token is invalid or has expired"},
-            status=status.HTTP_401_UNAUTHORIZED
+            status=status.HTTP_401_UNAUTHORIZED,
         )
 
 
@@ -196,8 +202,7 @@ class SetNewPasswordView(GenericAPIView):
         serializer.is_valid(raise_exception=True)
 
         return Response(
-            {"message": "Password reset sucessfully"},
-            status=status.HTTP_200_OK
+            {"message": "Password reset sucessfully"}, status=status.HTTP_200_OK
         )
 
 
@@ -219,7 +224,7 @@ class GoogleSignInView(GenericAPIView):
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
 
-        data = ((serializer.validated_data)['access_token'])
+        data = (serializer.validated_data)["access_token"]
 
         return Response(data, status=status.HTTP_200_OK)
 
@@ -230,10 +235,7 @@ class GithubSignInView(GenericAPIView):
     def post(self, request):
         serializer = self.serializer_class(data=request.data)
         if serializer.is_valid(raise_exception=True):
-            data = ((serializer.validated_data)['code'])
+            data = (serializer.validated_data)["code"]
             return Response(data, status=status.HTTP_200_OK)
 
-        return Response(
-            data=serializer.errors,
-            status=status.HTTP_400_BAD_REQUEST
-        )
+        return Response(data=serializer.errors, status=status.HTTP_400_BAD_REQUEST)

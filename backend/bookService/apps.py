@@ -2,5 +2,5 @@ from django.apps import AppConfig
 
 
 class BookserviceConfig(AppConfig):
-    default_auto_field = 'django.db.models.BigAutoField'
-    name = 'bookService'
+    default_auto_field = "django.db.models.BigAutoField"
+    name = "bookService"
