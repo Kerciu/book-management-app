@@ -188,8 +188,7 @@ class PasswordResetSerializerTest(TestCase):
         serializer = PasswordResetRequestSerializer(
             data={"email": "nonexistent@example.com"}
         )
-        self.assertFalse(serializer.is_valid())
-        self.assertIn("email", serializer.errors)
+        self.assertTrue(serializer.is_valid())  # to avoid attacks
 
 
 class ResendEmailSerializerTest(TestCase):
