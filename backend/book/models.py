@@ -30,5 +30,13 @@ class Book(models.Model):
     published_at = models.DateField(null=True, blank=True)
     publishers = models.ManyToManyField(Publisher)
 
+    page_count = models.PositiveIntegerField(null=True, blank=True)
+    language = models.CharField(max_length=30, default="English")
+
+    cover_image = models.URLField(blank=True)
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
     def __str__(self):
         return self.title
