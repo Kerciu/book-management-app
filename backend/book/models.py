@@ -27,10 +27,19 @@ class Publisher(models.Model):
         return self.name
 
 
+class Genre(models.Model):
+    name = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.name
+
+
 class Book(models.Model):
     title = models.CharField(max_length=255)
     description = models.TextField(blank=True)
     authors = models.ManyToManyField(Author)
+
+    genres = models.ManyToManyField(Genre)
 
     isbn = models.CharField(max_length=13, unique=True)
     published_at = models.DateField(null=True, blank=True)
@@ -46,22 +55,3 @@ class Book(models.Model):
 
     def __str__(self):
         return self.title
-
-
-class Rating(models.Model):
-    pass
-
-
-class Review(models.Model):
-    pass
-
-
-class Collection(models.Model):
-    pass
-
-
-class Genre(models.Model):
-    name = models.CharField(max_length=100)
-
-    def __str__(self):
-        return self.name
