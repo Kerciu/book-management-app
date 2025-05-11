@@ -1,5 +1,7 @@
 from django.db import models
 from django.core.validators import MinLengthValidator
+from django.contrib.postgres.indexes import GinIndex
+from django.contrib.postgres.search import SearchVectorField
 
 # Create your models here.
 
@@ -13,6 +15,11 @@ class Author(models.Model):
 
     birth_date = models.DateField(null=True, blank=True, db_index=True)
     death_date = models.DateField(null=True, blank=True)
+
+    class Meta:
+        indexes = [
+            models.Index(fields=["last_name", "first_name"]),
+        ]
 
     def __str__(self):
         return f"{self.first_name} {self.last_name}"
@@ -56,6 +63,11 @@ class Book(models.Model):
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+    search_vector = SearchVectorField(null=True)
+
+    class Meta:
+        indexes = [GinIndex(fields=["search_vector"])]
 
     def __str__(self):
         return self.title
