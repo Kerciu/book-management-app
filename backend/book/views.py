@@ -2,6 +2,7 @@ from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from django_filters import rest_framework as filters
 from rest_framework import filters as drf_filters
+from rest_framework.pagination import PageNumberPagination
 
 from .models import Book, Author, Publisher, Genre
 from .serializers import (
@@ -56,6 +57,11 @@ class BookViewSet(viewsets.ModelViewSet):
     ]
 
     ordering = ["title"]
+
+    pagination_class = PageNumberPagination
+    page_size = 10
+    page_size_query_param = "page_size"
+    max_page_size = 100
 
     def get_permissions(self):
         if self.action in ["create", "update", "partial_update", "destroy"]:
