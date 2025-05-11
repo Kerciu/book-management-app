@@ -31,7 +31,9 @@ logger = logging.getLogger(__name__)
 
 
 class UserRegisterView(GenericAPIView):
+
     serializer_class = UserRegisterSerializer
+    permission_classes = [AllowAny]
 
     def post(self, request):
         serializer = self.serializer_class(data=request.data)
@@ -56,7 +58,9 @@ class UserRegisterView(GenericAPIView):
 
 
 class ValidateRegisterView(GenericAPIView):
+
     serializer_class = OTPSerializer
+    permission_classes = [AllowAny]
 
     def post(self, request):
         otp_code = request.data.get("otp")
@@ -87,6 +91,7 @@ class ValidateRegisterView(GenericAPIView):
 class LoginUserView(GenericAPIView):
 
     serializer_class = UserLoginSerializer
+    permission_classes = [AllowAny]
 
     def post(self, request):
         serializer = self.serializer_class(
@@ -106,6 +111,7 @@ class LoginUserView(GenericAPIView):
 class ResendEmailView(GenericAPIView):
 
     serializer_class = ResendEmailSerializer
+    permission_classes = [AllowAny]
 
     def post(self, request):
         serializer = self.serializer_class(data=request.data)
@@ -157,6 +163,8 @@ class PasswordResetView(GenericAPIView):
 
 class PasswordResetConfirmView(GenericAPIView):
 
+    permission_classes = [AllowAny]
+
     def get(self, request, uid, token):
         try:
             user_id = smart_str(urlsafe_base64_decode(uid))
@@ -188,6 +196,7 @@ class PasswordResetConfirmView(GenericAPIView):
 class SetNewPasswordView(GenericAPIView):
 
     serializer_class = SetNewPasswordSerializer
+    permission_classes = [AllowAny]
 
     def patch(self, request):
         serializer = self.serializer_class(data=request.data)
@@ -199,6 +208,7 @@ class SetNewPasswordView(GenericAPIView):
 
 
 class LogoutUserView(GenericAPIView):
+
     serializer_class = LogoutUserSerializer
     permission_classes = [IsAuthenticated]
 
@@ -210,7 +220,9 @@ class LogoutUserView(GenericAPIView):
 
 
 class GoogleSignInView(GenericAPIView):
+
     serializer_class = GoogleSignInSerializer
+    permission_classes = [AllowAny]
 
     def post(self, request):
         serializer = self.serializer_class(data=request.data)
@@ -222,7 +234,9 @@ class GoogleSignInView(GenericAPIView):
 
 
 class GithubSignInView(GenericAPIView):
+
     serializer_class = GithubSignInSerializer
+    permission_classes = [AllowAny]
 
     def post(self, request):
         serializer = self.serializer_class(data=request.data)

@@ -1,4 +1,5 @@
 from django.db import models
+from django.core.validators import MinLengthValidator
 
 # Create your models here.
 
@@ -41,7 +42,10 @@ class Book(models.Model):
 
     genres = models.ManyToManyField(Genre)
 
-    isbn = models.CharField(max_length=13, unique=True)
+    isbn = models.CharField(
+        max_length=13, unique=True, validators=[MinLengthValidator(10)]
+    )
+
     published_at = models.DateField(null=True, blank=True)
     publishers = models.ManyToManyField(Publisher)
 
