@@ -18,7 +18,6 @@ ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS", "localhost,127.0.0.1").split(","
 
 # Application definition
 INSTALLED_APPS = [
-    "authentication.apps.AuthenticationConfig",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -30,7 +29,13 @@ INSTALLED_APPS = [
     "corsheaders",
     "django.contrib.sites",
     # Add your apps here
+    "authentication",
     "book",
+    "shelf",
+    "social",
+    "notification",
+    "recommend",
+    "statistic",
 ]
 
 SITE_ID = 1
