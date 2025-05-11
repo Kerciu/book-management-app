@@ -21,7 +21,11 @@ class IsAdminOrReadOnly(IsAuthenticated):
 
 
 class BookViewSet(viewsets.ModelViewSet):
-    queryset = Book.objects.all()
+    queryset = Book.objects.all().prefetch_related(
+        "authors",
+        "publishers",
+        "genres",
+    )
     serializer_class = BookSerializer
     permission_classes = [IsAuthenticated]
 
