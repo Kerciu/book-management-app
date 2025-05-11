@@ -1,5 +1,7 @@
 from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
+from django_filters import rest_framework as filters
+from rest_framework import filters as drf_filters
 
 from .models import Book, Author, Publisher, Genre
 from .serializers import (
@@ -8,6 +10,7 @@ from .serializers import (
     PublisherSerializer,
     GenreSerializer,
 )
+from .filters import BookFilter
 
 # Create your views here.
 
@@ -27,7 +30,32 @@ class BookViewSet(viewsets.ModelViewSet):
         "genres",
     )
     serializer_class = BookSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAdminOrReadOnly]
+
+    filter_backends = [
+        filters.DjangoFilterBackend,
+        drf_filters.SearchFilter,
+        drf_filters.OrderingFilter,
+    ]
+
+    filterset_class = BookFilter
+
+    search_fields = [
+        "title",
+        "description",
+        "isbn",
+        "authors__last_name",
+        "genres__name",
+    ]
+
+    ordering_fields = [
+        "title",
+        "published_at",
+        "page_count",
+        "created_at",
+    ]
+
+    ordering = ["title"]
 
     def get_permissions(self):
         if self.action in ["create", "update", "partial_update", "destroy"]:
