@@ -26,30 +26,42 @@ class BookSerializer(serializers.ModelSerializer):
     publishers = PublisherSerializer(many=True, required=False)
     genres = GenreSerializer(many=True, required=False)
 
+    authors_ids = serializers.PrimaryKeyRelatedField(
+        queryset=Author.objects.all(),
+        source="authors",
+        many=True,
+        write_only=True,
+    )
+
+    publishers_ids = serializers.PrimaryKeyRelatedField(
+        queryset=Publisher.objects.all(),
+        source="publishers",
+        many=True,
+        write_only=True,
+    )
+
+    genres_ids = serializers.PrimaryKeyRelatedField(
+        queryset=Genre.objects.all(),
+        source="genres",
+        many=True,
+        write_only=True,
+    )
+
     class Meta:
         model = Book
         fields = "__all__"
         read_only_fields = ("created_at", "updated_at")
 
-    def create(self, validated_data):
-
-        authors = validated_data.pop("authors", [])
-        publishers = validated_data.pop("publishers", [])
-        genres = validated_data.pop("genres", [])
-
-        book = Book.objects.create(**validated_data)
-
-        book.authors.add(authors)
-        book.publishers.add(publishers)
-        book.genres.add(genres)
-
-        return book
-
     def validate_isbn(self, value):
+        import isbnlib
+
         if not value.isdigit():
             raise serializers.ValidationError("ISBN must contain only digits")
 
         if len(value) not in [10, 13]:
             raise serializers.ValidationError("ISBN must be 10 or 13 digits long")
+
+        if not isbnlib.check_digit10(value) and not isbnlib.check_digit13(value):
+            raise serializers.ValidationError("Invalid ISBN checksum")
 
         return value
