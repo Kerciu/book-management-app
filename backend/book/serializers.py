@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from django.utils import timezone
+from django.core.validators import URLValidator
 
 from .models import Book, Author, Genre, Publisher
 
@@ -29,6 +30,11 @@ class PublisherSerializer(serializers.ModelSerializer):
     class Meta:
         model = Publisher
         fields = "__all__"
+
+    def validate_website(self, value):
+        validator = URLValidator()
+        validator(value)
+        return value
 
 
 class BookSerializer(serializers.ModelSerializer):
@@ -85,7 +91,7 @@ class BookSerializer(serializers.ModelSerializer):
         if len(value) not in [10, 13]:
             raise serializers.ValidationError("ISBN must be 10 or 13 digits long")
 
-        if not isbnlib.check_digit10(value) and not isbnlib.check_digit13(value):
+        if not isbnlib.is_isbn10(value) and not isbnlib.is_isbn13(value):
             raise serializers.ValidationError("Invalid ISBN checksum")
 
         return value

@@ -1,5 +1,5 @@
 from rest_framework import viewsets
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import BasePermission, SAFE_METHODS
 from django_filters import rest_framework as filters
 from rest_framework import filters as drf_filters
 from rest_framework.pagination import PageNumberPagination
@@ -16,12 +16,12 @@ from .filters import BookFilter
 # Create your views here.
 
 
-class IsAdminOrReadOnly(IsAuthenticated):
+class IsAdminOrReadOnly(BasePermission):
     def has_permission(self, request, view):
-        if request.method in ["GET", "HEAD", "OPTIONS"]:
-            return super().has_permission(request, view)
+        if request.method in SAFE_METHODS:
+            return True
 
-        return request.user.is_staff or request.user.is_superuser
+        return request.user.is_staff
 
 
 class BookViewSet(viewsets.ModelViewSet):
@@ -64,20 +64,6 @@ class BookViewSet(viewsets.ModelViewSet):
     page_size = 10
     page_size_query_param = "page_size"
     max_page_size = 100
-
-    def get_queryset(self):
-        return (
-            super()
-            .get_queryset()
-            .select_related(
-                # foreign keys in the future
-            )
-            .prefetch_related(
-                "authors",
-                "publishers",
-                "genres",
-            )
-        )
 
 
 class AuthorViewSet(viewsets.ModelViewSet):

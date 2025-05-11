@@ -1,7 +1,7 @@
 from django.db import models
 from django.core.validators import MinLengthValidator
 from django.contrib.postgres.indexes import GinIndex
-from django.contrib.postgres.search import SearchVectorField
+from django.contrib.postgres.search import SearchVectorField, SearchVector
 
 # Create your models here.
 
@@ -71,3 +71,7 @@ class Book(models.Model):
 
     def __str__(self):
         return self.title
+
+    @classmethod
+    def update_search_vector(cls):
+        cls.objects.update(search_vector=SearchVector("title", "description"))
