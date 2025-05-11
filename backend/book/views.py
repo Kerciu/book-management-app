@@ -1,5 +1,5 @@
 from rest_framework import viewsets
-from rest_framework.permissions import IsAuthenticated, IsAdminUser
+from rest_framework.permissions import IsAuthenticated
 from django_filters import rest_framework as filters
 from rest_framework import filters as drf_filters
 from rest_framework.pagination import PageNumberPagination
@@ -33,6 +33,8 @@ class BookViewSet(viewsets.ModelViewSet):
     serializer_class = BookSerializer
     permission_classes = [IsAdminOrReadOnly]
 
+    throttle_scope = "books"
+
     filter_backends = [
         filters.DjangoFilterBackend,
         drf_filters.SearchFilter,
@@ -63,10 +65,19 @@ class BookViewSet(viewsets.ModelViewSet):
     page_size_query_param = "page_size"
     max_page_size = 100
 
-    def get_permissions(self):
-        if self.action in ["create", "update", "partial_update", "destroy"]:
-            return [IsAdminUser()]
-        return super().get_permissions()
+    def get_queryset(self):
+        return (
+            super()
+            .get_queryset()
+            .select_related(
+                # foreign keys in the future
+            )
+            .prefetch_related(
+                "authors",
+                "publishers",
+                "genres",
+            )
+        )
 
 
 class AuthorViewSet(viewsets.ModelViewSet):
