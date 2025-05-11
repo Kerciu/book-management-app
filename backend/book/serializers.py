@@ -3,25 +3,25 @@ from rest_framework import serializers
 from .models import Book, Author, Genre, Publisher
 
 
-class AuthorSerializer(serializers.Serializer):
+class AuthorSerializer(serializers.ModelSerializer):
     class Meta:
         model = Author
-        fields = "__all___"
+        fields = "__all__"
 
 
-class GenreSerializer(serializers.Serializer):
+class GenreSerializer(serializers.ModelSerializer):
     class Meta:
         model = Genre
-        fields = "__all___"
+        fields = "__all__"
 
 
-class PublisherSerializer(serializers.Serializer):
+class PublisherSerializer(serializers.ModelSerializer):
     class Meta:
         model = Publisher
-        fields = "__all___"
+        fields = "__all__"
 
 
-class BookSerializer(serializers.Serializer):
+class BookSerializer(serializers.ModelSerializer):
     authors = AuthorSerializer(many=True, required=False)
     publishers = PublisherSerializer(many=True, required=False)
     genres = GenreSerializer(many=True, required=False)
@@ -29,25 +29,27 @@ class BookSerializer(serializers.Serializer):
     class Meta:
         model = Book
         fields = "__all__"
+        read_only_fields = ("created_at", "updated_at")
 
     def create(self, validated_data):
 
-        authors_data = validated_data.pop("authors", [])
-        publishers_data = validated_data.pop("publishers", [])
-        genres_data = validated_data.pop("genres", [])
+        authors = validated_data.pop("authors", [])
+        publishers = validated_data.pop("publishers", [])
+        genres = validated_data.pop("genres", [])
 
         book = Book.objects.create(**validated_data)
 
-        for author in authors_data:
-            if "id" in author:
-                book.authors.add(author["id"])
-
-        for publisher in publishers_data:
-            if "id" in publisher:
-                book.publishers.add(publisher["id"])
-
-        for genre in genres_data:
-            if "id" in genre:
-                book.genres.add(genre["id"])
+        book.authors.add(authors)
+        book.publishers.add(publishers)
+        book.genres.add(genres)
 
         return book
+
+    def validate_isbn(self, value):
+        if not value.isdigit():
+            raise serializers.ValidationError("ISBN must contain only digits")
+
+        if len(value) not in [10, 13]:
+            raise serializers.ValidationError("ISBN must be 10 or 13 digits long")
+
+        return value
