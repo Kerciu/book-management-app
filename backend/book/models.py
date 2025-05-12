@@ -1,5 +1,4 @@
 from django.db import models
-from django.core.validators import MinLengthValidator
 from django.contrib.postgres.indexes import GinIndex
 from django.contrib.postgres.search import SearchVectorField, SearchVector
 
@@ -49,9 +48,7 @@ class Book(models.Model):
 
     genres = models.ManyToManyField(Genre)
 
-    isbn = models.CharField(
-        max_length=13, unique=True, validators=[MinLengthValidator(10)]
-    )
+    isbn = models.CharField(max_length=17, unique=True)  # 17 for hyphen storage
 
     published_at = models.DateField(null=True, blank=True, db_index=True)
     publishers = models.ManyToManyField(Publisher)

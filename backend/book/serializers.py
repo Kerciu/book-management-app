@@ -80,18 +80,23 @@ class BookSerializer(serializers.ModelSerializer):
         if not attrs.get("authors"):
             raise serializers.ValidationError("At least one author is required")
 
+        if not attrs.get("genres"):
+            raise serializers.ValidationError("At least one genre is required")
+
         return attrs
 
     def validate_isbn(self, value):
         import isbnlib
 
-        if not value.isdigit():
+        cleaned_isbn = value.replace("-", "").replace(" ", "")
+
+        if not cleaned_isbn.isdigit():
             raise serializers.ValidationError("ISBN must contain only digits")
 
-        if len(value) not in [10, 13]:
+        if len(cleaned_isbn) not in [10, 13]:
             raise serializers.ValidationError("ISBN must be 10 or 13 digits long")
 
-        if not isbnlib.is_isbn10(value) and not isbnlib.is_isbn13(value):
+        if not isbnlib.is_isbn10(cleaned_isbn) and not isbnlib.is_isbn13(cleaned_isbn):
             raise serializers.ValidationError("Invalid ISBN checksum")
 
-        return value
+        return cleaned_isbn
