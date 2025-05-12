@@ -758,16 +758,44 @@ class GenreViewSetTest(APITestCase):
         self.genre = Genre.objects.create(name="Fiction")
 
     def create_genre_admin(self):
-        pass
+        self.client.force_authenticate(self.admin)
+        url = reverse("genre-list")
+        data = {"name": "Science Fiction"}
+        response = self.client.post(url, data)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(Genre.objects.count(), 2)
 
     def test_unique_name_validation(self):
-        pass
+        self.client.force_authenticate(self.admin)
+        url = reverse("genre-list")
+        data = {"name": "Fiction"}
+        response = self.client.post(url, data)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn("This genre already exists", str(response.data))
 
     def test_case_insensitive_name(self):
-        pass
+        self.client.force_authenticate(self.admin)
+        url = reverse("genre-list")
+        data = {"name": "fiction"}
+        response = self.client.post(url, data)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_update_name(self):
-        pass
+        self.client.force_authenticate(self.admin)
+        url = reverse("genre-detail", args=[self.genre.id])
+        data = {"name": "Non-Fiction"}
+        response = self.client.patch(url, data)
+        self.genre.refresh_from_db()
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(self.genre.name, "Non-Fiction")
 
     def test_delete_protection(self):
-        pass
+        from .models import Book
+
+        book = Book.objects.create(title="Test Book", isbn="1234567890123")
+        book.genres.add(self.genre)
+
+        self.client.force_authenticate(self.admin)
+        url = reverse("genre-detail", args=[self.genre.id])
+        response = self.client.delete(url)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
