@@ -131,6 +131,15 @@ Each user profile displays:
 * **Recent Activity** – Includes recent ratings, reviews, or shelf changes.
 * **Custom Shelves** – View and browse all custom shelves the user has created.
 
+### Reading Goals & Progress
+
+Users can set a yearly reading goal and track progress directly from their profile.
+
+* **Set Annual Goal** – Users define how many books they aim to read within the current calendar year.
+* **Progress Bar** – Visual tracker shows how many books have been read toward the goal.
+* **Timeline Tracking** – Displays whether the user is ahead, behind, or on track based on current reading pace.
+* **Completion History** – Keeps a record of past goals and their outcomes (optional).
+
 ### Social Features
 
 * **Friends List** – Displays mutual connections or followed users.
@@ -140,8 +149,6 @@ Each user profile displays:
 ### Profile Customization
 
 * **Edit Profile Info** – Users can change their bio, profile picture, and display name.
-
-## Social
 
 ## Notifications
 
@@ -170,3 +177,36 @@ Users can fine-tune their notification preferences:
 * **Notification History** – A log of past notifications that users can revisit at any time.
 
 ## Recommendations
+
+The recommendation system helps users discover new books aligned with their interests, reading history, and community trends. It encourages continued engagement and exploration of new genres, authors, and titles.
+
+### Personalized Recommendations
+
+The app suggests books based on:
+
+* **Reading History** – Titles similar to books the user has marked as "Read" or rated highly.
+* **Shelves & Genres** – Recommendations reflect books from genres or shelves the user frequently interacts with (e.g., “Fantasy,” “Classics,” or “Non-fiction”).
+* **Favorite Authors** – Suggestions for other titles from favorite authors.
+
+### Community-Driven Suggestions
+
+Users receive curated suggestions powered by community behavior:
+
+* **Trending Books** – Popular books currently being read, reviewed, or rated across the app.
+* **Friends’ Picks** – Books highly rated or shelved by friends.
+* **Readers Like You** – Suggestions based on users with similar reading patterns or ratings.
+
+### Discover Page
+
+A dedicated section for exploration, featuring:
+
+* **Editor’s Picks** – Hand-selected recommendations across categories.
+* **Friends' Favorites** – Upcoming or newly published books by genre or interest.
+* **Hidden Gems** – Highly rated titles for user with similar patterns.
+
+### Customization & Feedback
+
+* **Mark as Not Interested** – Users can remove books from future recommendations.
+* **Rate to Improve** – Encouragement to rate more books to refine recommendation accuracy.
+* **Genre Preferences** – Users can select preferred or disliked genres to shape suggestions.
+* **Dynamic Learning** – The more users interact with books (rating, shelving, reviewing), the more accurate and tailored their recommendations become.
