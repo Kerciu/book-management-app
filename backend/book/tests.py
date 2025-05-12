@@ -9,7 +9,7 @@ from .serializers import (
     GenreSerializer,
 )
 
-from .models import Author, Genre, Publisher
+from .models import Book, Author, Genre, Publisher
 
 # Create your tests here.
 
@@ -87,6 +87,17 @@ class GenreSerializerTest(TestCase):
             serializer.is_valid(raise_exception=True)
 
         self.assertIn("This field may not be blank.", str(context.exception))
+
+    def test_duplicate_genre_name(self):
+        Genre.objects.create(name="Fantasy")
+        data = {"name": "Fantasy"}
+
+        serializer = GenreSerializer(data=data)
+        with self.assertRaises(ValidationError) as context:
+            serializer.is_valid(raise_exception=True)
+
+        self.assertIn("name", context.exception.detail)
+        self.assertIn("already exists", str(context.exception))
 
 
 class BookSerializerTest(TestCase):
@@ -171,6 +182,132 @@ class BookSerializerTest(TestCase):
         with self.assertRaises(ValidationError) as context:
             serializer.is_valid(raise_exception=True)
         self.assertIn("Invalid ISBN checksum", str(context.exception))
+
+    def test_partial_update(self):
+        book = Book.objects.create(
+            title="Original Title", isbn="9780544003415", published_at="2020-01-01"
+        )
+        book.authors.add(self.author)
+        book.genres.add(self.genre)
+
+        update_data = {"title": "Updated Title", "page_count": 1000}
+
+        serializer = BookSerializer(instance=book, data=update_data, partial=True)
+        self.assertTrue(serializer.is_valid())
+        updated_book = serializer.save()
+
+        self.assertEqual(updated_book.title, "Updated Title")
+        self.assertEqual(updated_book.page_count, 1000)
+
+        # verifying existing relationships preserved
+        self.assertEqual(updated_book.authors.count(), 1)
+
+    def test_partial_update_invalid(self):
+        book = Book.objects.create(
+            title="Original Title", isbn="9780544003415", published_at="2020-01-01"
+        )
+        book.authors.add(self.author)
+
+        update_data = {"authors_ids": []}
+
+        serializer = BookSerializer(instance=book, data=update_data, partial=True)
+        with self.assertRaises(ValidationError) as context:
+            serializer.is_valid(raise_exception=True)
+
+        self.assertIn("At least one author is required", str(context.exception))
+
+    def test_title_length_validation(self):
+        data = self.valid_data.copy()
+        data["title"] = "A" * 256
+        serializer = BookSerializer(data=data)
+
+        with self.assertRaises(ValidationError) as context:
+            serializer.is_valid(raise_exception=True)
+
+        self.assertIn(
+            "Ensure this field has no more than 255 characters", str(context.exception)
+        )
+
+    def test_isbn_length_after_clean(self):
+        data = self.valid_data.copy()
+        data["isbn"] = "978-0-545-01022-1"
+        serializer = BookSerializer(data=data)
+        self.assertTrue(serializer.is_valid())
+
+    def test_page_count_validation(self):
+        data = self.valid_data.copy()
+        data["page_count"] = 0
+        serializer = BookSerializer(data=data)
+        with self.assertRaises(ValidationError) as context:
+            serializer.is_valid(raise_exception=True)
+        self.assertIn("Page count must be at least 1", str(context.exception))
+
+    def test_null_page_count(self):
+        data = self.valid_data.copy()
+        data["page_count"] = None
+        serializer = BookSerializer(data=data)
+        self.assertTrue(serializer.is_valid())
+
+    def test_language_default(self):
+        data = self.valid_data.copy()
+        del data["language"]
+        serializer = BookSerializer(data=data)
+        self.assertTrue(serializer.is_valid())
+        book = serializer.save()
+        self.assertEqual(book.language, "English")
+
+    def test_read_only_fields(self):
+        data = self.valid_data.copy()
+        data["created_at"] = "2020-01-01T00:00:00Z"
+        data["updated_at"] = "2020-01-01T00:00:00Z"
+
+        serializer = BookSerializer(data=data)
+        self.assertTrue(serializer.is_valid())
+        book = serializer.save()
+
+        self.assertIsNotNone(book.created_at)
+        self.assertIsNotNone(book.updated_at)
+        self.assertNotEqual(book.created_at.isoformat(), "2020-01-01T00:00:00Z")
+
+    def test_invalid_author_id(self):
+        data = self.valid_data.copy()
+        data["authors_ids"] = [99999]
+
+        serializer = BookSerializer(data=data)
+        with self.assertRaises(ValidationError) as context:
+            serializer.is_valid(raise_exception=True)
+
+        self.assertIn("Invalid pk", str(context.exception))
+
+    def test_multiple_authors(self):
+        author2 = Author.objects.create(first_name="Christopher", last_name="Tolkien")
+        data = self.valid_data.copy()
+        data["authors_ids"] = [self.author.id, author2.id]
+
+        serializer = BookSerializer(data=data)
+        self.assertTrue(serializer.is_valid())
+        book = serializer.save()
+        self.assertEqual(book.authors.count(), 2)
+
+    def test_duplicate_isbn(self):
+        Book.objects.create(
+            title="Existing Book", isbn="9780544003415", published_at="2020-01-01"
+        )
+
+        serializer = BookSerializer(data=self.valid_data)
+        with self.assertRaises(ValidationError) as context:
+            serializer.is_valid(raise_exception=True)
+
+        self.assertIn("isbn", context.exception.detail)
+        self.assertIn("already exists", str(context.exception))
+
+    def test_isbn_cleaning(self):
+        data = self.valid_data.copy()
+        data["isbn"] = "978-0-545-01022-1"
+
+        serializer = BookSerializer(data=data)
+        self.assertTrue(serializer.is_valid())
+        self.assertEqual(serializer.validated_data["isbn"], "9780545010221")
 
 
 class BookViewSetTest(TestCase):
