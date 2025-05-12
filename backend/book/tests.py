@@ -388,6 +388,39 @@ class AuthorViewSetTest(APITestCase):
     def setUp(self):
         self.client = APIClient()
 
+    def test_create_author_admin(self):
+        pass
+
+    def test_retrieve_author(self):
+        pass
+
+    def test_update_author_admin(self):
+        pass
+
+    def test_delete_author_admin(self):
+        pass
+
+    def test_create_author_regular_user(self):
+        pass
+
+    def test_update_author_regular_user(self):
+        pass
+
+    def test_delete_author_regular_user(self):
+        pass
+
+    def test_invalid_dates(self):
+        pass
+
+    def test_future_dates(self):
+        pass
+
+    def test_optional_fields(self):
+        pass
+
+    def test_max_length_fields(self):
+        pass
+
 
 class PublisherViewSetTest(APITestCase):
     def setUp(self):
