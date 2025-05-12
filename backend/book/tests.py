@@ -311,7 +311,72 @@ class BookSerializerTest(TestCase):
 
 
 class BookViewSetTest(TestCase):
-    pass
+    def setUp(self):
+        return super().setUp()
+
+    def test_list_books(self):
+        pass
+
+    def test_retrieve_book(self):
+        pass
+
+    def test_filter_books_by_min_pages(self):
+        pass
+
+    def test_filter_books_by_language(self):
+        pass
+
+    def test_filter_books_by_published_date_range(self):
+        pass
+
+    def test_search_by_title(self):
+        pass
+
+    def test_search_by_author_last_name(self):
+        pass
+
+    def test_default_ordering(self):
+        pass
+
+    def test_custom_ordering(self):
+        pass
+
+    def test_pagination(self):
+        pass
+
+    # create(), retrieve(), update(), partial_update(), destroy() and list() actions.
+    def test_search_book(self):
+        pass
+
+    def test_create_book_admin(self):
+        pass
+
+    def test_create_book_regular_user(self):
+        pass
+
+    def test_partial_update_book_admin(self):
+        pass
+
+    def test_partial_update_book_regular_user(self):
+        pass
+
+    def test_destroy_book_admin(self):
+        pass
+
+    def test_destroy_book_regular_user(self):
+        pass
+
+    def test_invalid_isbn_creation(self):
+        pass
+
+    def test_future_publish_date_creation(self):
+        pass
+
+    def test_update_relationship(self):
+        pass
+
+    def test_empty_page_count(self):
+        pass
 
 
 class AuthorViewSetTest(TestCase):
