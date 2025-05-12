@@ -83,6 +83,43 @@ The app supports comprehensive shelf control:
   * Date started or finished (if applicable)
 
 ## Reviews
+
+Reviews allow users to reflect on their reading experience and share opinions with the community. They also help others discover books that match their interests—or avoid those that don't.
+
+### Writing a Review
+
+Users can write a review once a book is added to the **Read** shelf. A review may include:
+
+* **Rating** – A required star-based rating from 1 to 5 stars.
+* **Text Review** – An optional field for sharing thoughts, summaries, critiques, or quotes.
+* **Spoiler Tag** – Users can mark sections of their review as spoilers. These are hidden by default unless a reader clicks *see spoiler*.
+* **Publication/Edit Date** – The date the review was written or last updated is displayed.
+
+### Editing and Managing Reviews
+
+* **Edit Review** – Users can update the rating, text, or spoiler tags at any time.
+* **Delete Review** – Users can permanently delete a review if they choose.
+
+### Review Visibility
+
+* **Public by Default** – Reviews are visible to all users and appear on the book’s detail page.
+* **Private Option** – Users can mark a review as private, making it visible only to themselves.
+* **Sorting Options** – On a book’s page, reviews can be sorted by:
+
+  * Most liked
+  * Most recent
+  * Highest rating
+  * Lowest rating
+
+### Community Feedback
+
+* **Like Reviews** – Users can like others’ reviews to express agreement or appreciation.
+* **Comment on Reviews** – (Optional feature) Users may comment on reviews to discuss opinions or ask follow-up questions.
+
 ## Recommendations
+
+
+
 ## Notifications
 ## Social
+## User profile
