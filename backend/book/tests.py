@@ -3,6 +3,8 @@ from django.contrib.auth import get_user_model
 from rest_framework.serializers import ValidationError
 from rest_framework.exceptions import ValidationError as URLValidationError
 from rest_framework.test import APITestCase, APIClient
+from rest_framework import status
+from django.urls import reverse
 from django.utils import timezone
 
 from .serializers import (
@@ -366,34 +368,86 @@ class BookViewSetTest(APITestCase):
         self.book2.publishers.add(self.publisher2)
 
     def test_list_books(self):
-        pass
+        url = reverse("book-list")
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data["results"]), 2)
 
     def test_retrieve_book(self):
-        pass
+        url = reverse("book-retrieve", args=[self.book1.pk])
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data["title"]), "Test Book")
 
     def test_filter_books_by_min_pages(self):
-        pass
+        url = reverse("book-list")
+        response = self.client.get(url, {"min_pages": 200})
+        self.assertEqual(len(response.data["results"]), 1)
+        self.assertEqual(response.data["results"][0]["id"], self.book1.id)
+
+    def test_filter_books_by_max_pages(self):
+        url = reverse("book-list")
+        response = self.client.get(url, {"max_pages": 200})
+        self.assertEqual(len(response.data["results"]), 1)
+        self.assertEqual(response.data["results"][0]["id"], self.book2.id)
 
     def test_filter_books_by_language(self):
-        pass
+        url = reverse("book-list")
+        response = self.client.get(url, {"language": "Spanish"})
+        self.assertEqual(len(response.data["results"]), 1)
+        self.assertEqual(response.data["results"][0]["id"], self.book2.id)
 
     def test_filter_books_by_published_date_range(self):
-        pass
+        url = reverse("book-list")
+        params = {
+            "published_after": (timezone.now() - timezone.timedelta(days=200))
+            .date()
+            .isoformat(),
+            "published_before": (timezone.now() - timezone.timedelta(days=50))
+            .date()
+            .isoformat(),
+        }
+        response = self.client.get(url, params)
+        self.assertEqual(len(response.data["results"]), 1)
+        self.assertEqual(response.data["results"][0]["id"], self.book2.id)
 
     def test_search_by_title(self):
-        pass
+        url = reverse("book-list")
+        response = self.client.get(url, {"search": "Another"})
+        self.assertEqual(len(response.data["results"]), 1)
+        self.assertEqual(response.data["results"][0]["id"], self.book2.id)
 
     def test_search_by_author_last_name(self):
-        pass
+        url = reverse("book-list")
+        response = self.client.get(url, {"search": "Smith"})
+        self.assertEqual(len(response.data["results"]), 1)
+        self.assertEqual(response.data["results"][0]["id"], self.book2.id)
 
     def test_default_ordering(self):
-        pass
+        url = reverse("book-list")
+        response = self.client.get(url)
+        titles = [item["title"] for item in response.data["results"]]
+        self.assertEqual(titles, ["Another Book", "Test Book"])
 
     def test_custom_ordering(self):
-        pass
+        url = reverse("book-list")
+        response = self.client.get(url, {"ordering": "-published_at"})
+        dates = [item["published_at"] for item in response.data["results"]]
+        self.assertTrue(dates[0] > dates[1])
 
     def test_pagination(self):
-        pass
+        for i in range(15):
+            Book.objects.create(
+                title=f"Book {i}",
+                isbn=f"1234567890{i:03}",
+                language="English",
+                page_count=100,
+            )
+
+        url = reverse("book-list")
+        response = self.client.get(url, {"page_size": 10})
+        self.assertEqual(len(response.data["results"]), 10)
+        self.assertIn("?page=2", response.data["next"])
 
     # create(), retrieve(), update(), partial_update(), destroy() and list() actions.
     def test_search_book(self):
