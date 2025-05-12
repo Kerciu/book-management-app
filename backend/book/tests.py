@@ -445,3 +445,18 @@ class PublisherViewSetTest(APITestCase):
 class GenreViewSetTest(APITestCase):
     def setUp(self):
         self.client = APIClient()
+
+    def create_genre_admin(self):
+        pass
+
+    def test_unique_name_validation(self):
+        pass
+
+    def test_case_insensitive_name(self):
+        pass
+
+    def test_update_name(self):
+        pass
+
+    def test_delete_protection(self):
+        pass
