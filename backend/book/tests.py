@@ -3,6 +3,7 @@ from rest_framework.serializers import ValidationError
 from rest_framework.exceptions import ValidationError as URLValidationError
 
 from .serializers import (
+    BookSerializer,
     AuthorSerializer,
     PublisherSerializer,
     GenreSerializer,
@@ -104,6 +105,72 @@ class BookSerializerTest(TestCase):
             "genres_ids": [self.genre.id],
             "publishers_ids": [self.publisher.id],
         }
+
+    def test_valid_book_creation(self):
+        serializer = BookSerializer(data=self.valid_data)
+        self.assertTrue(serializer.is_valid())
+
+    def test_invalid_future_publish_date(self):
+        invalid_data = self.valid_data.copy()
+        invalid_data["published_at"] = "2137-07-29"
+
+        serializer = BookSerializer(data=invalid_data)
+        with self.assertRaises(ValidationError) as context:
+            serializer.is_valid(raise_exception=True)
+
+        self.assertIn(
+            "Publication date cannot be in the future", str(context.exception)
+        )
+
+    def test_author_missing(self):
+        invalid_data = self.valid_data.copy()
+        invalid_data["authors_ids"] = []
+
+        serializer = BookSerializer(data=invalid_data)
+        with self.assertRaises(ValidationError) as context:
+            serializer.is_valid(raise_exception=True)
+
+        self.assertIn("At least one author is required", str(context.exception))
+
+    def test_genre_missing(self):
+        invalid_data = self.valid_data.copy()
+        invalid_data["genres_ids"] = []
+
+        serializer = BookSerializer(data=invalid_data)
+        with self.assertRaises(ValidationError) as context:
+            serializer.is_valid(raise_exception=True)
+
+        self.assertIn("At least one genre is required", str(context.exception))
+
+    def test_valid_isbn_creation(self):
+        data = self.valid_data.copy()
+        data["isbn"] = "0544003411"
+        serializer = BookSerializer(data=data)
+        self.assertTrue(serializer.is_valid())
+
+    def test_invalid_isbn_with_non_digit_char(self):
+        data = self.valid_data.copy()
+        data["isbn"] = "978-05440A3415"
+        serializer = BookSerializer(data=data)
+        with self.assertRaises(ValidationError) as context:
+            serializer.is_valid(raise_exception=True)
+        self.assertIn("ISBN must contain only digits", str(context.exception))
+
+    def test_invalid_isbn_length(self):
+        data = self.valid_data.copy()
+        data["isbn"] = "12345"
+        serializer = BookSerializer(data=data)
+        with self.assertRaises(ValidationError) as context:
+            serializer.is_valid(raise_exception=True)
+        self.assertIn("ISBN must be 10 or 13 digits long", str(context.exception))
+
+    def test_invalid_isbn_checksum(self):
+        data = self.valid_data.copy()
+        data["isbn"] = "0000000000"
+        serializer = BookSerializer(data=data)
+        with self.assertRaises(ValidationError) as context:
+            serializer.is_valid(raise_exception=True)
+        self.assertIn("Invalid ISBN checksum", str(context.exception))
 
 
 class BookViewSetTest(TestCase):
