@@ -579,31 +579,79 @@ class AuthorViewSetTest(APITestCase):
         )
 
     def test_create_author_admin(self):
-        pass
+        self.client.force_authenticate(self.admin)
+        url = reverse("author-list")
+        data = {
+            "first_name": "Ernest",
+            "last_name": "Hemingway",
+            "birth_date": "1899-07-21",
+            "death_date": "1961-07-02",
+        }
+        response = self.client.post(url, data)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(Author.objects.count(), 2)
 
     def test_retrieve_author(self):
-        pass
+        url = reverse("author-detail", args=[self.author.id])
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["last_name"], "Doe")
 
     def test_update_author_admin(self):
-        pass
+        self.client.force_authenticate(self.admin)
+        url = reverse("author-detail", args=[self.author.id])
+        data = {"middle_name": "Edgar"}
+        response = self.client.patch(url, data)
+        self.author.refresh_from_db()
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(self.author.middle_name, "Edgar")
 
     def test_delete_author_admin(self):
-        pass
+        self.client.force_authenticate(self.admin)
+        url = reverse("author-detail", args=[self.author.id])
+        response = self.client.delete(url)
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertEqual(Author.objects.count(), 0)
 
     def test_create_author_regular_user(self):
-        pass
+        self.client.force_authenticate(self.user)
+        url = reverse("author-list")
+        data = {"first_name": "New", "last_name": "Author"}
+        response = self.client.post(url, data)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
     def test_update_author_regular_user(self):
-        pass
+        self.client.force_authenticate(self.user)
+        url = reverse("author-list")
+        data = {"first_name": "Updated", "last_name": "Author"}
+        response = self.client.patch(url, data)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
     def test_delete_author_regular_user(self):
-        pass
+        self.client.force_authenticate(self.user)
+        url = reverse("author-list", args=[self.author.id])
+        response = self.client.delete(url)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
     def test_invalid_dates(self):
-        pass
+        self.client.force_authenticate(self.admin)
+        url = reverse("author-list")
+        data = {
+            "first_name": "Invalid",
+            "last_name": "Dates",
+            "birth_date": "2000-01-01",
+            "death_date": "1999-01-01",
+        }
+        response = self.client.post(url, data)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn("Death date must be after birth date", str(response.data))
 
     def test_future_dates(self):
-        pass
+        self.client.force_authenticate(self.admin)
+        url = reverse("author-detail", args=[self.author.id])
+        future_date = (timezone.now() + timezone.timedelta(days=365)).date().isoformat()
+        response = self.client.patch(url, {"birth_date": future_date})
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_optional_fields(self):
         pass
