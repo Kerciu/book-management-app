@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from rest_framework.validators import UniqueValidator
 from django.utils import timezone
 from django.core.validators import URLValidator
 
@@ -24,6 +25,16 @@ class GenreSerializer(serializers.ModelSerializer):
     class Meta:
         model = Genre
         fields = "__all__"
+        extra_kwargs = {
+            "name": {
+                "validators": [
+                    UniqueValidator(
+                        queryset=Genre.objects.all(),
+                        message="This genre already exists",
+                    )
+                ]
+            }
+        }
 
 
 class PublisherSerializer(serializers.ModelSerializer):
@@ -65,6 +76,13 @@ class BookSerializer(serializers.ModelSerializer):
         required=True,
     )
 
+    language = serializers.CharField(max_length=30, required=False, default="English")
+
+    page_count = serializers.IntegerField(
+        required=False,
+        allow_null=True,
+    )
+
     class Meta:
         model = Book
         fields = "__all__"
@@ -77,11 +95,24 @@ class BookSerializer(serializers.ModelSerializer):
                 "Publication date cannot be in the future"
             )
 
-        if not attrs.get("authors"):
-            raise serializers.ValidationError("At least one author is required")
+        if (
+            "page_count" in attrs
+            and attrs["page_count"] is not None
+            and attrs["page_count"] < 1
+        ):
+            raise serializers.ValidationError("Page count must be at least 1")
 
-        if not attrs.get("genres"):
-            raise serializers.ValidationError("At least one genre is required")
+        # only validate required relationships on create
+        if self.instance is None:  # creation operation
+            if not attrs.get("authors"):
+                raise serializers.ValidationError("At least one author is required")
+            if not attrs.get("genres"):
+                raise serializers.ValidationError("At least one genre is required")
+        else:  # update operation
+            if "authors" in attrs and not attrs["authors"]:
+                raise serializers.ValidationError("At least one author is required")
+            if "genres" in attrs and not attrs["genres"]:
+                raise serializers.ValidationError("At least one genre is required")
 
         return attrs
 
@@ -100,3 +131,14 @@ class BookSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("Invalid ISBN checksum")
 
         return cleaned_isbn
+
+    def create(self, validated_data):
+        authors = validated_data.pop("authors", [])
+        genres = validated_data.pop("genres", [])
+        publishers = validated_data.pop("publishers", [])
+
+        book = Book.objects.create(**validated_data)
+        book.authors.set(authors)
+        book.genres.set(genres)
+        book.publishers.set(publishers)
+        return book
