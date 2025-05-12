@@ -450,32 +450,78 @@ class BookViewSetTest(APITestCase):
         self.assertIn("?page=2", response.data["next"])
 
     # create(), retrieve(), update(), partial_update(), destroy() and list() actions.
-    def test_search_book(self):
-        pass
 
     def test_create_book_admin(self):
-        pass
+        self.client.force_authenticate(self.admin)
+        url = reverse("book-list")
+        data = {
+            "title": "New Book",
+            "isbn": "1234567890789",
+            "authors_ids": [self.author1.id],
+            "genres_ids": [self.genre1.id],
+            "publishers_ids": [self.publisher1.id],
+            "language": "French",
+            "page_count": 200,
+        }
+        response = self.client.post(url, data)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(Book.objects.count(), 3)
 
     def test_create_book_regular_user(self):
-        pass
+        self.client.force_authenticate(self.user)
+        url = reverse("book-list")
+        data = {"title": "New Book", "isbn": "1234567890789"}
+        response = self.client.post(url, data)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
     def test_partial_update_book_admin(self):
-        pass
+        self.client.force_authenticate(self.admin)
+        url = reverse("book-detail", args=[self.book1.id])
+        data = {"title": "Updated Title"}
+        response = self.client.patch(url, data)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.book1.refresh_from_db()
+        self.assertEqual(self.book1.title, "Updated Title")
 
     def test_partial_update_book_regular_user(self):
-        pass
+        self.client.force_authenticate(self.user)
+        url = reverse("book-detail", args=[self.book1.id])
+        data = {"title": "Updated Title"}
+        response = self.client.patch(url, data)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
     def test_destroy_book_admin(self):
-        pass
+        self.client.force_authenticate(self.admin)
+        url = reverse("book-detail", args=[self.book1.id])
+        response = self.client.delete(url)
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertEqual(Book.objects.count(), 1)
 
     def test_destroy_book_regular_user(self):
-        pass
+        self.client.force_authenticate(self.user)
+        url = reverse("book-detail", args=[self.book1.id])
+        response = self.client.delete(url)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
     def test_invalid_isbn_creation(self):
-        pass
+        self.client.force_authenticate(self.admin)
+        url = reverse("book-list")
+        data = {
+            "title": "Invalid Book",
+            "isbn": "invalid-isbn",
+            "authors_ids": [self.author1.id],
+            "genres_ids": [self.genre1.id],
+        }
+        response = self.client.post(url, data)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn("isbn", response.data)
 
     def test_future_publish_date_creation(self):
-        pass
+        self.client.force_authenticate(self.admin)
+        url = reverse("book-detail", args=[self.book1.id])
+        future_date = (timezone.now() + timezone.timedelta(days=365)).date().isoformat()
+        response = self.client.patch(url, {"published_at": future_date})
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_update_relationship(self):
         pass
