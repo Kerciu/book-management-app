@@ -524,10 +524,31 @@ class BookViewSetTest(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_update_relationship(self):
-        pass
+        self.client.force_authenticate(self.admin)
+        url = reverse("book-detail", args=[self.book1.id])
+        data = {
+            "authors_ids": [self.author1.id, self.author2.id],
+            "genres_ids": [self.genre2.id],
+        }
+        response = self.client.patch(url, data)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.book1.refresh_from_db()
+        self.assertEqual(self.book1.authors.count(), 2)
+        self.assertEqual(self.book1.genres.count(), 1)
 
     def test_empty_page_count(self):
-        pass
+        self.client.force_authenticate(self.admin)
+        url = reverse("book-list")
+        data = {
+            "title": "No Pages Book",
+            "isbn": "1234567890999",
+            "authors_ids": [self.author1.id],
+            "genres_ids": [self.genre1.id],
+            "page_count": None,
+        }
+        response = self.client.post(url, data)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertIsNone(response.data["page_count"])
 
 
 class AuthorViewSetTest(APITestCase):
