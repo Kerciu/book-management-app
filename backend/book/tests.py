@@ -8,6 +8,8 @@ from .serializers import (
     GenreSerializer,
 )
 
+from .models import Author, Genre, Publisher
+
 # Create your tests here.
 
 
@@ -87,7 +89,21 @@ class GenreSerializerTest(TestCase):
 
 
 class BookSerializerTest(TestCase):
-    pass
+    def setUp(self):
+        self.author = Author.objects.create(first_name="J.R.R.", last_name="Tolkien")
+        self.publisher = Publisher.objects.create(name="Houghton Mifflin")
+        self.genre = Genre.objects.create(name="Fantasy")
+
+        self.valid_data = {
+            "title": "The Lord of the Rings",
+            "isbn": "9780544003415",
+            "published_at": "1954-07-29",
+            "page_count": 1178,
+            "language": "English",
+            "authors_ids": [self.author.id],
+            "genres_ids": [self.genre.id],
+            "publishers_ids": [self.publisher.id],
+        }
 
 
 class BookViewSetTest(TestCase):
