@@ -426,6 +426,21 @@ class PublisherViewSetTest(APITestCase):
     def setUp(self):
         self.client = APIClient()
 
+    def test_create_publisher_admin(self):
+        pass
+
+    def test_unique_name(self):
+        pass
+
+    def test_website_validation(self):
+        pass
+
+    def test_update_website(self):
+        pass
+
+    def test_empty_description(self):
+        pass
+
 
 class GenreViewSetTest(APITestCase):
     def setUp(self):
