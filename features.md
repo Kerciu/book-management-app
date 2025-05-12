@@ -116,10 +116,57 @@ Users can write a review once a book is added to the **Read** shelf. A review ma
 * **Like Reviews** – Users can like others’ reviews to express agreement or appreciation.
 * **Comment on Reviews** – (Optional feature) Users may comment on reviews to discuss opinions or ask follow-up questions.
 
-## Recommendations
+## User Profiles
 
+User profiles serve as personal hubs for tracking reading activity, showcasing reviews, and managing social features within the app. Each profile reflects the user's unique reading journey and preferences.
 
+### Profile Overview
+
+Each user profile displays:
+
+* **Username and Profile Picture** – Customizable identity for each user.
+* **Bio** – Optional short description to share interests or favorite genres.
+* **Total Books Read** – Count of all books marked as “Read.”
+* **Currently Reading** – A glance at books the user is actively reading.
+* **Recent Activity** – Includes recent ratings, reviews, or shelf changes.
+* **Custom Shelves** – View and browse all custom shelves the user has created.
+
+### Social Features
+
+* **Friends List** – Displays mutual connections or followed users.
+* **Follow Users** – Users can follow others to stay updated on their activity.
+* **Profile Privacy Settings** – Choose between public, friends-only, or private visibility.
+
+### Profile Customization
+
+* **Edit Profile Info** – Users can change their bio, profile picture, and display name.
+
+## Social
 
 ## Notifications
-## Social
-## User profile
+
+Notifications keep users informed and engaged by providing timely updates related to their books and activities within the app. Users can customize their notification preferences to ensure they receive relevant alerts.
+
+### Types of Notifications
+
+* **Review Interactions** – Alerts when:
+  * Someone likes or comments on a review the user has posted.
+  * A review receives a reply or is flagged for being reported.
+
+* **Friend Activity** – Notifications about the user's friends' activities, such as:
+  * A friend adding or completing a book.
+  * A friend's review or rating.
+
+### Customizing Notifications
+
+Users can fine-tune their notification preferences:
+
+* **Push Notifications** – Users can opt to receive push notifications for specific activities, such as when someone comments on a review.
+
+### Notification Control
+
+* **Mute Specific Notifications** – Users can mute notifications for certain books, shelves, or activities.
+* **Do Not Disturb Mode** – Temporarily disable all notifications for a set period.
+* **Notification History** – A log of past notifications that users can revisit at any time.
+
+## Recommendations
