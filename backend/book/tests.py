@@ -697,19 +697,42 @@ class PublisherViewSetTest(APITestCase):
         )
 
     def test_create_publisher_admin(self):
-        pass
+        self.client.force_authenticate(self.admin)
+        url = reverse("publisher-list")
+        data = {"name": "New Publisher", "website": "https://new.example.com"}
+        response = self.client.post(url, data)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(Publisher.objects.count(), 2)
 
     def test_unique_name(self):
-        pass
+        self.client.force_authenticate(self.admin)
+        url = reverse("publisher-list")
+        data = {"name": "Test Publisher", "website": "https://different.com"}
+        response = self.client.post(url, data)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_website_validation(self):
-        pass
+        self.client.force_authenticate(self.admin)
+        url = reverse("publisher-list")
+        data = {"name": "Invalid Website", "website": "not-a-url"}
+        response = self.client.post(url, data)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_update_website(self):
-        pass
+        self.client.force_authenticate(self.admin)
+        url = reverse("publisher-detail", args=[self.publisher.id])
+        data = {"website": "https://updated.example.com"}
+        response = self.client.patch(url, data)
+        self.publisher.refresh_from_db()
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(self.publisher.website, "https://updated.example.com")
 
     def test_empty_description(self):
-        pass
+        self.client.force_authenticate(self.admin)
+        url = reverse("publisher-list")
+        data = {"name": "No Description", "description": ""}
+        response = self.client.post(url, data)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
 
 class GenreViewSetTest(APITestCase):
