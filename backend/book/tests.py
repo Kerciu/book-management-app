@@ -3,6 +3,7 @@ from django.contrib.auth import get_user_model
 from rest_framework.serializers import ValidationError
 from rest_framework.exceptions import ValidationError as URLValidationError
 from rest_framework.test import APITestCase, APIClient
+from django.utils import timezone
 
 from .serializers import (
     BookSerializer,
@@ -312,12 +313,57 @@ class BookSerializerTest(TestCase):
         self.assertEqual(serializer.validated_data["isbn"], "9780545010221")
 
 
-UserTest = get_user_model()
+User = get_user_model()
 
 
 class BookViewSetTest(APITestCase):
     def setUp(self):
         self.client = APIClient()
+
+        self.admin = User.objects.create_superuser(
+            "admin",
+            "admin@example.com",
+            "Kacper",
+            "Gorski",
+            "password2137",
+        )
+
+        self.user = User.objects.create_superuser(
+            "user",
+            "user@example.com",
+            "Kacper",
+            "NotGorski",
+            "password2137",
+        )
+
+        self.author1 = Author.objects.create(first_name="John", last_name="Doe")
+        self.author2 = Author.objects.create(first_name="Jane", last_name="Smith")
+        self.genre1 = Genre.objects.create(name="Fiction")
+        self.genre2 = Genre.objects.create(name="Science Fiction")
+        self.publisher1 = Publisher.objects.create(name="Test Publisher")
+        self.publisher2 = Publisher.objects.create(name="Another Publisher")
+
+        self.book1 = Book.objects.create(
+            title="Test Book",
+            isbn="1234567890123",
+            language="English",
+            page_count=300,
+            published_at=timezone.now().date() - timezone.timedelta(days=365),
+        )
+        self.book1.authors.add(self.author1)
+        self.book1.genres.add(self.genre1)
+        self.book1.publishers.add(self.publisher1)
+
+        self.book2 = Book.objects.create(
+            title="Another Book",
+            isbn="1234567890456",
+            language="Spanish",
+            page_count=150,
+            published_at=timezone.now().date() - timezone.timedelta(days=100),
+        )
+        self.book2.authors.add(self.author2)
+        self.book2.genres.add(self.genre2)
+        self.book2.publishers.add(self.publisher2)
 
     def test_list_books(self):
         pass
@@ -388,6 +434,29 @@ class AuthorViewSetTest(APITestCase):
     def setUp(self):
         self.client = APIClient()
 
+        self.admin = User.objects.create_superuser(
+            "admin",
+            "admin@example.com",
+            "Kacper",
+            "Gorski",
+            "password2137",
+        )
+
+        self.user = User.objects.create_superuser(
+            "user",
+            "user@example.com",
+            "Kacper",
+            "NotGorski",
+            "password2137",
+        )
+
+        self.author = Author.objects.create(
+            first_name="Sigmund",
+            last_name="Freud",
+            birth_date="1900-01-01",
+            death_date="1950-01-01",
+        )
+
     def test_create_author_admin(self):
         pass
 
@@ -426,6 +495,26 @@ class PublisherViewSetTest(APITestCase):
     def setUp(self):
         self.client = APIClient()
 
+        self.admin = User.objects.create_superuser(
+            "admin",
+            "admin@example.com",
+            "Kacper",
+            "Gorski",
+            "password2137",
+        )
+
+        self.user = User.objects.create_superuser(
+            "user",
+            "user@example.com",
+            "Kacper",
+            "NotGorski",
+            "password2137",
+        )
+
+        self.publisher = Publisher.objects.create(
+            name="Kacper Publisher", website="https://kerciu.github.io"
+        )
+
     def test_create_publisher_admin(self):
         pass
 
@@ -445,6 +534,24 @@ class PublisherViewSetTest(APITestCase):
 class GenreViewSetTest(APITestCase):
     def setUp(self):
         self.client = APIClient()
+
+        self.admin = User.objects.create_superuser(
+            "admin",
+            "admin@example.com",
+            "Kacper",
+            "Gorski",
+            "password2137",
+        )
+
+        self.user = User.objects.create_superuser(
+            "user",
+            "user@example.com",
+            "Kacper",
+            "NotGorski",
+            "password2137",
+        )
+
+        self.genre = Genre.objects.create(name="Fiction")
 
     def create_genre_admin(self):
         pass
