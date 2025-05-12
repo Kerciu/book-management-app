@@ -654,10 +654,22 @@ class AuthorViewSetTest(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_optional_fields(self):
-        pass
+        self.client.force_authenticate(self.admin)
+        url = reverse("author-list")
+        data = {"first_name": "Fyodor", "last_name": "Dostoevsky"}
+        response = self.client.post(url, data)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertIsNone(response.data["death_date"])
 
     def test_max_length_fields(self):
-        pass
+        self.client.force_authenticate(self.admin)
+        url = reverse("author-list")
+        data = {
+            "first_name": "A" * 101,
+            "last_name": "Doe",
+        }
+        response = self.client.post(url, data)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
 
 class PublisherViewSetTest(APITestCase):
