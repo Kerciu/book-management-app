@@ -1,6 +1,8 @@
 from django.test import TestCase
+from django.contrib.auth import get_user_model
 from rest_framework.serializers import ValidationError
 from rest_framework.exceptions import ValidationError as URLValidationError
+from rest_framework.test import APITestCase, APIClient
 
 from .serializers import (
     BookSerializer,
@@ -310,9 +312,12 @@ class BookSerializerTest(TestCase):
         self.assertEqual(serializer.validated_data["isbn"], "9780545010221")
 
 
-class BookViewSetTest(TestCase):
+UserTest = get_user_model()
+
+
+class BookViewSetTest(APITestCase):
     def setUp(self):
-        return super().setUp()
+        self.client = APIClient()
 
     def test_list_books(self):
         pass
@@ -379,13 +384,16 @@ class BookViewSetTest(TestCase):
         pass
 
 
-class AuthorViewSetTest(TestCase):
-    pass
+class AuthorViewSetTest(APITestCase):
+    def setUp(self):
+        self.client = APIClient()
 
 
-class PublisherViewSetTest(TestCase):
-    pass
+class PublisherViewSetTest(APITestCase):
+    def setUp(self):
+        self.client = APIClient()
 
 
-class GenreViewSetTest(TestCase):
-    pass
+class GenreViewSetTest(APITestCase):
+    def setUp(self):
+        self.client = APIClient()
