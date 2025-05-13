@@ -148,7 +148,7 @@ REST_FRAMEWORK = {
         "rest_framework.filters.OrderingFilter",
     ],
     "DEFAULT_THROTTLE_RATES": {
-        "books": "100/hour",
+        "anon": "100/hour",
     },
 }
 
