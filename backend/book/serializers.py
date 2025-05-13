@@ -18,6 +18,12 @@ class AuthorSerializer(serializers.ModelSerializer):
         if birth_date and death_date and death_date < birth_date:
             raise serializers.ValidationError("Death date must be after birth date")
 
+        present_date = timezone.now().date()
+        if birth_date and birth_date > present_date:
+            raise serializers.ValidationError("Birth date must not be in the future")
+        if death_date and death_date > present_date:
+            raise serializers.ValidationError("Death date must not be in the future")
+
         return attrs
 
 
