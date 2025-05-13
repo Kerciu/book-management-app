@@ -3,9 +3,6 @@ init:
 	docker compose exec backend python manage.py makemigrations authentication
 	make makemigrations
 	make migrate
-	docker compose exec backend python manage.py makemigrations bookService
-	make makemigrations
-	make migrate
 
 build:
 	docker compose up -d --build
