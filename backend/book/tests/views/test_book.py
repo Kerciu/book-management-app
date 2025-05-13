@@ -112,8 +112,6 @@ class BookViewSetTest(APITestCase):
             url, {"published_after": "2020-01-01", "published_before": "2021-01-01"}
         )
 
-        print(response.data)
-
         self.assertEqual(len(response.data["results"]), 1)
 
     def test_filter_published_before_future_date(self):

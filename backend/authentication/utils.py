@@ -2,7 +2,6 @@ import random
 
 from django.conf import settings
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
-from django.contrib.sites.models import Site
 from django.core.mail import EmailMessage
 from django.urls import reverse
 from django.utils.encoding import force_bytes
@@ -57,7 +56,7 @@ def generate_password_reset_tokens(user):
 
 
 def send_password_reset_email(user, uid, token, request):
-    site_domain = Site.objects.get_current(request).domain
+    site_domain = settings.DOMAIN_NAME
     relative_link = reverse(
         "password-reset-confirm", kwargs={"uid": uid, "token": token}
     )
