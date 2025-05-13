@@ -73,7 +73,7 @@ class BookViewSetTest(APITestCase):
         url = reverse("books", args=[self.book1.pk])
         response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(response.data["title"]), "Test Book")
+        self.assertEqual(response.data["title"], "Test Book")
 
     def test_filter_books_by_min_pages(self):
         url = reverse("books")
@@ -140,7 +140,7 @@ class BookViewSetTest(APITestCase):
                 page_count=100,
             )
 
-        url = reverse("books")
+        url = reverse("books-list")
         response = self.client.get(url, {"page_size": 10})
         self.assertEqual(len(response.data["results"]), 10)
 

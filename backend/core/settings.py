@@ -28,6 +28,8 @@ INSTALLED_APPS = [
     "rest_framework_simplejwt.token_blacklist",
     "corsheaders",
     "django.contrib.sites",
+    "django_extensions",
+    "drf_spectacular",
     # Add your apps here
     "authentication",
     "book",

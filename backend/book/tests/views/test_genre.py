@@ -64,7 +64,7 @@ class GenreViewSetTest(APITestCase):
         self.assertEqual(self.genre.name, "Non-Fiction")
 
     def test_delete_protection(self):
-        from .models import Book
+        from ...models import Book
 
         book = Book.objects.create(title="Test Book", isbn="1234567890123")
         book.genres.add(self.genre)

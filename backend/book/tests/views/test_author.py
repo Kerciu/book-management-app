@@ -39,7 +39,7 @@ class AuthorViewSetTest(APITestCase):
 
     def test_create_author_admin(self):
         self.client.force_authenticate(self.admin)
-        url = reverse("authors")
+        url = reverse("authors-list")
         data = {
             "first_name": "Ernest",
             "last_name": "Hemingway",
@@ -51,7 +51,7 @@ class AuthorViewSetTest(APITestCase):
         self.assertEqual(Author.objects.count(), 2)
 
     def test_retrieve_author(self):
-        url = reverse("authors", args=[self.author.id])
+        url = reverse("authors-detail", args=[self.author.id])
         response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data["last_name"], "Freud")
@@ -81,7 +81,7 @@ class AuthorViewSetTest(APITestCase):
 
     def test_update_author_regular_user(self):
         self.client.force_authenticate(self.user)
-        url = reverse("authors-detail")
+        url = reverse("authors-list")
         data = {"first_name": "Updated", "last_name": "Author"}
         response = self.client.patch(url, data)
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
