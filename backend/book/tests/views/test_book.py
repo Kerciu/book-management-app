@@ -100,9 +100,12 @@ class BookViewSetTest(APITestCase):
             title="Wuthering Heights",
             isbn="9783161484100",
             published_at="2020-06-01",
+            language="English",
         )
         book.authors.add(author)
         book.genres.add(genre)
+
+        self.assertEqual(book.published_at, "2020-06-01")
 
         url = reverse("books-list")
         response = self.client.get(
@@ -110,7 +113,28 @@ class BookViewSetTest(APITestCase):
         )
 
         print(response.data)
+
         self.assertEqual(len(response.data["results"]), 1)
+
+    def test_filter_published_before_future_date(self):
+        url = reverse("books-list")
+        response = self.client.get(
+            url,
+            {
+                "published_before": (timezone.now() + timezone.timedelta(days=365))
+                .date()
+                .isoformat()
+            },
+        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn(
+            "Published before date cannot be in the future", str(response.data)
+        )
+
+    def test_filter_invalid_date_format(self):
+        url = reverse("books-list")
+        response = self.client.get(url, {"published_after": "invalid-date"})
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_search_by_title(self):
         url = reverse("books-list")
@@ -169,7 +193,6 @@ class BookViewSetTest(APITestCase):
 
         self.client.force_authenticate(self.admin)
         response = self.client.post(reverse("books-list"), data, format="json")
-        print(response.data)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
     def test_create_book_regular_user(self):
@@ -255,5 +278,4 @@ class BookViewSetTest(APITestCase):
         url = reverse("books-list")
         response = self.client.post(url, data, format="json")
 
-        print(response.data)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)

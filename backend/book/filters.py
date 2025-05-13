@@ -1,6 +1,6 @@
 from django_filters import rest_framework as filters
 from django.utils import timezone
-from django.core.exceptions import ValidationError
+from rest_framework.exceptions import ValidationError
 from .models import Book
 
 
@@ -12,13 +12,14 @@ class BookFilter(filters.FilterSet):
         field_name="published_at",
         lookup_expr="gte",
         label="Publish on or after (YYYY-MM-DD)",
+        method="validate_published_after",
     )
 
     published_before = filters.DateFilter(
         field_name="published_at",
         lookup_expr="lte",
         label="Publish on or before (YYYY-MM-DD)",
-        method="filter_published_before",
+        method="validate_published_before",
     )
 
     class Meta:
@@ -32,8 +33,10 @@ class BookFilter(filters.FilterSet):
             "page_count": ["exact"],
         }
 
-    def filter_published_before(self, queryset, name, value):
+    def validate_published_after(self, queryset, name, value):
+        return queryset.filter(**{"published_at__gte": value})
+
+    def validate_published_before(self, queryset, name, value):
         if value > timezone.now().date():
             raise ValidationError("Published before date cannot be in the future")
-
-        return queryset.filter(**{name: value})
+        return queryset.filter(**{"published_at__lte": value})

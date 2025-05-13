@@ -160,9 +160,9 @@ class BookSerializer(serializers.ModelSerializer):
 
     def update(self, instance, validated_data):
 
-        authors = validated_data.pop("authors", [])
-        genres = validated_data.pop("genres", [])
-        publishers = validated_data.pop("publishers", [])
+        authors = validated_data.pop("authors", None)
+        genres = validated_data.pop("genres", None)
+        publishers = validated_data.pop("publishers", None)
 
         instance = super().update(instance, validated_data)
 
