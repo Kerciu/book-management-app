@@ -7,6 +7,8 @@ django-cors-headers
 gunicorn
 python-dotenv
 django-sendgrid-v5
+django-filter
+django-extensions
 pytest
 pytest-django
 pytest-cov
@@ -14,6 +16,7 @@ factory-boy
 google-api-python-client
 requests
 drf-spectacular
+isbnlib
 pre-commit
 black
 isort
