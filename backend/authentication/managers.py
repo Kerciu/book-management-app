@@ -13,15 +13,20 @@ class UserManager(BaseUserManager):
 
     def _check_field_existence(self, field_name, field_value):
         if not field_value:
-            readable_name = field_name.replace('_', ' ').capitalize() or "Field"
+            readable_name = field_name.replace("_", " ").capitalize() or "Field"
             raise ValueError(f"{readable_name} is required.")
 
     def _check_superuser_fields(self, extra_fields, field):
         if extra_fields.get(field) is not True:
-            readable_name = field.replace('_', ' ').capitalize()
+            readable_name = field.replace("_", " ").capitalize()
             raise ValueError(f"{readable_name} must be True for a superuser.")
 
-    def create_user(self, email, first_name, last_name, password=None, **other_fields):
+    def create_user(
+        self, username, email, first_name, last_name, password=None, **other_fields
+    ):
+        if not username:
+            raise ValueError("Username is required.")
+
         if email:
             email = self.normalize_email(email)
             self.email_validator(email)
@@ -32,12 +37,20 @@ class UserManager(BaseUserManager):
         self._check_field_existence("last_name", last_name)
         self._check_field_existence("password", password)
 
-        user = self.model(email=email, first_name=first_name, last_name=last_name, **other_fields)
+        user = self.model(
+            username=username,
+            email=email,
+            first_name=first_name,
+            last_name=last_name,
+            **other_fields,
+        )
         user.set_password(password)
         user.save(using=self._db)
         return user
 
-    def create_superuser(self, email, first_name, last_name, password=None, **other_fields):
+    def create_superuser(
+        self, username, email, first_name, last_name, password=None, **other_fields
+    ):
         other_fields.setdefault("is_staff", True)
         other_fields.setdefault("is_superuser", True)
         other_fields.setdefault("is_verified", True)
@@ -46,4 +59,6 @@ class UserManager(BaseUserManager):
         self._check_superuser_fields(other_fields, "is_superuser")
         self._check_superuser_fields(other_fields, "is_verified")
 
-        return self.create_user(email, first_name, last_name, password, **other_fields)
+        return self.create_user(
+            username, email, first_name, last_name, password, **other_fields
+        )
