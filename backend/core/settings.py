@@ -83,12 +83,15 @@ if DEBUG:
     }
 else:
     # prod: real Postgres
-    import dj_database_url
-
     DATABASES = {
-        "default": dj_database_url.config(
-            default=os.getenv("DATABASE_URL"), conn_max_age=600, conn_health_checks=True
-        )
+        "default": {
+            "ENGINE": "django.db.backends.postgresql",
+            "NAME": os.environ.get("DB_NAME", "postgres"),
+            "USER": os.environ.get("DB_USER", "postgres"),
+            "PASSWORD": os.environ.get("DB_PASSWORD", "postgres"),
+            "HOST": os.environ.get("DB_HOST", "localhost"),
+            "PORT": os.environ.get("DB_PORT", "5432"),
+        }
     }
 
 AUTH_USER_MODEL = "authentication.CustomUser"
