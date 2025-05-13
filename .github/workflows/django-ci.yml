@@ -17,13 +17,13 @@ jobs:
 
     services:
       postgres:
-        image: postgres:17
+        image: postgres:15
         env:
           POSTGRES_DB: test_db
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: postgres
         ports:
-          - 5433:5432
+          - 5432:5432
         options: >-
           --health-cmd pg_isready
           --health-interval 10s
@@ -45,9 +45,15 @@ jobs:
 
     - name: Run Tests
       env:
-        DATABASE_URL: postgres://postgres:postgres@localhost:5433/test_db
+        DB_HOST: localhost
+        DB_PORT: 5432
+        DB_NAME: test_db
+        DB_USER: postgres
+        DB_PASSWORD: postgres
         DEBUG: "False"
         SECRET_KEY: test-secret-key
       run: |
+        python manage.py makemigrations authentication
+        python manage.py makemigrations
         python manage.py migrate
         python manage.py test
