@@ -1,6 +1,7 @@
 from django.contrib.auth.models import BaseUserManager
 from django.core.exceptions import ValidationError
 from django.core.validators import validate_email
+from .models import AUTH_PROVIDERS
 
 
 class UserManager(BaseUserManager):
@@ -24,6 +25,9 @@ class UserManager(BaseUserManager):
     def create_user(
         self, username, email, first_name, last_name, password=None, **other_fields
     ):
+
+        auth_provider = other_fields.get("auth_provider", AUTH_PROVIDERS["email"])
+
         if not username:
             raise ValueError("Username is required.")
 
@@ -35,7 +39,9 @@ class UserManager(BaseUserManager):
 
         self._check_field_existence("first_name", first_name)
         self._check_field_existence("last_name", last_name)
-        self._check_field_existence("password", password)
+
+        if auth_provider == AUTH_PROVIDERS["email"]:
+            self._check_field_existence("password", password)
 
         user = self.model(
             username=username,
@@ -44,7 +50,12 @@ class UserManager(BaseUserManager):
             last_name=last_name,
             **other_fields,
         )
-        user.set_password(password)
+
+        if auth_provider == AUTH_PROVIDERS["email"] and password:
+            user.set_password(password)
+        else:
+            user.set_unusable_password()
+
         user.save(using=self._db)
         return user
 
