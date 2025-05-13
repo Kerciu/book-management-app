@@ -38,7 +38,7 @@ class BookViewSetTest(APITestCase):
             name="Test Publisher", website="http://first.com"
         )
         self.publisher2 = Publisher.objects.create(
-            name="Another Publisher", website="http://first.com"
+            name="Another Publisher", website="http://second.com"
         )
 
         self.book1 = Book.objects.create(
@@ -64,37 +64,37 @@ class BookViewSetTest(APITestCase):
         self.book2.publishers.add(self.publisher2)
 
     def test_list_books(self):
-        url = reverse("books")
+        url = reverse("books-list")
         response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data["results"]), 2)
 
     def test_retrieve_book(self):
-        url = reverse("books", args=[self.book1.pk])
+        url = reverse("books-detail", args=[self.book1.pk])
         response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data["title"], "Test Book")
 
     def test_filter_books_by_min_pages(self):
-        url = reverse("books")
+        url = reverse("books-list")
         response = self.client.get(url, {"min_pages": 200})
         self.assertEqual(len(response.data["results"]), 1)
         self.assertEqual(response.data["results"][0]["id"], self.book1.id)
 
     def test_filter_books_by_max_pages(self):
-        url = reverse("books")
+        url = reverse("books-list")
         response = self.client.get(url, {"max_pages": 200})
         self.assertEqual(len(response.data["results"]), 1)
         self.assertEqual(response.data["results"][0]["id"], self.book2.id)
 
     def test_filter_books_by_language(self):
-        url = reverse("books")
+        url = reverse("books-list")
         response = self.client.get(url, {"language": "Spanish"})
         self.assertEqual(len(response.data["results"]), 1)
         self.assertEqual(response.data["results"][0]["id"], self.book2.id)
 
     def test_filter_books_by_published_date_range(self):
-        url = reverse("books")
+        url = reverse("books-list")
         params = {
             "published_after": (timezone.now() - timezone.timedelta(days=200))
             .date()
@@ -108,25 +108,25 @@ class BookViewSetTest(APITestCase):
         self.assertEqual(response.data["results"][0]["id"], self.book2.id)
 
     def test_search_by_title(self):
-        url = reverse("books")
+        url = reverse("books-list")
         response = self.client.get(url, {"search": "Another"})
         self.assertEqual(len(response.data["results"]), 1)
         self.assertEqual(response.data["results"][0]["id"], self.book2.id)
 
     def test_search_by_author_last_name(self):
-        url = reverse("books")
+        url = reverse("books-list")
         response = self.client.get(url, {"search": "Smith"})
         self.assertEqual(len(response.data["results"]), 1)
         self.assertEqual(response.data["results"][0]["id"], self.book2.id)
 
     def test_default_ordering(self):
-        url = reverse("books")
+        url = reverse("books-list")
         response = self.client.get(url)
         titles = [item["title"] for item in response.data["results"]]
         self.assertEqual(titles, ["Another Book", "Test Book"])
 
     def test_custom_ordering(self):
-        url = reverse("books")
+        url = reverse("books-list")
         response = self.client.get(url, {"ordering": "-published_at"})
         dates = [item["published_at"] for item in response.data["results"]]
         self.assertTrue(dates[0] > dates[1])
@@ -171,7 +171,7 @@ class BookViewSetTest(APITestCase):
 
     def test_partial_update_book_admin(self):
         self.client.force_authenticate(self.admin)
-        url = reverse("books", args=[self.book1.id])
+        url = reverse("books-detail", args=[self.book1.id])
         data = {"title": "Updated Title"}
         response = self.client.patch(url, data)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -180,27 +180,27 @@ class BookViewSetTest(APITestCase):
 
     def test_partial_update_book_regular_user(self):
         self.client.force_authenticate(self.user)
-        url = reverse("books", args=[self.book1.id])
+        url = reverse("books-detail", args=[self.book1.id])
         data = {"title": "Updated Title"}
         response = self.client.patch(url, data)
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
     def test_destroy_book_admin(self):
         self.client.force_authenticate(self.admin)
-        url = reverse("books", args=[self.book1.id])
+        url = reverse("books-detail", args=[self.book1.id])
         response = self.client.delete(url)
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
         self.assertEqual(Book.objects.count(), 1)
 
     def test_destroy_book_regular_user(self):
         self.client.force_authenticate(self.user)
-        url = reverse("books", args=[self.book1.id])
+        url = reverse("books-detail", args=[self.book1.id])
         response = self.client.delete(url)
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
     def test_invalid_isbn_creation(self):
         self.client.force_authenticate(self.admin)
-        url = reverse("books")
+        url = reverse("books-list")
         data = {
             "title": "Invalid Book",
             "isbn": "invalid-isbn",
@@ -213,14 +213,14 @@ class BookViewSetTest(APITestCase):
 
     def test_future_publish_date_creation(self):
         self.client.force_authenticate(self.admin)
-        url = reverse("books", args=[self.book1.id])
+        url = reverse("books-detail", args=[self.book1.id])
         future_date = (timezone.now() + timezone.timedelta(days=365)).date().isoformat()
         response = self.client.patch(url, {"published_at": future_date})
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_update_relationship(self):
         self.client.force_authenticate(self.admin)
-        url = reverse("books", args=[self.book1.id])
+        url = reverse("books-detail", args=[self.book1.id])
         data = {
             "authors_ids": [self.author1.id, self.author2.id],
             "genres_ids": [self.genre2.id],
@@ -233,13 +233,12 @@ class BookViewSetTest(APITestCase):
 
     def test_empty_page_count(self):
         self.client.force_authenticate(self.admin)
-        url = reverse("books")
+        url = reverse("books-list")
         data = {
             "title": "No Pages Book",
             "isbn": "1234567890999",
             "authors_ids": [self.author1.id],
             "genres_ids": [self.genre1.id],
-            "page_count": None,
         }
         response = self.client.post(url, data)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
