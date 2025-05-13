@@ -3,6 +3,8 @@ from rest_framework.permissions import BasePermission, SAFE_METHODS
 from django_filters import rest_framework as filters
 from rest_framework import filters as drf_filters
 from rest_framework.pagination import PageNumberPagination
+from rest_framework.response import Response
+from rest_framework import status
 
 from .models import Book, Author, Publisher, Genre
 from .serializers import (
@@ -82,3 +84,12 @@ class GenreViewSet(viewsets.ModelViewSet):
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
     permission_classes = [IsAdminOrReadOnly]
+
+    def destroy(self, request, *args, **kwargs):
+        instance = self.get_object()
+        if instance.book_set.exists():
+            return Response(
+                {"error": "Cannot delete genre that is assigned to books."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        return super().destroy(request, *args, **kwargs)

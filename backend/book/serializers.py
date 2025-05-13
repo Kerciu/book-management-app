@@ -42,6 +42,13 @@ class GenreSerializer(serializers.ModelSerializer):
             }
         }
 
+    def validate_name(self, value):
+        existing_name = Genre.objects.filter(name__iexact=value).first()
+        if existing_name:
+            raise serializers.ValidationError("This genre already exists.")
+
+        return value.lower()
+
 
 class PublisherSerializer(serializers.ModelSerializer):
     class Meta:

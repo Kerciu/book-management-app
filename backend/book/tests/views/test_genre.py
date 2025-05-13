@@ -61,7 +61,7 @@ class GenreViewSetTest(APITestCase):
         response = self.client.patch(url, data)
         self.genre.refresh_from_db()
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(self.genre.name, "Non-Fiction")
+        self.assertEqual(self.genre.name, "non-fiction")  # as it is lower-cased
 
     def test_delete_protection(self):
         from ...models import Book
