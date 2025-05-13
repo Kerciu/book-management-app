@@ -95,6 +95,7 @@ class OAuth2Registerer:
                 "first_name": first_name,
                 "last_name": last_name,
                 "password": settings.SOCIAL_AUTH_PASSWORD,
+                "provider": provider,
             }
 
             registered_user = CustomUser.objects.create_user(**new_user)
