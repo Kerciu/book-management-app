@@ -94,6 +94,8 @@ class BookSerializer(serializers.ModelSerializer):
     page_count = serializers.IntegerField(
         required=False,
         allow_null=True,
+        min_value=1,
+        error_messages={"min_value": "Page count must be at least 1 if provided."},
     )
 
     class Meta:
@@ -155,3 +157,22 @@ class BookSerializer(serializers.ModelSerializer):
         book.genres.set(genres)
         book.publishers.set(publishers)
         return book
+
+    def update(self, instance, validated_data):
+
+        authors = validated_data.pop("authors", [])
+        genres = validated_data.pop("genres", [])
+        publishers = validated_data.pop("publishers", [])
+
+        instance = super().update(instance, validated_data)
+
+        if genres is not None:
+            instance.genres.set(genres)
+
+        if authors is not None:
+            instance.authors.set(authors)
+
+        if publishers is not None:
+            instance.publishers.set(publishers)
+
+        return instance

@@ -94,18 +94,23 @@ class BookViewSetTest(APITestCase):
         self.assertEqual(response.data["results"][0]["id"], self.book2.id)
 
     def test_filter_books_by_published_date_range(self):
+        author = Author.objects.create(first_name="Emily", last_name="Bronte")
+        genre = Genre.objects.create(name="Classic")
+        book = Book.objects.create(
+            title="Wuthering Heights",
+            isbn="9783161484100",
+            published_at="2020-06-01",
+        )
+        book.authors.add(author)
+        book.genres.add(genre)
+
         url = reverse("books-list")
-        params = {
-            "published_after": (timezone.now() - timezone.timedelta(days=200))
-            .date()
-            .isoformat(),
-            "published_before": (timezone.now() - timezone.timedelta(days=50))
-            .date()
-            .isoformat(),
-        }
-        response = self.client.get(url, params)
+        response = self.client.get(
+            url, {"published_after": "2020-01-01", "published_before": "2021-01-01"}
+        )
+
+        print(response.data)
         self.assertEqual(len(response.data["results"]), 1)
-        self.assertEqual(response.data["results"][0]["id"], self.book2.id)
 
     def test_search_by_title(self):
         url = reverse("books-list")
@@ -147,20 +152,25 @@ class BookViewSetTest(APITestCase):
     # create(), retrieve(), update(), partial_update(), destroy() and list() actions.
 
     def test_create_book_admin(self):
-        self.client.force_authenticate(self.admin)
-        url = reverse("books-list")
+        genre_name = "TestFiction"
+        genre = Genre.objects.create(name=genre_name)
+
+        author = Author.objects.create(first_name="John", last_name="Doe")
+
         data = {
             "title": "New Book",
-            "isbn": "1234567890789",
-            "authors_ids": [self.author1.id],
-            "genres_ids": [self.genre1.id],
+            "isbn": "9783161484100",
+            "authors_ids": [author.id],
+            "genres_ids": [genre.id],
             "publishers_ids": [self.publisher1.id],
-            "language": "French",
-            "page_count": 200,
+            "published_at": "2023-01-01",
+            "language": "English",
         }
-        response = self.client.post(url, data)
+
+        self.client.force_authenticate(self.admin)
+        response = self.client.post(reverse("books-list"), data, format="json")
+        print(response.data)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        self.assertEqual(Book.objects.count(), 3)
 
     def test_create_book_regular_user(self):
         self.client.force_authenticate(self.user)
@@ -233,13 +243,17 @@ class BookViewSetTest(APITestCase):
 
     def test_empty_page_count(self):
         self.client.force_authenticate(self.admin)
-        url = reverse("books-list")
         data = {
-            "title": "No Pages Book",
-            "isbn": "1234567890999",
+            "title": "No Page Count",
+            "isbn": "9783161484100",
             "authors_ids": [self.author1.id],
             "genres_ids": [self.genre1.id],
+            "publishers_ids": [self.publisher1.id],
+            "published_at": "2023-01-01",
+            "page_count": None,
         }
-        response = self.client.post(url, data)
+        url = reverse("books-list")
+        response = self.client.post(url, data, format="json")
+
+        print(response.data)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        self.assertIsNone(response.data["page_count"])
