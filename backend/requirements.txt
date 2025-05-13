@@ -1,4 +1,4 @@
-Django
+Django==5.2b.1
 djangorestframework
 djangorestframework-simplejwt
 psycopg2-binary
