@@ -16,6 +16,11 @@ jobs:
         working-directory: backend
 
     services:
+      redis:
+        image: redis:alpine
+        ports:
+          - 6379:6379
+
       postgres:
         image: postgres:15
         env:
@@ -52,8 +57,8 @@ jobs:
         DB_PASSWORD: postgres
         DEBUG: "False"
         SECRET_KEY: test-secret-key
+        REDIS_LOCATION: redis://redis:6379/1
       run: |
-        python manage.py flush --no-input
         python manage.py makemigrations authentication
         python manage.py makemigrations
         python manage.py migrate
