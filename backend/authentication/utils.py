@@ -6,8 +6,7 @@ from django.core.mail import EmailMessage
 from django.urls import reverse
 from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode
-
-from .models import OneTimePassword
+from django.core.cache import cache
 
 
 def generate_otp():
@@ -32,11 +31,14 @@ def send_code_to_user(email, resending=False):
         """
 
     OTP_CODE = generate_otp()
-    PASSCODE_PART = f"Please verify your email with your one time passcode: {OTP_CODE}"
+    PASSCODE_PART = f"""
+        Please verify your email with your one time passcode: {OTP_CODE}
+        Keep in mind it will expire after 10 minutes.
+    """
 
     from_email = settings.DEFAULT_FROM_EMAIL
 
-    OneTimePassword.objects.create(user=user, code=OTP_CODE)
+    cache.set(f"otp:{email}", OTP_CODE, timeout=600)
 
     send_email = EmailMessage(
         subject=SUBJECT,
