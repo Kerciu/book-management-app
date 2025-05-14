@@ -6,8 +6,6 @@ from .managers import UserManager
 
 # Create your models here.
 
-AUTH_PROVIDERS = {"email": "email", "google": "google", "github": "github"}
-
 
 class CustomUser(AbstractUser):
 
@@ -22,9 +20,7 @@ class CustomUser(AbstractUser):
     date_joined = models.DateTimeField(auto_now_add=True)
     last_login = models.DateTimeField(auto_now=True)
 
-    auth_provider = models.CharField(
-        max_length=255, default=AUTH_PROVIDERS.get("email")
-    )
+    auth_provider = models.CharField(max_length=255, default="email")
 
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = ["username", "first_name", "last_name"]
@@ -42,11 +38,3 @@ class CustomUser(AbstractUser):
         refresh = RefreshToken.for_user(self)
 
         return {"refresh": str(refresh), "access": str(refresh.access_token)}
-
-
-class OneTimePassword(models.Model):
-    user = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
-    code = models.CharField(max_length=6, db_index=True)
-
-    def __str__(self):
-        return f"{self.user.first_name}-passcode"
