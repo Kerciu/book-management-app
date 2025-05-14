@@ -1,4 +1,4 @@
-import random
+import secrets
 
 from django.conf import settings
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
@@ -10,7 +10,7 @@ from django.core.cache import cache
 
 
 def generate_otp():
-    return "".join(([str(random.randint(0, 9)) for _ in range(6)]))
+    return f"{secrets.randbelow(1000000):06d}"
 
 
 def send_code_to_user(email, resending=False):
