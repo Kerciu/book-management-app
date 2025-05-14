@@ -16,10 +16,14 @@ def generate_otp():
 def send_code_to_user(email, resending=False):
     from .models import CustomUser
 
-    user = CustomUser.objects.get(email=email)
-
     SUBJECT = "One time passcode for email verification"
     if resending:
+
+        try:
+            user = CustomUser.objects.get(email=email)
+        except CustomUser.DoesNotExist:
+            raise CustomUser.DoesNotExist("User not found")
+
         BODY = f"""
         Thank you {user.first_name.capitalize()} for registering to
         the book management application!
