@@ -5,6 +5,7 @@ __pycache__/
 
 .env
 backend/.env
+db.sqlite3
 
 target/
 Cargo.lock
@@ -12,3 +13,5 @@ dist/
 
 .nvim.lua
 .vscode/
+
+.pytest-cache/

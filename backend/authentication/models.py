@@ -1,5 +1,7 @@
-from django.db import models
 from django.contrib.auth.models import AbstractUser
+from django.db import models
+from rest_framework_simplejwt.tokens import RefreshToken
+
 from .managers import UserManager
 
 # Create your models here.
@@ -18,21 +20,21 @@ class CustomUser(AbstractUser):
     date_joined = models.DateTimeField(auto_now_add=True)
     last_login = models.DateTimeField(auto_now=True)
 
+    auth_provider = models.CharField(max_length=255, default="email")
+
     USERNAME_FIELD = "email"
-    REQUIRED_FIELDS = ['username', 'first_name', 'last_name', 'password']
+    REQUIRED_FIELDS = ["username", "first_name", "last_name"]
 
     objects = UserManager()
 
     def __str__(self):
         return self.email
 
-    def get_full_name(self):
-        return f'{self.first_name.capitalize()} {self.last_name.capitalize()}'
+    @property
+    def full_name(self):
+        return f"{self.first_name.capitalize()} {self.last_name.capitalize()}"
 
+    def tokens(self):
+        refresh = RefreshToken.for_user(self)
 
-class OneTimePassword(models.Model):
-    user = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
-    code = models.CharField(max_length=6, unique=True)
-
-    def __str__(self):
-        return f'{self.user.first_name}-passcode'
+        return {"refresh": str(refresh), "access": str(refresh.access_token)}
