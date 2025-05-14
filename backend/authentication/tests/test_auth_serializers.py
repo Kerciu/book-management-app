@@ -151,12 +151,12 @@ class UserLoginSerializerTest(TestCase):
 
 class OTPSerializerTest(TestCase):
     def test_valid_otp(self):
-        data = {"otp": "123456"}
+        data = {"otp": "123456", "email": "kacper@polska.pl"}
         serializer = OTPSerializer(data=data)
         self.assertTrue(serializer.is_valid())
 
     def test_otp_too_long(self):
-        data = {"otp": "1234567"}
+        data = {"otp": "1234567", "email": "kacper@polska.pl"}
         serializer = OTPSerializer(data=data)
         self.assertFalse(serializer.is_valid())
         self.assertIn("otp", serializer.errors)

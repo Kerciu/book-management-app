@@ -43,10 +43,12 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
-    - name: Check Redis Availability
+    - name: Install Redis CLI and check availability
       run: |
+        sudo apt-get update
+        sudo apt-get install -y redis-tools
         echo "Waiting for Redis..."
-        timeout 20 bash -c 'until redis-cli -h localhost ping; do sleep 1; done'
+        timeout 20 bash -c 'until redis-cli -h localhost ping > /dev/null; do sleep 1; done'
 
     - name: Set up Python
       uses: actions/setup-python@v3
