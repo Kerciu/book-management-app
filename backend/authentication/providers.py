@@ -65,6 +65,9 @@ class OAuth2Registerer:
     @staticmethod
     def login_user(email, password):
         user = authenticate(email=email, password=password)
+        if not user:
+            user = CustomUser.objects.get(email=email)
+
         tokens = user.tokens()
 
         return {
@@ -94,7 +97,7 @@ class OAuth2Registerer:
                 "username": username,
                 "first_name": first_name,
                 "last_name": last_name,
-                "provider": provider,
+                "auth_provider": provider,
             }
 
             registered_user = CustomUser.objects.create_user(**new_user)
