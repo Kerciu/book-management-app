@@ -84,6 +84,8 @@ DATABASES = {
     }
 }
 
+REDIS_LOCATION = os.environ.get("REDIS_LOCATION", "redis://localhost:6379/1")
+
 CACHES = {
     "default": {
         "BACKEND": "django_redis.cache.RedisCache",
