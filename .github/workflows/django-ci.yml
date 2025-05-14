@@ -57,7 +57,7 @@ jobs:
         DB_PASSWORD: postgres
         DEBUG: "False"
         SECRET_KEY: test-secret-key
-        REDIS_LOCATION: redis://redis:6379/1
+        REDIS_LOCATION: redis://localhost:6379/1
       run: |
         python manage.py makemigrations authentication
         python manage.py makemigrations
