@@ -12,7 +12,7 @@ class UserManager(BaseUserManager):
             raise ValueError("Please enter a valid email address")
 
     def _check_field_existence(self, field_name, field_value):
-        if not field_value:
+        if not field_value and field_name != "password":
             readable_name = field_name.replace("_", " ").capitalize() or "Field"
             raise ValueError(f"{readable_name} is required.")
 
@@ -38,9 +38,6 @@ class UserManager(BaseUserManager):
 
         self._check_field_existence("first_name", first_name)
         self._check_field_existence("last_name", last_name)
-
-        if auth_provider == "email":
-            self._check_field_existence("password", password)
 
         user = self.model(
             username=username,

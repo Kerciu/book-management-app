@@ -94,7 +94,6 @@ class OAuth2Registerer:
                 "username": username,
                 "first_name": first_name,
                 "last_name": last_name,
-                "password": settings.SOCIAL_AUTH_PASSWORD,
                 "provider": provider,
             }
 
