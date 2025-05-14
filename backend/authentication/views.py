@@ -8,8 +8,9 @@ from rest_framework.generics import GenericAPIView
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.throttling import AnonRateThrottle
+from django.core.cache import cache
 
-from .models import CustomUser, OneTimePassword
+from .models import CustomUser
 from .serializers import (
     GithubSignInSerializer,
     GoogleSignInSerializer,
@@ -63,28 +64,30 @@ class ValidateRegisterView(GenericAPIView):
     permission_classes = [AllowAny]
 
     def post(self, request):
+        email = request.data.get("email")
         otp_code = request.data.get("otp")
 
-        try:
-            otp_code_object = OneTimePassword.objects.get(code=otp_code)
-            user = otp_code_object.user
+        stored_otp = cache.get(f"otp:{email}")
+        if stored_otp and stored_otp == otp_code:
+            user = CustomUser.objects.get(email=email)
 
             if user.is_verified:
+                cache.delete(f"otp:{email}")
                 return Response(
-                    {"message": "Account was already verified"},
+                    {"message": "Account is already verified"},
                     status=status.HTTP_208_ALREADY_REPORTED,
                 )
 
             user.is_verified = True
             user.save()
-
+            cache.delete(f"otp:{email}")
             return Response(
                 {"message": "Account verified successfully"}, status=status.HTTP_200_OK
             )
-
-        except OneTimePassword.DoesNotExist:
+        else:
             return Response(
-                {"message": "Passcode not provided"}, status=status.HTTP_404_NOT_FOUND
+                {"message": "Passcode not provided or has expired"},
+                status=status.HTTP_404_NOT_FOUND,
             )
 
 
@@ -109,9 +112,9 @@ class LoginUserView(GenericAPIView):
 
 
 class ResendEmailView(GenericAPIView):
-
     serializer_class = ResendEmailSerializer
     permission_classes = [AllowAny]
+    throttle_classes = [AnonRateThrottle]  # anti-spam
 
     def post(self, request):
         serializer = self.serializer_class(data=request.data)
@@ -119,8 +122,6 @@ class ResendEmailView(GenericAPIView):
         email = serializer.validated_data["email"]
 
         try:
-            user = CustomUser.objects.get(email=email)
-            OneTimePassword.objects.filter(user=user).delete()
             send_code_to_user(email, resending=True)
             return Response(
                 {"message": "New verification code has been sent to your email"},
@@ -130,6 +131,12 @@ class ResendEmailView(GenericAPIView):
             return Response(
                 {"message": "User with this email does not exist!"},
                 status=status.HTTP_404_NOT_FOUND,
+            )
+        except Exception as e:
+            logger.error(f"OTP resend failed: {str(e)}")
+            return Response(
+                {"message": "Failed to resend OTP"},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
             )
 
 

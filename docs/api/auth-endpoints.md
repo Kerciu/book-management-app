@@ -39,7 +39,10 @@ Validates the OTP sent to the user's email.
 
 #### Request Body (JSON):
 ```json
-{ "otp": "213769" }
+{
+  "email": "kacper@polska.pl",
+  "otp": "213769",
+}
 ```
 
 #### Responses:
