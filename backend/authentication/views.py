@@ -104,9 +104,9 @@ class LoginUserView(GenericAPIView):
 
 
 class ResendEmailView(GenericAPIView):
-
     serializer_class = ResendEmailSerializer
     permission_classes = [AllowAny]
+    throttle_classes = [AnonRateThrottle]  # anti-spam
 
     def post(self, request):
         serializer = self.serializer_class(data=request.data)
@@ -123,6 +123,12 @@ class ResendEmailView(GenericAPIView):
             return Response(
                 {"message": "User with this email does not exist!"},
                 status=status.HTTP_404_NOT_FOUND,
+            )
+        except Exception as e:
+            logger.error(f"OTP resend failed: {str(e)}")
+            return Response(
+                {"message": "Failed to resend OTP"},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
             )
 
 
