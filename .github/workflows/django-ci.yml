@@ -53,6 +53,7 @@ jobs:
         DEBUG: "False"
         SECRET_KEY: test-secret-key
       run: |
+        python manage.py flush --no-input
         python manage.py makemigrations authentication
         python manage.py makemigrations
         python manage.py migrate
