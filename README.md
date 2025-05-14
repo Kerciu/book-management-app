@@ -25,8 +25,11 @@ A web application for managing book collections, reviewing books, and sharing re
 | **Frontend**     | Leptos (Rust WASM framework)        |
 | **Database**     | PostgreSQL 15                       |
 | **Container**    | Docker + Docker Compose             |
+| **Caching**      | Redis                               |
 | **Auth**         | JWT Tokens + OAuth 2.0              |
 | **CI/CD**        | GitHub Actions (if applicable)      |
+
+<img src="https://skillicons.dev/icons?i=django,postgres,redis,githubactions,rust,git,docker" />
 
 ## 🚀 Getting Started
 
