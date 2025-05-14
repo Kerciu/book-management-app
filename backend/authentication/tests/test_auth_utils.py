@@ -7,10 +7,11 @@ from django.contrib.sites.models import Site
 from django.urls import reverse
 from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode
+from django.core.cache import cache
 
 from django.conf import settings
 
-from ..models import CustomUser, OneTimePassword
+from ..models import CustomUser
 from ..utils import (
     generate_otp,
     send_code_to_user,
@@ -48,10 +49,9 @@ class EmailUtilsTest(TestCase):
     def test_send_code_to_user(self, mock_email):
         send_code_to_user(self.user.email)
 
-        otp = OneTimePassword.objects.first()
+        otp = cache.get(f"otp:{self.user.email}")
         self.assertIsNotNone(otp)
-        self.assertEqual(otp.user, self.user)
-        self.assertEqual(len(otp.code), 6)
+        self.assertEqual(len(otp), 6)
 
         mock_email.assert_called_once_with(
             subject="One time passcode for email verification",
@@ -60,12 +60,16 @@ class EmailUtilsTest(TestCase):
             to=[self.user.email],
         )
 
+        cache.delete(f"otp:{self.user.email}")
+
     @patch("authentication.utils.EmailMessage")
     def test_send_code_resending(self, mock_email):
         send_code_to_user(self.user.email, resending=True)
 
         body = mock_email.call_args[1]["body"]
         self.assertIn("Thank you Test", body)
+
+        cache.delete(f"otp:{self.user.email}")
 
     def test_generate_password_reset_tokens(self):
         uid, token = generate_password_reset_tokens(self.user)
@@ -98,6 +102,8 @@ class EmailUtilsTest(TestCase):
         )
         self.assertIn(expected_path, body)
         self.assertIn("http://", body)
+
+        cache.delete(f"otp:{self.user.email}")
 
     def test_generate_password_reset_tokens_unique(self):
         uid1, token1 = generate_password_reset_tokens(self.user)

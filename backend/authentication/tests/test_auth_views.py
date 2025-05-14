@@ -9,8 +9,9 @@ from rest_framework import status
 from rest_framework.test import APIClient
 from rest_framework_simplejwt.tokens import RefreshToken, TokenError
 from django.conf import settings
+from django.core.cache import cache
 
-from ..models import CustomUser, OneTimePassword
+from ..models import CustomUser
 
 
 class UserRegisterViewTest(TestCase):
@@ -63,13 +64,17 @@ class ValidateRegisterViewTest(TestCase):
             last_name="User",
             is_verified=False,
         )
-        self.otp = OneTimePassword.objects.create(user=self.user, code="123456")
+
+        cache.set(f"otp:{self.user.email}", "123456", timeout=300)
 
     def test_successful_verification(self):
-        response = self.client.post(self.url, {"otp": "123456"})
+        response = self.client.post(
+            self.url, {"otp": "123456", "email": self.user.email}
+        )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.user.refresh_from_db()
         self.assertTrue(self.user.is_verified)
+        self.assertIsNone(cache.get(f"otp:{self.user.email}"))
 
     def test_invalid_otp(self):
         response = self.client.post(self.url, {"otp": "000000"})
@@ -78,7 +83,9 @@ class ValidateRegisterViewTest(TestCase):
     def test_already_verified_user(self):
         self.user.is_verified = True
         self.user.save()
-        response = self.client.post(self.url, {"otp": "123456"})
+        response = self.client.post(
+            self.url, {"otp": "123456", "email": self.user.email}
+        )
         self.assertEqual(response.status_code, status.HTTP_208_ALREADY_REPORTED)
 
 
@@ -145,11 +152,12 @@ class ResendEmailViewTest(TestCase):
         response = self.client.post(self.url, {"email": "nonexistent@example.com"})
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
-    @patch("authentication.views.send_code_to_user")
+    @patch("authentication.utils.EmailMessage.send")
     def test_old_otp_deleted(self, mock_send):
-        OneTimePassword.objects.create(user=self.user, code="123456")
+        cache.set(f"otp:{self.user.email}", "123456", timeout=300)
         self.client.post(self.url, {"email": self.user.email})
-        self.assertEqual(OneTimePassword.objects.count(), 0)
+        new_otp = cache.get(f"otp:{self.user.email}")
+        self.assertNotEqual(new_otp, "123456")
 
 
 class PasswordResetViewTest(TestCase):

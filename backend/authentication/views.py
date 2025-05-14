@@ -70,6 +70,14 @@ class ValidateRegisterView(GenericAPIView):
         stored_otp = cache.get(f"otp:{email}")
         if stored_otp and stored_otp == otp_code:
             user = CustomUser.objects.get(email=email)
+
+            if user.is_verified:
+                cache.delete(f"otp:{email}")
+                return Response(
+                    {"message": "Account is already verified"},
+                    status=status.HTTP_208_ALREADY_REPORTED,
+                )
+
             user.is_verified = True
             user.save()
             cache.delete(f"otp:{email}")
