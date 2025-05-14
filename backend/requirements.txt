@@ -8,6 +8,7 @@ python-dotenv
 django-sendgrid-v5
 django-filter
 django-extensions
+django-redis
 pytest
 pytest-django
 pytest-cov

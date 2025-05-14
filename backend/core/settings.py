@@ -94,6 +94,16 @@ else:
         }
     }
 
+CACHES = {
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": os.environ.get("REDIS_LOCATION"),
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+        },
+    }
+}
+
 AUTH_USER_MODEL = "authentication.CustomUser"
 
 AUTH_PASSWORD_VALIDATORS = [
