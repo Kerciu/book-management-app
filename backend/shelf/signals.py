@@ -5,6 +5,7 @@ from .models import Shelf
 
 User = get_user_model()
 
+
 # signal to create default shelves for user
 @receiver(post_save, sender=User)
 def create_default_shelves(sender, instance, created, **kwargs):
