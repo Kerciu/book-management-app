@@ -67,3 +67,7 @@ class ShelfModelTests(TestCase):
             Shelf.objects.create(user=user2, name='Classics')  # Should not raise
         except Exception:
             self.fail('Should allow same shelf name for different users')
+
+    def test_str_representation(self):
+        shelf = Shelf.objects.get(user=self.user, shelf_type='read')
+        self.assertEqual(str(shelf), f"Read (by {self.user.username})")
