@@ -34,7 +34,14 @@ class Review(models.Model):
 
 
 class ReviewLike(models.Model):
-    pass
+    user = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name="liked_reviews"
+    )
+    review = models.ForeignKey(Review, on_delete=models.CASCADE, related_name="likes")
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ["user", "review"]
 
 
 class ReviewComment(models.Model):
