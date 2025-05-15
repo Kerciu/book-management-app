@@ -1,5 +1,6 @@
 from django.db import models
 from django.core.validators import MinValueValidator, MaxValueValidator
+from django.core.exceptions import ValidationError
 from django.contrib.auth import get_user_model
 from ..book.models import Book
 
@@ -43,6 +44,31 @@ class ReviewLike(models.Model):
     class Meta:
         unique_together = ["user", "review"]
 
+    def __str__(self):
+        return f"{self.user.username} liked {self.review}"
+
 
 class ReviewComment(models.Model):
-    pass
+    user = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name="commented_reviews"
+    )
+    review = models.ForeignKey(
+        Review, on_delete=models.CASCADE, related_name="comments"
+    )
+
+    text = models.TextField()
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ["-created-at"]
+
+    def __str__(self):
+        return f"{self.user.username} commented on {self.review}"
+
+    def clean(self):
+        if not self.review.is_public and self.user != self.review.user:
+            raise ValidationError(
+                "Cannot comment on private reviews unless you're the owner"
+            )
