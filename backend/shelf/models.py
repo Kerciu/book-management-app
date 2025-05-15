@@ -48,3 +48,12 @@ class Shelf(models.Model):
         else:
             if self.shelf_type:
                 raise ValidationError('Custom shelves cannot have a shelf type')
+
+    def save(self, *args, **kwargs):
+        self.full_clean()
+        super().save(*args, **kwargs)
+
+    def delete(self, *args, **kwargs):
+        if self.is_default:
+            raise ValidationError('Default shelves cannot be deleted')
+        super().delete(*args, **kwargs)
