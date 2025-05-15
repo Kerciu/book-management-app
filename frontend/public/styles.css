@@ -6,6 +6,15 @@ body {
     font-family: 'Roboto', sans-serif;
 }
 
+header {
+    display: flex;
+    background-color: #d6b5dc;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 30px;
+    box-shadow: 0 2px 5px #E2BDFF;
+}
+
 /*containers*/
 .container-flex {
     display: flex;
@@ -184,7 +193,34 @@ body {
     scale: 1;
 }
 
+.button-login {
+  background-color: #d6b5dc;
+  color: #350949;
+  border-radius: 10em;
+  font-size: 17px;
+  font-weight: 600;
+  padding: 1em 2em;
+  cursor: pointer;
+  transition: all 0.3s ease-in-out;
+  border: 2px solid #350949;
+  box-shadow: 0 0 0 0 #350949;
+}
+
+.button-login:hover {
+  transform: translateY(-4px) translateX(-2px);
+  box-shadow: 2px 5px 0 0 #350949;
+};
+
+.button-login:active {
+  transform: translateY(2px) translateX(1px);
+  box-shadow: 0 0 0 0 #350949;
+}
+
 /*other*/
+
+.spacer {
+      flex: 1;
+}
 
 .in-line-field {
     display: inline-block;
