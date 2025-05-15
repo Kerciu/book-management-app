@@ -1,5 +1,6 @@
 from django.test import TestCase
 from django.contrib.auth import get_user_model
+from django.core.exceptions import ValidationError
 from ..models import Shelf
 
 User = get_user_model()
@@ -21,3 +22,10 @@ class ShelfModelTests(TestCase):
         self.assertIn('Want to Read', shelf_names)
         self.assertIn('Currently Reading', shelf_names)
         self.assertIn('Read', shelf_names)
+
+    def test_default_shelf_cannot_be_deleted(self):
+        default_shelf = Shelf.objects.get(user=self.user, shelf_type='want_to_read')
+        with self.assertRaises(ValidationError):
+            default_shelf.delete()
+
+    
