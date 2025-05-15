@@ -7,7 +7,7 @@ use web_sys::*;
 mod components;
 mod auth;
 mod pages;
-use crate::pages::{home::HomePage, about::AboutPage, book::BookPage, account::AccountPage, list::ListPage};
+use crate::pages::{home::HomePage, about::AboutPage, book::BookPage, account::AccountPage, list::ListPage, not_found::NotFound};
 
 /// TODO: Replace with env String
 const BACKEND: &'static str = "http://localhost:8000";
@@ -19,7 +19,7 @@ pub fn App() -> impl IntoView {
 
     view! {
         <Router>
-            <Routes fallback=|| view! { NotFound }>
+            <Routes fallback=|| view! { <NotFound/> }>
                 <Route path=path!("/") view=HomePage />
                 <Route path=path!("/about") view=AboutPage />
                 <Route path=path!("/books/list") view=ListPage />
