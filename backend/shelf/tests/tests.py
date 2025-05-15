@@ -54,3 +54,16 @@ class ShelfModelTests(TestCase):
     def test_unique_default_shelf_type_constraint(self):
         with self.assertRaises(Exception):
             Shelf.objects.create(user=self.user, is_default=True, shelf_type='read')
+
+    def test_unique_shelf_name_per_user(self):
+        Shelf.objects.create(user=self.user, name='To Reread')
+        with self.assertRaises(Exception):
+            Shelf.objects.create(user=self.user, name='To Reread')
+
+    def test_different_users_can_have_same_custom_shelf_name(self):
+        Shelf.objects.create(user=self.user, name='Classics')
+        user2 = User.objects.create_user(username='bob', password='password321')
+        try:
+            Shelf.objects.create(user=user2, name='Classics')  # Should not raise
+        except Exception:
+            self.fail('Should allow same shelf name for different users')
