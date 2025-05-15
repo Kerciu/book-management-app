@@ -30,7 +30,11 @@ class Shelf(models.Model):
         constraints = [
             UniqueConstraint(
                 fields=['user', 'shelf_type'],
-                condition=Q(is_default=True)
+                condition=Q(is_default=True),
                 name='unique_deafult_shelf'
+            ),
+            UniqueConstraint(
+                fields=['user', 'name'],
+                name='unique_shelf_name_for_user'
             )
         ]
