@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth import get_user_model
 from django.core.validators import MinLengthValidator
+from django.core.exceptions import ValidationError
 from django.db.models import Q, UniqueConstraint
 
 User = get_user_model()
@@ -23,9 +24,6 @@ class Shelf(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
-    def __str__(self):
-        return f"{self.name} (by {self.user.username})"
-
     class Meta:
         constraints = [
             UniqueConstraint(
@@ -38,3 +36,15 @@ class Shelf(models.Model):
                 name='unique_shelf_name_for_user'
             )
         ]
+
+    def __str__(self):
+        return f"{self.name} (by {self.user.username})"
+
+    def clean(self):
+        if self.is_default:
+            if not self.shelf_type:
+                raise ValidationError('Default shelves must have a shelf type')
+            self.name = dict(self.SHELF_TYPES).get(self.shelf_type, self.name)
+        else:
+            if self.shelf_type:
+                raise ValidationError('Custom shelves cannot have a shelf type')
