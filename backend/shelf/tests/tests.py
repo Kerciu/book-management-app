@@ -33,3 +33,12 @@ class ShelfModelTests(TestCase):
         shelf.name = 'New Name'
         shelf.save()
         self.assertEqual(shelf.name, 'Want to Read')
+
+    def test_custom_shelf_can_be_created_and_renamed_and_deleted(self):
+        shelf = Shelf.objects.create(user=self.user, name='Favorites')
+        shelf.name = 'Top Picks'
+        shelf.save()
+        self.assertEqual(shelf.name, 'Top Picks')
+        shelf.delete()
+        self.assertFalse(
+            Shelf.objects.filter(user=self.user, name='Top Picks').exists())
