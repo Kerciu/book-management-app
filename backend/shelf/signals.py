@@ -12,16 +12,19 @@ def create_default_shelves(sender, instance, created, **kwargs):
     if created:
         Shelf.objects.create(
             user=instance,
+            name='Want to read',
             shelf_type='want_to_read',
             is_default=True
         )
         Shelf.objects.create(
             user=instance,
+            name='Currently reading',
             shelf_type='currently_reading',
             is_default=True
         )
         Shelf.objects.create(
             user=instance,
+            name='Read',
             shelf_type='read',
             is_default=True
         )
