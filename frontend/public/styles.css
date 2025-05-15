@@ -1,0 +1,214 @@
+body {
+    background-color: #460C61;
+    margin: 0;
+    min-height: 100vh;
+    color: white;
+    font-family: 'Roboto', sans-serif;
+}
+
+.home-page-welcome-text {
+    font-family: 'Roboto', sans-serif;
+    color: rgb(255, 255, 255);
+    width: 90vw;
+    font-size: 10vw;
+    font-weight: bold;
+    margin: 0 auto;
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+.in-line-field {
+    display: inline-block;
+}
+
+.container {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+.welcome-info-bold {
+    font-weight: bold;
+    font-size: 23px;
+    width: 100%;
+    font-family: 'Roboto', sans-serif;
+    max-width: 600px;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    white-space: normal;
+    line-height: 1.2;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-align: left;
+}
+
+.welcome-info {
+    font-size: 23px;
+    width: 100%;
+    max-width: 300px;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    white-space: normal;
+    line-height: 1.2;
+    font-family: 'Roboto', sans-serif;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    place-items: start center;
+}
+
+.welcome-info-button {
+    display: inline-block;
+    text-align: right;
+}
+
+.button-start {
+    cursor: pointer;
+    position: relative;
+    padding: 10px 24px;
+    font-size: 18px;
+    color: #E2BDFF;
+    border: 2px solid #E2BDFF;
+    border-radius: 34px;
+    background-color: transparent;
+    font-weight: 600;
+    height: 45px;
+    transition: all 0.3s cubic-bezier(0.23, 1, 0.320, 1);
+    overflow: hidden;
+}
+
+.button-start::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    margin: auto;
+    width: 157px;
+    height: 45px;
+    border-radius: inherit;
+    scale: 0;
+    z-index: -1;
+    background-color: #E2BDFF;
+    transition: all 0.6s cubic-bezier(0.23, 1, 0.320, 1);
+}
+
+.button-start:hover::before {
+    scale: 3;
+}
+
+.button-start:hover {
+    color: #3F0A57;
+    scale: 1.1;
+}
+
+.button-start:active {
+    scale: 1;
+}
+
+.white-section {
+    margin-top: 120px;
+    height: 1000px;
+    background-color: #FFFFFF;
+}
+
+.content-container {
+    display: flex;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.text-side {
+    padding-left: 20px;
+}
+
+.image-side {
+    padding-right: 20px;
+    flex: 1;
+    height: 340px;
+    width: auto;
+    max-width: 50%;
+    object-fit: cover;
+    border-radius: 8px;
+    align-items: flex-start;
+    justify-content: flex-start;
+}
+
+.information-title-text {
+    font-size: 26px;
+    color: #460C61;
+    place-items: start center;
+    margin-bottom: 16px;
+}
+
+.information-body-text {
+    font-size: 16px;
+    color: #460C61;
+    max-width: 400px;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    white-space: normal;
+    font-family: 'Roboto', sans-serif;
+    display: -webkit-box;
+    -webkit-line-clamp: 7;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    place-items: start center;
+}
+
+.button-more {
+    cursor: pointer;
+    position: relative;
+    padding: 10px 24px;
+    font-size: 18px;
+    color: #460C61;
+    margin-top: 50px;
+    border: 2px solid #460C61;
+    border-radius: 34px;
+    background-color: transparent;
+    font-weight: 600;
+    height: 45px;
+    transition: all 0.3s cubic-bezier(0.23, 1, 0.320, 1);
+    overflow: hidden;
+}
+
+.button-more::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    margin: auto;
+    width: 157px;
+    height: 45px;
+    border-radius: inherit;
+    scale: 0;
+    z-index: -1;
+    background-color: #460C61;
+    transition: all 0.6s cubic-bezier(0.23, 1, 0.320, 1);
+}
+
+.button-more:hover::before {
+    scale: 3;
+}
+
+.button-more:hover {
+    color: rgb(188, 164, 206);
+    scale: 1.1;
+    }
+
+.button-more:active {
+    scale: 1;
+}
+
+.text-title {
+    font-size: 26px;
+    color: #460C61;
+    margin-left: 20px;
+    margin-top: 10px;
+}
