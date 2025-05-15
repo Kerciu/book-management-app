@@ -13,8 +13,10 @@ class Review(models.Model):
     book = models.ForeignKey(Book, on_delete=models.CASCADE, related_name="reviews")
 
     rating = models.PositiveIntegerField(
-        MinValueValidator(1),
-        MaxValueValidator(5),
+        validators=[
+            MinValueValidator(1),
+            MaxValueValidator(5),
+        ]
     )
 
     text = models.TextField(blank=True, null=False)
@@ -34,8 +36,10 @@ class Review(models.Model):
 class BookRating(models.Model):
     book = models.ForeignKey(Book, on_delete=models.CASCADE)
     average_rating = models.FloatField(
-        MinValueValidator(1),
-        MaxValueValidator(5),
+        validators=[
+            MinValueValidator(1),
+            MaxValueValidator(5),
+        ]
     )
 
     num_reviews = models.PositiveIntegerField()
