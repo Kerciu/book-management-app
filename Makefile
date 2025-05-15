@@ -1,6 +1,6 @@
 init:
 	make build
-	docker compose exec backend python manage.py makemigrations authentication shelf
+	docker compose exec backend python manage.py makemigrations authentication
 	make makemigrations
 	make migrate
 

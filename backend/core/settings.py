@@ -33,7 +33,7 @@ INSTALLED_APPS = [
     # Add your apps here
     "authentication",
     "book",
-    "shelf.apps.ShelfConfig",
+    "shelf",
     "social",
     "notification",
     "recommend",
