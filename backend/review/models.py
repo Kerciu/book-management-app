@@ -33,13 +33,9 @@ class Review(models.Model):
         return f"{self.user.username}'s review of {self.book.title}"
 
 
-class BookRating(models.Model):
-    book = models.ForeignKey(Book, on_delete=models.CASCADE)
-    average_rating = models.FloatField(
-        validators=[
-            MinValueValidator(1),
-            MaxValueValidator(5),
-        ]
-    )
+class ReviewLike(models.Model):
+    pass
 
-    num_reviews = models.PositiveIntegerField()
+
+class ReviewComment(models.Model):
+    pass
