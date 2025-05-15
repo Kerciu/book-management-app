@@ -62,7 +62,12 @@ class ShelfModelTests(TestCase):
 
     def test_different_users_can_have_same_custom_shelf_name(self):
         Shelf.objects.create(user=self.user, name='Classics')
-        user2 = User.objects.create_user(username='bob', password='password321')
+        user2 = User.objects.create_user(
+            username='bob',
+            email='bob@gmail.com',
+            first_name='Bob',
+            last_name='Smith',
+            password='safepwd')
         try:
             Shelf.objects.create(user=user2, name='Classics')  # Should not raise
         except Exception:
