@@ -28,4 +28,8 @@ class ShelfModelTests(TestCase):
         with self.assertRaises(ValidationError):
             default_shelf.delete()
 
-    
+    def test_default_shelf_name_is_forced_by_shelf_type(self):
+        shelf = Shelf.objects.get(user=self.user, shelf_type='want_to_read')
+        shelf.name = 'New Name'
+        shelf.save()
+        self.assertEqual(shelf.name, 'Want to Read')
