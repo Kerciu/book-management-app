@@ -16,7 +16,7 @@ class Shelf(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="shelves")
     name = models.CharField(
         max_length=30,
-        validators=[MinLengthValidator(5)]
+        validators=[MinLengthValidator(3)]
     )
     is_default = models.BooleanField(default=False)
     shelf_type = models.CharField(
