@@ -42,3 +42,15 @@ class ShelfModelTests(TestCase):
         shelf.delete()
         self.assertFalse(
             Shelf.objects.filter(user=self.user, name='Top Picks').exists())
+
+    def test_custom_shelf_cannot_have_shelf_type(self):
+        with self.assertRaises(ValidationError):
+            Shelf.objects.create(user=self.user, name='Weird Shelf', shelf_type='read')
+
+    def test_default_shelf_must_have_shelf_type(self):
+        with self.assertRaises(ValidationError):
+            Shelf.objects.create(user=self.user, name='Read', is_default=True)
+
+    def test_unique_default_shelf_type_constraint(self):
+        with self.assertRaises(Exception):
+            Shelf.objects.create(user=self.user, is_default=True, shelf_type='read')
