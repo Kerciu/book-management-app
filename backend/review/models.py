@@ -9,13 +9,23 @@ User = get_user_model()
 
 
 class Review(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    book = models.ForeignKey(Book, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="reviews")
+    book = models.ForeignKey(Book, on_delete=models.CASCADE, related_name="reviews")
 
     rating = models.PositiveIntegerField(
         MinValueValidator(1),
         MaxValueValidator(5),
     )
+
+    text = models.TextField(blank=True, null=False)
+    has_spoilers = models.BooleanField(default=False)
+    is_public = models.BooleanField(default=True)
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"{self.user.username}'s review of {self.book.title}"
 
 
 class BookRating(models.Model):
