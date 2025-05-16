@@ -2,6 +2,7 @@ use anyhow::anyhow;
 use leptos::prelude::*;
 use log::Level;
 use serde::Serialize;
+use leptos_router::hooks::*;
 
 use crate::components::send_post_request;
 use crate::auth::email::Token as AuthToken;
@@ -60,6 +61,8 @@ async fn post(data: LoginRequest) -> anyhow::Result<LoginResponse> {
 
 #[component]
 pub fn login_form() -> impl IntoView {
+    let navigate = use_navigate();
+
     let request = LoginRequest::default();
 
     let send_request = move |request: &LoginRequest| {
@@ -97,6 +100,7 @@ pub fn login_form() -> impl IntoView {
     Effect::new(move || {
         if let LoginResponse::Token(token) = response() {
             provide_context(token);
+            navigate("/books/list", Default::default());
         }
     });
 

@@ -69,22 +69,30 @@ fn book_info(book: Book) -> impl IntoView {
         .. 
     } = book;
     view! {
-        <p>
-            {title}
-            " by "
-            {author}
-            " published at "
-            {published_at}
-            " genres: "
-            {
-                categories.into_iter().map(|category| {
-                    view! {
-                        <br/>
-                        {category}
-                    }
-                }).collect_view()
-            }
-        </p>
+            <div class="book-display">
+                    <div class="container-flex" style="padding: 0px;">
+                        //image url
+                        <img src="https://ecsmedia.pl/cdn-cgi/image/format=webp,width=544,height=544,/c/the-rust-programming-language-2nd-edition-b-iext138640655.jpg" alt="Description" class="image-side" style="margin-top: 20px; padding-bottom:20px;"></img>
+                        <div class="text-side" style="margin-top: 20px;">
+                            <div class="text-title" style="color: #FFFFFF; margin-left:0px;">{title}</div>
+                            <div class="body-text" style="color: #cac1ce; margin-left:0px;">{format!("by {}", author)}</div>
+                            <div class="body-text" style="color: #cac1ce; margin-left:0px;">{format!("Published: {}", published_at)}</div>
+                            <div class="body-text" style="color: #FFFFFF; margin-left:0px; font-size: 20px; margin-top:10px;">
+                                //description
+                                "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."
+                            </div>
+                            <div class="categories-container" style="margin-top:10px;">
+                                <div class="chips-container">
+                                    {categories.into_iter()
+                                        .map(|category| view! { 
+                                            <span class="chip">{category}</span> 
+                                        })
+                                        .collect_view()}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+            </div>
     }
 }
 
@@ -155,7 +163,11 @@ pub fn book_list() -> impl IntoView {
     };
 
     view! {
-        <p>"Book List:"</p>
+        <div class="container-flex-row" style="padding:0px;">
+            <input type="text" placeholder="Search" style="margin-left:0px; border-radius: 16px; height:19px; margin-top:0px;"/>
+            <button class="button-pop" style="width: auto;">"Filter"</button>
+            <button class="button-pop" style="width: auto;">"Sort"</button>
+        </div>
         <For
             each=move || books()
             key=|book| book.id

@@ -27,6 +27,12 @@ header {
     box-sizing: border-box;
 }
 
+.container-flex-row {
+  display: flex;
+  flex-direction: row; 
+  gap: 16px; 
+}
+
 .white-section {
     margin-top: 120px;
     height: 1000px;
@@ -89,6 +95,40 @@ header {
 	height: 40px;
 	width: 40px;
 }
+
+.container-books-list-page {
+    display: flex;
+    align-items: top;
+    padding-left: 20px;
+    width: auto;
+    height: auto;
+}
+
+.column {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 10px;
+}
+
+.right-buttons {
+    display: flex;
+    gap: 10px;
+}
+
+.categories-container {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 12px;
+}
+
+.chips-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
 
 /*texts*/
 
@@ -177,6 +217,12 @@ header {
     font-family: 'Roboto', sans-serif;
     margin-left: 20px;
     margin-top: 10px;
+}
+
+.text-title-list-page {
+    font-size: 100px;
+    color: rgb(226, 189, 255);
+    font-family: 'Roboto', sans-serif;
 }
 
 /* buttons */
@@ -382,3 +428,32 @@ input::placeholder {
 input::placeholder { opacity: 1; }
 input::-webkit-input-placeholder { color: #cac1ce; }
 
+
+.divider {
+    width: 1px;
+    background-color: #cac1ce;
+    height: auto;
+}
+
+.book-display {
+    border-bottom: 1px solid #eee;
+    width: auto;
+}
+
+.categories ul {
+    margin: 0.5rem 0;
+    padding-left: 1.5rem;
+}
+
+.categories li {
+    list-style-type: disc;
+}
+
+.chip {
+    background-color: #E2BDFF;
+    color: #372b3f;
+    padding: 4px 12px;
+    border-radius: 16px;
+    font-size: 1rem;
+    white-space: nowrap;
+}
