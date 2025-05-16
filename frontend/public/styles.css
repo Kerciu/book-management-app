@@ -1,6 +1,5 @@
 body {
-    background-color: #460C61;
-    margin: 0;
+background: linear-gradient(315deg, hsla(281, 64%, 14%, 1) 0%, hsla(281, 64%, 14%, 1) 10%, hsla(291, 19%, 43%, 1) 15%, hsla(281, 64%, 14%, 1) 35%, hsla(281, 64%, 14%, 1) 65%, hsla(291, 19%, 43%, 1) 85%, hsla(281, 64%, 14%, 1) 90%, hsla(280, 77%, 12%, 1) 100%);    margin: 0;
     height: 100%;
     min-height: 100vh;
     color: white;
@@ -225,6 +224,19 @@ header {
     font-family: 'Roboto', sans-serif;
 }
 
+.test-book-description{
+    color: #FFFFFF; 
+    margin-left:0px; 
+    font-size: 20px; 
+    margin-top: 10px;
+    margin-left: 20px; 
+    max-width: 50vw;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    white-space: normal;
+    font-family: 'Roboto', sans-serif;
+}
+
 /* buttons */
 
 .button-pop {
@@ -266,6 +278,48 @@ header {
 }
 
 .button-pop:active {
+    scale: 1;
+}
+
+.button-pop-ghost {
+    cursor: pointer;
+    position: relative;
+    padding: 10px 24px;
+    font-size: 18px;
+    color: #3F0A57;
+    border: 2px solid #d6b5dc;
+    border-radius: 34px;
+    background-color: transparent;
+    font-weight: 600;
+    height: 45px;
+    transition: all 0.3s cubic-bezier(0.23, 1, 0.320, 1);
+    overflow: hidden;
+}
+
+.button-pop-ghost::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    margin: auto;
+    width: 157px;
+    height: 45px;
+    border-radius: inherit;
+    scale: 0;
+    z-index: -1;
+    background-color: #3F0A57;
+    transition: all 0.6s cubic-bezier(0.23, 1, 0.320, 1);
+}
+
+.button-pop-ghost:hover::before {
+    scale: 3;
+}
+
+.button-pop-ghost:hover {
+    color: #E2BDFF;
+    scale: 1.1;
+}
+
+.button-pop-ghost:active {
     scale: 1;
 }
 
@@ -371,6 +425,8 @@ header {
 	outline: none;
 }
 
+
+
 .button-basic {
   background-color: #d6b5dc;
   color: #15041d;
@@ -470,3 +526,38 @@ input::-webkit-input-placeholder { color: #cac1ce; }
     font-size: 1rem;
     white-space: nowrap;
 }
+
+.custom-select {
+      position: relative;
+      width: 250px;
+    }
+
+    select {
+      width: 100%;
+      padding: 10px 15px;
+      border: 2px solid #5d4f68;
+      border-radius: 8px;
+      background: #E2BDFF;
+      color: #372b3f;
+      font-size: 16px;
+      appearance: none; /* Remove default arrow */
+      -webkit-appearance: none;
+      -moz-appearance: none;
+    }
+
+    .custom-select::after {
+      content: "▼";
+      position: absolute;
+      top: 50%;
+      right: 15px;
+      transform: translateY(-50%);
+      pointer-events: none;
+      font-size: 14px;
+      color: #372b3f;
+    }
+
+    select:focus {
+      outline: none;
+      border-color: #251d2b;
+      box-shadow: 0 0 0 3px #624e72;
+    }

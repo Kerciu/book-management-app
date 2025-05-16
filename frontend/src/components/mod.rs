@@ -1,3 +1,4 @@
+mod book_details;
 mod registraction_form;
 mod login_form;
 mod book_list;
@@ -7,7 +8,7 @@ pub use book_list::BookList;
 pub use friends_list::FriendList;
 pub use login_form::LoginForm;
 pub use registraction_form::RegistractionForm;
-
+pub use book_details::BookDetails;
 
 use gloo_net::http::{Request, Response};
 use serde::{de::DeserializeOwned, Deserialize};
