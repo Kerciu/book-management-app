@@ -2,7 +2,7 @@ use leptos::*;
 use leptos::prelude::*;
 use leptos_router::hooks::*;
 use leptos::html::*;
-use crate::components::{BookList};
+use crate::components::{BookList, FriendList};
 
     struct Book_temp {
         id: usize,
@@ -40,7 +40,7 @@ pub fn ListPage() -> impl IntoView {
             </button>
         </header>
         <div class="container-books-list-page" style ="padding-top:0px;">
-            <div style="padding-right: 40vw;">
+            <div style="padding-right: 20vw;">
                 <div class="text-title-list-page">"Books"</div>
                 <BookList/>
                 // book example
@@ -73,12 +73,9 @@ pub fn ListPage() -> impl IntoView {
 
             <div class="divider"></div>
 
-            <div style="width: fit-content;">
+            <div style="width: fit-content; padding-left: 20px;">
                 <div class="text-title-list-page">"Friends"</div>
-                <div class="right-buttons">
-                <button>button</button>
-                <button>button</button>
-                </div>
+                <FriendList/>
             </div>
         </div>
     }

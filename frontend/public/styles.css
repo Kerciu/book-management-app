@@ -371,6 +371,19 @@ header {
 	outline: none;
 }
 
+.button-basic {
+  background-color: #d6b5dc;
+  color: #15041d;
+  border-radius: 10em;
+  font-size: 17px;
+  font-weight: 600;
+  padding: 0.55em 2em;
+  cursor: pointer;
+  transition: all 0.3s ease-in-out;
+  border: 2px solid #d6b5dc;
+  box-shadow: 0 0 0 0 #d6b5dc;
+}
+
 /*other*/
 
 .spacer {
