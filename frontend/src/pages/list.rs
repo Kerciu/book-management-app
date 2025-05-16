@@ -30,6 +30,7 @@ pub fn ListPage() -> impl IntoView {
 
     let navigate = use_navigate();
     let account_nav = navigate.clone();
+    let book_nav_temp = navigate.clone();
     let book = get_example_book();
     view! {
         <header>
@@ -44,15 +45,17 @@ pub fn ListPage() -> impl IntoView {
                 <div class="text-title-list-page">"Books"</div>
                 <BookList/>
                 // book example
-                <div class="book-display">
+                <div class="book-display" on:click=move |_| {
+                    book_nav_temp("/books/details", Default::default());
+                    }>
                     <div class="container-flex" style="padding: 0px;">
                         //image url
                         <img src="https://ecsmedia.pl/cdn-cgi/image/format=webp,width=544,height=544,/c/the-rust-programming-language-2nd-edition-b-iext138640655.jpg" alt="Description" class="image-side" style="margin-top: 20px; padding-bottom:20px;"></img>
                         <div class="text-side" style="margin-top: 20px;">
-                            <div class="text-title" style="color: #FFFFFF; margin-left:0px;">{book.title.clone()}</div>
-                            <div class="body-text" style="color: #cac1ce; margin-left:0px;">{format!("by {}", book.author)}</div>
-                            <div class="body-text" style="color: #cac1ce; margin-left:0px;">{format!("Published: {}", book.published_at)}</div>
-                            <div class="body-text" style="color: #FFFFFF; margin-left:0px; font-size: 20px; margin-top:10px;">
+                            <div class="text-title" style="color: #eadfe7; margin-left:0px;">{book.title.clone()}</div>
+                            <div class="body-text" style="color: #cfc3cd; margin-left:0px;">{format!("by {}", book.author)}</div>
+                            <div class="body-text" style="color: #cfc3cd; margin-left:0px;">{format!("Published: {}", book.published_at)}</div>
+                            <div class="body-text" style="color: #eadfe7; margin-left:0px; font-size: 20px; margin-top:10px;">
                                 //description
                                 "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."
                             </div>

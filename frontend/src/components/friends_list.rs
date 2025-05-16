@@ -15,7 +15,7 @@ fn friend_info(friend: Friend) -> impl IntoView {
     view! {
         <div style="border-bottom: 1px solid #eee;">
             <div class="container-flex-row" style="padding:0px; padding-bottom:10px; padding-top:20px;">
-                <div class="text-title" style="color: #FFFFFF; margin-left:0px; font-size: 36px; margin-top:0px;">{name}</div>
+                <div class="text-title" style="color: #FFFFFF; margin-left:0px; font-size: 30px; margin-top:0px;">{name}</div>
                 <button class="button-basic" style="width: auto; font-size: 14px;">"Share book"</button>
                 <button class="button-basic" style="width: auto; font-size: 14px;">"View collection"</button>
             </div>

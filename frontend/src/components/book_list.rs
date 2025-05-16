@@ -1,5 +1,5 @@
 use std::collections::HashMap;
-
+use leptos_router::hooks::*;
 use leptos::prelude::*;
 use log::{Level, log};
 use serde::Deserialize;
@@ -68,8 +68,11 @@ fn book_info(book: Book) -> impl IntoView {
         categories, 
         .. 
     } = book;
+    let navigate = use_navigate();
     view! {
-            <div class="book-display">
+            <div class="book-display" on:click=move |_| {
+                    navigate("/books/details", Default::default());
+                    }>
                     <div class="container-flex" style="padding: 0px;">
                         //image url
                         <img src="https://ecsmedia.pl/cdn-cgi/image/format=webp,width=544,height=544,/c/the-rust-programming-language-2nd-edition-b-iext138640655.jpg" alt="Description" class="image-side" style="margin-top: 20px; padding-bottom:20px;"></img>
@@ -166,7 +169,11 @@ pub fn book_list() -> impl IntoView {
         <div class="container-flex-row" style="padding:0px;">
             <input type="text" placeholder="Search" style="margin-left:0px; border-radius: 16px; height:19px; margin-top:0px;"/>
             <button class="button-pop" style="width: auto;">"Filter"</button>
-            <button class="button-pop" style="width: auto;">"Sort"</button>
+            <select name="Sort" class="custom-select">
+                <option value="relevance">"Relevance"</option>  
+                <option value="alphabetically">"Alphabetically"</option>  
+                <option value="date">"Date published"</option>  =
+            </select>
         </div>
         <For
             each=move || books()
