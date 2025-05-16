@@ -38,6 +38,8 @@ INSTALLED_APPS = [
     "notification",
     "recommend",
     "statistic",
+    "review",
+    "rating",
 ]
 
 SITE_ID = 1
