@@ -125,7 +125,7 @@ pub fn registraction_form() -> impl IntoView {
         RegisterResponse::Ok => "Registration successful",
         RegisterResponse::NoResponse => "Something went wrong, try again",
         RegisterResponse::NoRequest => "",
-        RegisterResponse::Waiting => "Waiting for server",
+        RegisterResponse::Waiting => "",
         RegisterResponse::Err(_) => "Registration failed",
     };
 
@@ -134,8 +134,7 @@ pub fn registraction_form() -> impl IntoView {
     view! {
         <form>
             <div>
-                <label>"Username"</label>
-                <input type="text" bind:value=request.username required />
+                <input type="text" placeholder="Username" bind:value=request.username required />
                 <p>
                 {move ||
                     if let RegisterResponse::Err(arr) = response()
@@ -150,8 +149,7 @@ pub fn registraction_form() -> impl IntoView {
                 </p>
             </div>
             <div>
-                <label>"E-mail"</label>
-                <input type="email" bind:value=request.email required />
+                <input type="email" placeholder="Email" bind:value=request.email required />
                 <p>
                 {move ||
                     if let RegisterResponse::Err(arr) = response()
@@ -166,8 +164,7 @@ pub fn registraction_form() -> impl IntoView {
                 </p>
             </div>
             <div>
-                <label>"First Name"</label>
-                <input type="text" bind:value=request.first_name required />
+                <input type="text" placeholder="First name" bind:value=request.first_name required />
                 <p>
                 {move ||
                     if let RegisterResponse::Err(arr) = response()
@@ -182,8 +179,7 @@ pub fn registraction_form() -> impl IntoView {
                 </p>
             </div>
             <div>
-                <label>"Last Name"</label>
-                <input type="text" bind:value=request.last_name required />
+                <input type="text" placeholder="Last name" bind:value=request.last_name required />
                 <p>
                 {move ||
                     if let RegisterResponse::Err(arr) = response()
@@ -198,8 +194,7 @@ pub fn registraction_form() -> impl IntoView {
                 </p>
             </div>
             <div>
-                <label>"Password"</label>
-                <input type="password" bind:value=request.password required />
+                <input type="password" placeholder="Password" bind:value=request.password required />
                 <p>
                 {move ||
                     if let RegisterResponse::Err(arr) = response()
@@ -214,8 +209,7 @@ pub fn registraction_form() -> impl IntoView {
                 </p>
             </div>
             <div>
-                <label>"Repeat Password"</label>
-                <input type="password" bind:value=request.re_password required />
+                <input type="password" placeholder="Repeat password" bind:value=request.re_password required />
                 <p>
                 {move ||
                     if let RegisterResponse::Err(arr) = response()
@@ -229,12 +223,16 @@ pub fn registraction_form() -> impl IntoView {
                 }
                 </p>
             </div>
-            <input type="button" on:click=move |_| {
-                send_request.dispatch(request);
-            } value="Register" />
+            <div class="container-flex" style="padding: 0px; align-items: center; justify-content: center;">
+                <input type="button" class="button-squash" on:click=move |_| {
+                    send_request.dispatch(request);
+                } value="Register" />
+            </div>
         </form>
-        <p>
-            {response_display}
-        </p>
+        <div class="container-flex" style="padding: 0px; align-items: center; justify-content: center;">
+            <div class="body-text" style="color: #d6b5dc; text-align: center; margin-top: 10px;">
+                {response_display}
+            </div>
+        </div>
     }
 }

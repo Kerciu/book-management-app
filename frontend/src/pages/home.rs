@@ -1,19 +1,34 @@
 use leptos::*;
+use leptos::prelude::*;
 use leptos::html::*;
+use leptos_router::hooks::*;
 #[component]
 pub fn HomePage() -> impl IntoView {
+
+    let navigate = use_navigate();
+
+    let login_nav = navigate.clone();
+    let signup_nav = navigate.clone();
+
+
     view! {
                 <main>
                     <header>
                         <div class="spacer"></div>
-                        <button class="button-login" style="margin-top: 0px;">"Log in"</button>
+                        <button class="button-login" style="margin-top: 0px;" on:click=move |_| {
+                                login_nav("/sign?show_sign_up=false", Default::default());
+                            }>"Log in"
+                        </button>
                     </header>
                     <div class="home-page-welcome-text" >"Welcome in BookUp"</div>
                     <div class="container-flex">
                         <div class="text-lines">"Start using BookUp"</div>
                         <div class="text-lines-bold">"BookUp is an innovative app for managing your book collection, allowing you to add, rate, review, and share books with friends"</div>
                         <div class="text-lines">"Join now!"</div>
-                        <button class="button-pop">"Sign up"</button>
+                        <button class="button-pop" on:click=move |_| {
+                                signup_nav("/sign?show_sign_up=true", Default::default());
+                            }>"Sign up"
+                        </button>
                     </div>
                     <div style="display: flex; gap: 0px; align-items: center; margin-left: 20px; margin-right: 20px; margin-top: 80px;">
                         <img src="https://static.wixstatic.com/media/117514_dc6b7bd47a3e42df8ab688dd92fe65c5~mv2.png" style="width: 25vw; height: 316px; object-fit: cover;"></img>
