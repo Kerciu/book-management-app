@@ -1,6 +1,8 @@
-from django.shortcuts import render
+from rest_framework import viewsets
+from .models import Rating
+from .serializers import RatingSerializer
 
 # Create your views here.
-class BookRatingViewSet(viewsets.ModelViewSet):
-    queryset = BookRatings.objects.all()
-    serializer_class = BookRatingSerializer
+class RatingViewSet(viewsets.ModelViewSet):
+    queryset = Rating.objects.all()
+    serializer_class = RatingSerializer

@@ -4,7 +4,7 @@ from book.models import Book
 from authentication.models import CustomUser
 # Create your models here.
 
-class Rating:
+class Rating(models.Model):
     book_id = models.ForeignKey(Book, on_delete=models.CASCADE)
     user_id = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     pk = models.CompositePrimaryKey("user_id", "book_id")
