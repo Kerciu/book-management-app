@@ -8,7 +8,7 @@ from rest_framework import status
 from django.shortcuts import get_object_or_404
 
 from .permissions import IsCommentOwner, IsReviewOwner
-
+from .throttles import CommentCreateThrottle
 from .serializers import ReviewSerializer, ReviewLikeSerializer, ReviewCommentSerializer
 
 from ..book.models import Book
@@ -70,6 +70,8 @@ class CommentView(ModelViewSet):
     page_size = 10
     page_size_query_param = "page_size"
     max_page_size = 100
+
+    throttle_classes = [CommentCreateThrottle] if action == "create" else []
 
     def get_queryset(self):
         qs = ReviewComment.objects.filter(review_id=self.kwargs["review_pk"]).order_by(
