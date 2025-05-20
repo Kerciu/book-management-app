@@ -1,6 +1,5 @@
 from django.db import models
 from django.core.validators import MinValueValidator, MaxValueValidator
-from django.core.exceptions import ValidationError
 from django.contrib.auth import get_user_model
 from ..book.models import Book
 
@@ -66,9 +65,3 @@ class ReviewComment(models.Model):
 
     def __str__(self):
         return f"{self.user.username} commented on {self.review}"
-
-    def clean(self):
-        if not self.review.is_public and self.user != self.review.user:
-            raise ValidationError(
-                "Cannot comment on private reviews unless you're the owner"
-            )
