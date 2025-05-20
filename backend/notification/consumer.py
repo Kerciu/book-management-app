@@ -1,6 +1,9 @@
 from django.contrib.auth.models import AnonymousUser
 from channels.generic.websocket import AsyncWebsocketConsumer
+from channels.db import database_sync_to_async
 import json
+
+from .models import Notification
 
 
 class NotificationConsumer(AsyncWebsocketConsumer):
@@ -28,3 +31,9 @@ class NotificationConsumer(AsyncWebsocketConsumer):
 
     async def notify(self, event):
         await self.send(text_data=json.dumps(event))
+
+    @database_sync_to_async
+    def mark_as_read(self, notification_id):
+        notification = Notification.objects.get(id=notification_id)
+        notification_id.is_read = True
+        notification.save()
