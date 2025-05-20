@@ -5,6 +5,8 @@ from .models import (
     ReviewComment,
 )
 
+from django.core.cache import cache
+
 
 class ReviewSerializer(serializers.ModelSerializer):
     user = serializers.StringRelatedField(read_only=True)
@@ -31,10 +33,14 @@ class ReviewSerializer(serializers.ModelSerializer):
         read_only_fields = ["user", "created_at", "updated_at"]
 
     def get_likes_count(self, obj):
-        return obj.likes.count()
+        return cache.get_or_set(
+            f"review_{obj.id}_likes_count", lambda: obj.likes.count(), timeout=300
+        )
 
     def get_comments_count(self, obj):
-        return obj.comments.count()
+        return cache.get_or_set(
+            f"review_{obj.id}_comment_count", lambda: obj.likes.count(), timeout=300
+        )
 
     def get_has_liked(self, obj):
         request = self.context.get("request")
