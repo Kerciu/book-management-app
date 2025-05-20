@@ -30,6 +30,7 @@ INSTALLED_APPS = [
     "django.contrib.sites",
     "django_extensions",
     "drf_spectacular",
+    "channels",
     # Add your apps here
     "authentication",
     "book",
@@ -72,6 +73,8 @@ TEMPLATES = [
     },
 ]
 
+ASGI_APPLICATION = "core.asgi.application"
+
 WSGI_APPLICATION = "core.wsgi.application"
 
 DATABASES = {
@@ -94,6 +97,13 @@ CACHES = {
         "OPTIONS": {
             "CLIENT_CLASS": "django_redis.client.DefaultClient",
         },
+    }
+}
+
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {"hosts": [("127.0.0.1", 6379)]},
     }
 }
 
