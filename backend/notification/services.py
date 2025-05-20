@@ -30,3 +30,17 @@ class NotificationService:
         )
 
         return notification
+
+    @classmethod
+    def notify_review_liked(cls, user, review):
+        message = f"{user.username} liked your review on {review.book.title}"
+        return cls.send_notification(
+            user=user,
+            notification_type="REVIEW_LIKE",
+            message=message,
+            payload={
+                "review_id": str(review.id),
+                "book_id": str(review.book.id),
+                "actor_id": str(user.id),
+            },
+        )
