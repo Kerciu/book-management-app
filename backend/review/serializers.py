@@ -31,17 +31,17 @@ class ReviewSerializer(serializers.ModelSerializer):
         read_only_fields = ["user", "created_at", "updated_at"]
 
     def get_likes_count(self, obj):
-        return ReviewLike.objects.filter(review=obj).count()
+        return obj.likes.count()
 
     def get_comments_count(self, obj):
-        return ReviewComment.objects.filter(review=obj).count()
+        return obj.comments.count()
 
     def get_has_liked(self, obj):
         request = self.context.get("request")
         return (
             request
             and request.user.is_authenticated
-            and ReviewLike.objects.filter(user=request.user).exists()
+            and obj.likes.filter(user=request.user).exists()
         )
 
 
