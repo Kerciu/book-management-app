@@ -11,7 +11,7 @@ from .throttles import CommentCreateThrottle
 from .pagination import CommentPagination
 from .serializers import ReviewSerializer, ReviewLikeSerializer, ReviewCommentSerializer
 
-from ..book.models import Book
+from book.models import Book
 from .models import Review, ReviewLike, ReviewComment
 
 
