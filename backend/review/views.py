@@ -7,6 +7,8 @@ from rest_framework import status
 
 from django.shortcuts import get_object_or_404
 
+from .permissions import IsCommentOwner
+
 from .serializers import ReviewSerializer, ReviewLikeSerializer, ReviewCommentSerializer
 
 from ..book.models import Book
@@ -58,3 +60,13 @@ class CommentView(ModelViewSet):
     def perform_create(self, serializer):
         review = get_object_or_404(Review, pk=self.kwargs["review_pk"])
         serializer.save(user=self.request.user, review=review)
+
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        context["review"] = get_object_or_404(Review, pk=self.kwargs["review_pk"])
+        return context
+
+    def get_permissions(self):
+        if self.action in ["update", "partial_update", "destroy"]:
+            return [IsAuthenticated(), IsCommentOwner()]
+        return super().get_permissions()
