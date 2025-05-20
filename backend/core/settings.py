@@ -103,7 +103,10 @@ CACHES = {
 CHANNEL_LAYERS = {
     "default": {
         "BACKEND": "channels_redis.core.RedisChannelLayer",
-        "CONFIG": {"hosts": [("127.0.0.1", 6379)]},
+        "CONFIG": {
+            "hosts": [REDIS_LOCATION],
+            "symmetric_encryption_keys": [SECRET_KEY],
+        },
     }
 }
 
@@ -146,6 +149,11 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
     "http://127.0.0.1:3000",
     "http://0.0.0.0:3000",
+]
+
+CSRF_TRUSTED_ORIGINS = [
+    "ws://localhost:3000",
+    "ws://0.0.0.0:3000",
 ]
 
 # REST Framework settings
