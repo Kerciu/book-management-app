@@ -4,17 +4,27 @@ from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticate
 from rest_framework.decorators import action
 from rest_framework import status
 
+from django.shortcuts import get_object_or_404
+
 from .serializers import (
     ReviewSerializer,
     ReviewLikeSerializer,
 )
 
-from .models import ReviewLike
+from ..book.models import Book
+from .models import Review, ReviewLike
 
 
 class ReviewViewSet(ModelViewSet):
     serializer_class = ReviewSerializer
     permission_classes = [IsAuthenticatedOrReadOnly]
+
+    def get_queryset(self):
+        return Review.objects.filter(book_id=self.kwargs["book_pk"])
+
+    def perform_create(self, serializer):
+        book = get_object_or_404(Book, pk=self.kwargs["book_pk"])
+        serializer.save(user=self.request.user, book=book)
 
     @action(
         detail=True, methods=["post", "delete"], permission_classes=[IsAuthenticated]
