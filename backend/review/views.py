@@ -7,7 +7,7 @@ from rest_framework import status
 
 from django.shortcuts import get_object_or_404
 
-from .permissions import IsCommentOwner
+from .permissions import IsCommentOwner, IsReviewOwner
 
 from .serializers import ReviewSerializer, ReviewLikeSerializer, ReviewCommentSerializer
 
@@ -20,7 +20,11 @@ class ReviewViewSet(ModelViewSet):
     permission_classes = [IsAuthenticatedOrReadOnly]
 
     def get_queryset(self):
-        return Review.objects.filter(book_id=self.kwargs["book_pk"])
+        return (
+            Review.objects.filter(book_id=self.kwargs["book_pk"])
+            .select_related("user")
+            .prefetch_related("likes", "comments")
+        )
 
     def perform_create(self, serializer):
         book = get_object_or_404(Book, pk=self.kwargs["book_pk"])
@@ -32,17 +36,32 @@ class ReviewViewSet(ModelViewSet):
     def like(self, request, book_pk=None, pk=None):
         review = self.get_object()
 
-        like, created = ReviewLike.objects.get_or_create(
-            review=review,
-            user=request.user,
-        )
+        if request.method == "POST":
+            like, created = ReviewLike.objects.get_or_create(
+                review=review, user=request.user
+            )
+            if not created:
+                return Response(
+                    {"detail": "Already liked"}, status=status.HTTP_400_BAD_REQUEST
+                )
+            return Response(
+                ReviewLikeSerializer(like).data, status=status.HTTP_201_CREATED
+            )
 
         if request.method == "DELETE":
-            like.delete()
+            deleted, _ = ReviewLike.objects.filter(
+                review=review, user=request.user
+            ).delete()
+            if deleted == 0:
+                return Response(
+                    {"detail": "Like not found"}, status=status.HTTP_404_NOT_FOUND
+                )
             return Response(status=status.HTTP_204_NO_CONTENT)
 
-        serializer = ReviewLikeSerializer(like, context={"request": request})
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
+    def get_permissions(self):
+        if self.action in ["update", "partial_update", "destroy"]:
+            return [IsAuthenticated(), IsReviewOwner()]
+        return super().get_permissions()
 
 
 class CommentView(ModelViewSet):
@@ -53,9 +72,14 @@ class CommentView(ModelViewSet):
     max_page_size = 100
 
     def get_queryset(self):
-        return ReviewComment.objects.filter(
-            review_id=self.kwargs["review_pk"]
-        ).order_by("-created_at")
+        qs = ReviewComment.objects.filter(review_id=self.kwargs["review_pk"]).order_by(
+            "-created_at"
+        )
+
+        if search := self.request.query_params.get("search"):
+            qs = qs.filter(text__icontains=search)
+
+        return qs
 
     def perform_create(self, serializer):
         review = get_object_or_404(Review, pk=self.kwargs["review_pk"])
