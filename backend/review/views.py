@@ -1,7 +1,6 @@
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated
-from rest_framework.pagination import PageNumberPagination
 from rest_framework.decorators import action
 from rest_framework import status
 
@@ -9,6 +8,7 @@ from django.shortcuts import get_object_or_404
 
 from .permissions import IsCommentOwner, IsReviewOwner
 from .throttles import CommentCreateThrottle
+from .pagination import CommentPagination
 from .serializers import ReviewSerializer, ReviewLikeSerializer, ReviewCommentSerializer
 
 from ..book.models import Book
@@ -64,14 +64,9 @@ class ReviewViewSet(ModelViewSet):
         return super().get_permissions()
 
 
-class CommentView(ModelViewSet):
+class CommentViewSet(ModelViewSet):
     serializer_class = ReviewCommentSerializer
-    pagination_class = PageNumberPagination
-    page_size = 10
-    page_size_query_param = "page_size"
-    max_page_size = 100
-
-    throttle_classes = [CommentCreateThrottle] if action == "create" else []
+    pagination_class = CommentPagination
 
     def get_queryset(self):
         qs = ReviewComment.objects.filter(review_id=self.kwargs["review_pk"]).order_by(
@@ -96,3 +91,8 @@ class CommentView(ModelViewSet):
         if self.action in ["update", "partial_update", "destroy"]:
             return [IsAuthenticated(), IsCommentOwner()]
         return super().get_permissions()
+
+    def get_throttles(self):
+        if self.action == "create":
+            return [CommentCreateThrottle()]
+        return super().get_throttles()
