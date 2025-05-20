@@ -9,8 +9,12 @@ User = get_user_model()
 
 
 class Review(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="reviews")
-    book = models.ForeignKey(Book, on_delete=models.CASCADE, related_name="reviews")
+    user = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name="user_reviews"
+    )
+    book = models.ForeignKey(
+        Book, on_delete=models.CASCADE, related_name="book_reviews"
+    )
 
     rating = models.PositiveIntegerField(
         validators=[
