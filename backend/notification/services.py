@@ -35,7 +35,7 @@ class NotificationService:
     def notify_review_liked(cls, user, review):
         message = f"{user.username} liked your review of {review.book.title}"
         return cls.send_notification(
-            user=user,
+            user=review.user,
             notification_type="REVIEW_LIKE",
             message=message,
             payload={
@@ -49,7 +49,7 @@ class NotificationService:
     def notify_review_commented(cls, user, review, comment):
         message = f"{user.username} commented on your review of {review.book.title}"
         return cls.send_notification(
-            user=user,
+            user=review.user,
             notification_type="REVIEW_COMMENT",
             message=message,
             payload={

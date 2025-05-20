@@ -21,7 +21,7 @@ class Notification(models.Model):
     )
     notification_type = models.CharField(max_length=20, choices=NOTIFICATION_TYPES)
 
-    message = models.TimeField()
+    message = models.TextField()
     payload = models.JSONField(default=dict)
 
     is_read = models.BooleanField(default=False)

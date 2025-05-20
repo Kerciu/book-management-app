@@ -9,14 +9,14 @@ from .models import Notification
 class NotificationConsumer(AsyncWebsocketConsumer):
 
     async def connect(self):
-        if self.scope["user"] == AnonymousUser:
+        if isinstance(self.scope["user"], AnonymousUser):
             await self.close()
             return
 
         self.user = self.scope["user"]
         self.group_name = f"notifications_{self.user.id}"
 
-        await self.channel_layer.group_app(
+        await self.channel_layer.group_add(
             self.group_name,
             self.channel_name,
         )
@@ -35,5 +35,5 @@ class NotificationConsumer(AsyncWebsocketConsumer):
     @database_sync_to_async
     def mark_as_read(self, notification_id):
         notification = Notification.objects.get(id=notification_id)
-        notification_id.is_read = True
+        notification.is_read = True
         notification.save()
