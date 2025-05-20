@@ -6,7 +6,7 @@ from .models import (
 )
 
 
-class ReviewSerializer(serializers.Serializer):
+class ReviewSerializer(serializers.ModelSerializer):
     user = serializers.StringRelatedField(read_only=True)
     likes_count = serializers.SerializerMethodField()
     comments_count = serializers.SerializerMethodField()
@@ -35,9 +35,19 @@ class ReviewSerializer(serializers.Serializer):
         return ReviewComment.objects.filter(review=obj).count()
 
 
-class ReviewLikeSerializer(serializers.Serializer):
-    pass
+class ReviewLikeSerializer(serializers.ModelSerializer):
+    user = serializers.StringRelatedField(read_only=True)
+
+    class Meta:
+        model = ReviewLike
+        fields = [
+            "id",
+            "user",
+            "review",
+            "created_at",
+        ]
+        read_only_fields = ["user", "review", "created_at"]
 
 
-class ReviewCommentSerializer(serializers.Serializer):
+class ReviewCommentSerializer(serializers.ModelSerializer):
     pass
