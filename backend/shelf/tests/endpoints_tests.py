@@ -78,6 +78,27 @@ class ShelfTests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data['name', 'Test Shelf'])
 
+    def test_update_shelf_valid(self):
+        shelf = Shelf.objects.create(
+            user=self.user,
+            name='Original Name',
+            is_default=False
+        )
+        url = reverse('shelf-detail', args=[shelf.id])
+        data = {'name': 'Updated Name'}
+        response = self.client.patch(url, data)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        shelf.refresh_from_db()
+        self.assertEqual(shelf.name, 'Updated name')
+
+    def test_update_default_shelf(self):
+        default_shelf = self.default_shelves[0]
+        url = reverse('shelf-detail', args=[default_shelf.id])
+        data = {'name': 'New Name'}
+        response = self.client.patch(url, data)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.asserIn('Cannot rename default shelves', str(response.data))
+
     def test_delete_shelf(self):
         shelf = Shelf.objects.create(
             user=self.user,
@@ -88,6 +109,27 @@ class ShelfTests(APITestCase):
         response = self.client.delete(url)
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
         self.assertEqual(Shelf.objects.count(), 3)
+
+    def test_delete_default_shelf(self):
+        default_shelf = self.default_shelves[0]
+        url = reverse('shelf-detail', args=[default_shelf.id])
+        response = self.client.delete(url)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn('Cannot delete default shelves', str(response.data))
+
+    def test_unique_name_validation(self):
+        Shelf.objects.create(
+            user=self.user,
+            name='Unique Shelf',
+            is_default=False
+        )
+
+        url = reverse('shelf-list')
+        data = {'name': 'Unique Shelf', 'is_default': False}
+        response = self.client.post(url, data)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn('already have a shelf', str(response.data))
+        self.assertEqual(len(response.data), 4)
 
     def test_user_isolation(self):
         other_user = User.create_user(
@@ -106,17 +148,3 @@ class ShelfTests(APITestCase):
 
         response = self.client.get(reverse('shelf-list'))
         self.assertEqual(len(response.data), 3)
-
-    def test_unique_name_validation(self):
-        Shelf.objects.create(
-            user=self.user,
-            name='Unique Shelf',
-            is_default=False
-        )
-
-        url = reverse('shelf-list')
-        data = {'name': 'Unique Shelf', 'is_default': False}
-        response = self.client.post(url, data)
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertIn('already have a shelf', str(response.data))
-        self.assertEqual(len(response.data), 4)
