@@ -66,3 +66,35 @@ class ShelfTests(APITestCase):
         response = self.client.delete(url)
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
         self.assertEqual(Shelf.objects.count(), 3)
+
+    def test_user_isolation(self):
+        other_user = User.create_user(
+            username='testuser2',
+            first_name='Jane',
+            last_name='Doe',
+            email='testuser2@gmail.com',
+            password='testpass123'
+        )
+
+        Shelf.objects.create(
+            user=other_user,
+            name='Other Shelf',
+            is_default=False
+        )
+
+        response = self.client.get(reverse('shelf-list'))
+        self.assertEqual(len(response.data), 3)
+
+    def test_unique_name_validation(self):
+        Shelf.objects.create(
+            user=self.user,
+            name='Unique Shelf',
+            is_default=False
+        )
+
+        url = reverse('shelf-list')
+        data = {'name': 'Unique Shelf', 'is_default': False}
+        response = self.client.post(url, data)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn('already have a shelf', str(response.data))
+        self.assertEqual(len(response.data), 4)
