@@ -23,7 +23,8 @@ class ShelfAdminForm(forms.ModelForm):
 
         if instance and instance.pk and instance.is_default:
             if 'shelf_type' in self.changed_data:
-                raise ValidationError("Cannot modify shelf type of existing default shelves")
+                raise ValidationError(
+                    "Cannot modify shelf type of existing default shelves")
 
         return cleaned_data
 
@@ -49,7 +50,7 @@ class ShelfAdmin(admin.ModelAdmin):
         return obj.get_shelf_type_display()
     shelf_type_display.short_description = 'Shelf Type'
 
-    def get_readonly_fields(self, request, obj = None):
+    def get_readonly_fields(self, request, obj=None):
         if obj and obj.is_default:
             return ['is_default', 'shelf_type'] + self.readonly_fields
         return self.readonly_fields
