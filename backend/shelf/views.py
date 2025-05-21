@@ -11,7 +11,7 @@ class ShelfViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         return Shelf.objects.filter(user=self.request.user)
 
-    def perfor_create(self, serializer):
+    def perform_create(self, serializer):
         try:
             serializer.save(user=self.request.user)
         except ValidationError as e:
