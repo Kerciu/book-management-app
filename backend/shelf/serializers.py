@@ -17,5 +17,5 @@ class ShelfForm(forms.ModelForm):
 
         if Shelf.objects.filter(user=user, name=cleaned_data['name']).exists():
             raise ValidationError("You already have a shelf with this name")
-        
+
         return cleaned_data
