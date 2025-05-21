@@ -56,6 +56,28 @@ class ShelfTests(APITestCase):
         self.assertEqual(Shelf.objects.count(), 4)
         self.assertEqual(Shelf.objects.last().name, 'My Custom Shelf')
 
+    def test_create_shelf_invalid_default(self):
+        url = reverse('shelf-list')
+        data = {
+            'name': 'Invalid Default',
+            'is_default': True,
+            'shelf_type': 'want_to_read'
+        }
+        response = self.client.post(url, data)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn('already exists')
+
+    def test_retrieve_shelf(self):
+        shelf = Shelf.objects.create(
+            user=self.user,
+            name='Test Shelf',
+            is_default=False
+        )
+        url = reverse('shelf-detail', args=[shelf.id])
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['name', 'Test Shelf'])
+
     def test_delete_shelf(self):
         shelf = Shelf.objects.create(
             user=self.user,

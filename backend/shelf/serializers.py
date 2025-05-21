@@ -51,7 +51,7 @@ class ShelfSerializer(serializers.ModelSerializer):
                 name__iexact=name
             ).exclude(pk=instance.pk if instance else None).exists():
                 raise serializers.ValidationError(
-                    "You already have a shelf type"
+                    "You already have a shelf with this name"
                 )
 
         return attrs
