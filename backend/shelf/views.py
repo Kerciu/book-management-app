@@ -25,3 +25,18 @@ class ShelfListView(ShelfBaseView, ListView):
         return context
 
 
+class ShelfCreateView(ShelfBaseView, CreateView):
+    template_name = 'shelves/form.html'
+    fields = ['name']
+
+    def form_valid(self, form):
+        form.instance.user = self.request.user
+        try:
+            response = super().form_valid(form)
+            messages.success(self.request, f'Shelf "{self.object.name}" created!')
+            return response
+        except Exception as e:
+            messages.error(self.request, str(e))
+            return self.form_invalid(form)
+
+
