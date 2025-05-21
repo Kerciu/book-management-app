@@ -40,3 +40,12 @@ class ShelfCreateView(ShelfBaseView, CreateView):
             return self.form_invalid(form)
 
 
+class ShelfUpdateView(ShelfBaseView, UpdateView):
+    template_name = 'shelves/form.html'
+    fields = ['name']
+
+    def form_valid(self, form):
+        if form.instance.is_default:
+            messages.error(self.request, "Cannot modify default shelves")
+            return self.form_invalid(form)
+        return super().form_valid(form)
