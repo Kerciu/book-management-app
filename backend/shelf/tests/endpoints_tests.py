@@ -131,6 +131,12 @@ class ShelfTests(APITestCase):
         self.assertIn('already have a shelf', str(response.data))
         self.assertEqual(len(response.data), 4)
 
+    def test_unathenticated_access(self):
+        self.client.logout()
+        url = reverse('shelf-list')
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
     def test_user_isolation(self):
         other_user = User.create_user(
             username='testuser2',
@@ -148,3 +154,30 @@ class ShelfTests(APITestCase):
 
         response = self.client.get(reverse('shelf-list'))
         self.assertEqual(len(response.data), 3)
+
+    def test_read_only_fields(self):
+        shelf = Shelf.objects.create(
+            user=self.user,
+            name='Test Shelf',
+            is_default=False
+        )
+        url = reverse('shelf-detail', args=[shelf.id])
+        data = {
+            'user': self.id + 1,
+            'created_at': '2000-01-01'
+        }
+        response = self.client.patch(url, data)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.refresh_from_db()
+        self.assertEqual(shelf.user, self.user)
+        self.assertNotEqual(shelf.created_at.strftime('%Y-%m-%d'), '2020-01-01')
+
+    def test_default_shelf_auto_name(self):
+        url = reverse('shelf-list')
+        data = {
+            'is_default': True,
+            'shelf_type': 'read'
+        }
+        response = self.client.post(url, data)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(response.data['name'], 'Read')
