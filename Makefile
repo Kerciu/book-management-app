@@ -16,6 +16,13 @@ build:
 clean:
 	docker compose down -v
 
+test:
+	@if [ -z "$(argument)" ]; then \
+		echo "Error: argument is required"; \
+		exit 1; \
+	fi
+	docker compose exec backend python manage.py test $(argument)
+
 docker_run:
 	@if [ -z "$(argument)" ]; then \
 		echo "Error: argument is required"; \
