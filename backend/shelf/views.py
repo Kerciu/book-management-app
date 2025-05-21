@@ -49,3 +49,15 @@ class ShelfUpdateView(ShelfBaseView, UpdateView):
             messages.error(self.request, "Cannot modify default shelves")
             return self.form_invalid(form)
         return super().form_valid(form)
+
+
+class ShelfDeleteView(ShelfBaseView, DeleteView):
+    template_name = 'shelves/confirm_delete.html'
+
+    def delete(self, request, *args, **kwargs):
+        shelf = self.get_object()
+        if shelf.is_default:
+            messages.error(request, "Cannot delete default shelves")
+            return self.get(request, *args, **kwargs)
+        messages.success(request, f'Shelf "{shelf.name}" deleted')
+        return super().delete(request, *args, **kwargs)
