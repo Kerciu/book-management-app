@@ -1,63 +1,23 @@
-from django.views.generic import ListView, CreateView, UpdateView, DeleteView
-from django.contrib.auth.mixins import LoginRequiredMixin
-from django.urls import reverse_lazy
-from django.contrib import messages
+from rest_framework import viewsets, permissions
+from rest_framework.exceptions import ValidationError
 from .models import Shelf
+from .serializers import ShelfSerializer
 
 
-class ShelfBaseView(LoginRequiredMixin):
-    model = Shelf
-    succes_url = reverse_lazy('shelf-list')
+class ShelfViewSet(viewsets.ModelViewSet):
+    serializer_class = ShelfSerializer
+    permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
-        return self.model.objects.filter(user=self.request.user)
+        return Shelf.objects.filter(user=self.request.user)
 
-
-class ShelfListView(ShelfBaseView, ListView):
-    template_name = 'shelves/list.html'
-    context_object_name = 'shelves'
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        shelves = self.get_queryset()
-        context['default_shelves'] = shelves.filter(is_default=True)
-        context['custom_shelves'] = shelves.filter(is_default=False)
-        return context
-
-
-class ShelfCreateView(ShelfBaseView, CreateView):
-    template_name = 'shelves/form.html'
-    fields = ['name']
-
-    def form_valid(self, form):
-        form.instance.user = self.request.user
+    def perfor_create(self, serializer):
         try:
-            response = super().form_valid(form)
-            messages.success(self.request, f'Shelf "{self.object.name}" created!')
-            return response
-        except Exception as e:
-            messages.error(self.request, str(e))
-            return self.form_invalid(form)
+            serializer.save(user=self.request.user)
+        except ValidationError as e:
+            raise ValidationError(e.detail)
 
-
-class ShelfUpdateView(ShelfBaseView, UpdateView):
-    template_name = 'shelves/form.html'
-    fields = ['name']
-
-    def form_valid(self, form):
-        if form.instance.is_default:
-            messages.error(self.request, "Cannot modify default shelves")
-            return self.form_invalid(form)
-        return super().form_valid(form)
-
-
-class ShelfDeleteView(ShelfBaseView, DeleteView):
-    template_name = 'shelves/confirm_delete.html'
-
-    def delete(self, request, *args, **kwargs):
-        shelf = self.get_object()
-        if shelf.is_default:
-            messages.error(request, "Cannot delete default shelves")
-            return self.get(request, *args, **kwargs)
-        messages.success(request, f'Shelf "{shelf.name}" deleted')
-        return super().delete(request, *args, **kwargs)
+    def perform_destroy(self, instance):
+        if instance.is_default:
+            raise ValidationError("Cannot delete default shelves")
+        instance.delete()
