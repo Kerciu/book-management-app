@@ -1,0 +1,93 @@
+name: Django CI Pipeline
+
+on:
+  push:
+    branches: [ "main", "38*" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v2
+
+    - name: Create .env file
+      run: |
+        cat > .env << EOF
+        DEBUG=True
+        SECRET_KEY=django-insecure-key-for-testing
+        ALLOWED_HOSTS=localhost,127.0.0.1
+        
+        # Database settings
+        DB_NAME=test_db
+        DB_USER=postgres
+        DB_PASSWORD=postgres
+        DB_HOST=db
+        DB_PORT=5432
+        POSTGRES_PASSWORD=postgres
+        POSTGRES_USER=postgres
+        POSTGRES_DB=test_db
+        
+        # Email settings (placeholder values for testing)
+        EMAIL_BACKEND=django.core.mail.backends.console.EmailBackend
+        EMAIL_HOST=smtp.example.com
+        EMAIL_PORT=587
+        EMAIL_USE_TLS=True
+        EMAIL_HOST_USER=test@example.com
+        EMAIL_HOST_PASSWORD=testpassword
+        DEFAULT_FROM_EMAIL=test@example.com
+        
+        # Redis settings
+        REDIS_LOCATION=redis://redis:6379/1
+        EOF
+
+    - name: Build and start Docker services
+      run: |
+        docker compose build
+        docker compose up -d
+
+    - name: Wait for database to be ready
+      run: |
+        timeout=60
+        elapsed=0
+        echo "Waiting for database to be ready..."
+        while ! docker compose exec -T db pg_isready -U postgres -d test_db; do
+          if [ $elapsed -ge $timeout ]; then
+            echo "Timeout waiting for database"
+            docker compose logs db
+            exit 1
+          fi
+          sleep 5
+          elapsed=$((elapsed+5))
+          echo "Still waiting for database... ($elapsed seconds)"
+        done
+        echo "Database is ready"
+
+    - name: Run initialization process
+      run: make init
+
+    - name: Run migrations
+      run: |
+        make makemigrations
+        make migrate
+
+    - name: Run Django tests
+      run: docker compose exec -T backend python manage.py test
+
+    - name: Show container status
+      if: always()
+      run: docker compose ps
+
+    - name: Show logs on failure
+      if: failure()
+      run: docker compose logs
+
+    - name: Clean up
+      if: always()
+      run: make clean

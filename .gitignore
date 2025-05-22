@@ -2,14 +2,12 @@ venv/
 .venv/
 migrations/
 __pycache__/
-
 .env
 backend/.env
-
 target/
 Cargo.lock
 dist/
-
 .nvim.lua
 .vscode/
 db.sqlite3
+.pytest-cache/
