@@ -1,36 +1,49 @@
+#![feature(iter_intersperse)]
+
 use leptos::prelude::*;
 use leptos::*;
 use leptos_meta::*;
 use leptos_router::{components::*, path};
 use web_sys::*;
 
-mod components;
 mod auth;
+mod components;
 mod pages;
-use crate::pages::{home::HomePage, about::AboutPage, book::BookPage, account::AccountPage, list::ListPage};
+use crate::pages::{
+    about::AboutPage, account::AccountPage, book::BookPage, home::HomePage, list::ListPage,
+};
+use components::*;
 
 /// TODO: Replace with env String
 const BACKEND: &'static str = "http://localhost:8000";
 
-
 #[component]
 pub fn App() -> impl IntoView {
-    provide_meta_context();
+    //provide_meta_context();
+
+    let (cat_name, set_cat_name) = signal(String::new());
 
     view! {
-        <Router>
-            <Routes fallback=|| view! { NotFound }>
-                <Route path=path!("/") view=HomePage />
-                <Route path=path!("/about") view=AboutPage />
-                <Route path=path!("/books/list") view=ListPage />
-                <Route path=path!("/books/details") view=BookPage />
-                <Route path=path!("/account") view=AccountPage />
-
-            </Routes>
-        </Router>
+        "Category ame is " {cat_name}
+        <br/>
+        <CategorySelectList selected=set_cat_name />
+        <br/>
+        "end"
     }
-}
 
+    // view! {
+    //     <Router>
+    //         <Routes fallback=|| view! { NotFound }>
+    //             <Route path=path!("/") view=HomePage />
+    //             <Route path=path!("/about") view=AboutPage />
+    //             <Route path=path!("/books/list") view=ListPage />
+    //             <Route path=path!("/books/details") view=BookPage />
+    //             <Route path=path!("/account") view=AccountPage />
+    //
+    //         </Routes>
+    //     </Router>
+    // }
+}
 
 fn main() {
     // better error logging
