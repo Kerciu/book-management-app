@@ -1,72 +1,73 @@
-use std::collections::HashMap;
-use leptos_router::hooks::*;
 use leptos::prelude::*;
-use log::{Level, log};
+use leptos_router::hooks::*;
+use log::Level;
 use serde::Deserialize;
+use std::collections::HashMap;
 
 use super::send_get_request;
+use serde::Serialize;
+
+#[derive(Deserialize, Debug, Clone)]
+struct Author {
+    first_name: String,
+    middle_name: String,
+    last_name: String,
+    bio: String,
+    birth_date: String,
+    death_date: String,
+}
+
+#[derive(Deserialize, Debug, Clone)]
+struct Genre {
+    name: String,
+}
+
+#[derive(Deserialize, Debug, Clone)]
+struct Book {
+    id: usize,
+    genres: Vec<Genre>,
+    authors: Vec<Author>,
+    page_count: usize,
+    title: String,
+    description: String,
+    isbn: String,
+    published_at: String,
+    language: String,
+}
 
 #[derive(Deserialize, Debug, Clone)]
 struct BookResponse {
-    id: usize,
-    title: String,
-    published_at: String,
-    #[serde(alias = "author_id")]
-    author: usize,
-    categories: Vec<usize>,
+    count: usize,
+    next: Option<String>,
+    previous: Option<String>,
+    result: Vec<Book>,
 }
 
-#[derive(Deserialize, Debug, Clone)]
-struct AuthorResponse {
-    id: usize,
-    name: String,
+#[derive(Serialize, Debug, Clone, Default)]
+struct BookRequest {
+    title: RwSignal<String>,
+    genre: RwSignal<String>,
+    isbn: RwSignal<String>,
+    page: RwSignal<usize>,
 }
 
-#[derive(Deserialize, Debug, Clone)]
-struct CategoryResponse {
-    id: usize,
-    name: String,
-}
-
-struct Book {
-    id: usize,
-    title: String,
-    published_at: String,
-    author: String,
-    categories: Vec<String>,
-}
-
-async fn get_books() -> anyhow::Result<Vec<BookResponse>> {
-    let endpoint = "/api/books/";
-    send_get_request(endpoint).await
-}
-
-async fn get_authors() -> anyhow::Result<HashMap<usize, String>> {
-    let endpoint = "/api/authors/";
-    let res: Vec<AuthorResponse> = send_get_request(endpoint).await?;
-    Ok(res
-        .into_iter()
-        .map(|AuthorResponse { id, name }| (id, name))
-        .collect())
-}
-
-async fn get_categories() -> anyhow::Result<HashMap<usize, String>> {
-    let endpoint = "/api/categories/";
-    let res: Vec<CategoryResponse> = send_get_request(endpoint).await?;
-    Ok(res
-        .into_iter()
-        .map(|CategoryResponse { id, name }| (id, name))
-        .collect())
+async fn get(request: String) -> anyhow::Result<BookResponse> {
+    let res: BookResponse = send_get_request(&request).await?;
+    Ok(res)
 }
 
 #[component]
 fn book_info(book: Book) -> impl IntoView {
     let Book {
+        genres,
+        authors,
+        page_count,
         title,
+        description,
+        isbn,
         published_at,
-        author,
-        categories, 
-        .. 
+        language,
+        ..
     } = book;
     let navigate = use_navigate();
     view! {
@@ -86,9 +87,9 @@ fn book_info(book: Book) -> impl IntoView {
                             </div>
                             <div class="categories-container" style="margin-top:10px;">
                                 <div class="chips-container">
-                                    {categories.into_iter()
-                                        .map(|category| view! { 
-                                            <span class="chip">{category}</span> 
+                                    {genres.into_iter()
+                                        .map(|genre| view! {
+                                            <span class="chip">{genre.name}</span>
                                         })
                                         .collect_view()}
                                 </div>
@@ -101,67 +102,37 @@ fn book_info(book: Book) -> impl IntoView {
 
 #[component]
 pub fn book_list() -> impl IntoView {
-    let book_templates = LocalResource::new(get_books);
-    let authors = LocalResource::new(get_authors);
-    let categories = LocalResource::new(get_categories);
+    const ENDPOINT: &'static str = "/api/book/books/";
+    let (title, set_title) = signal(String::new());
+    let (genre, set_genre) = signal(String::new());
+    let (isbn, set_isbn) = signal(String::new());
+    let (page, set_page) = signal(String::new());
 
-    let authors = move || {
-        let maybe_authors = &*authors.read();
-        match maybe_authors {
-            Some(response) => match response {
-                Ok(authors) => authors.clone(),
-                Err(err) => {
-                    log!(Level::Error, "{}", err);
-                    return Default::default();
-                }
-            },
-            None => return Default::default(),
-        }
+    let request_url = move || {
+        format!(
+            "{ENDPOINT}?title={}&genre={}&isbn={}&page={}",
+            title.read(),
+            genre.read(),
+            isbn.read(),
+            page.read()
+        )
     };
+    let request = LocalResource::new(move || get(request_url()));
 
-    let categories = move || {
-        let maybe_categories = &*categories.read();
-        match maybe_categories {
-            Some(response) => match response {
-                Ok(categories) => categories.clone(),
-                Err(err) => {
-                    log!(Level::Error, "{}", err);
-                    return Default::default();
-                }
-            },
-            None => return Default::default(),
+    let request = move || match &*request.read() {
+        Some(Ok(res)) => Some(res.clone()),
+        Some(Err(err)) => {
+            log::log!(Level::Error, "{err}");
+            None
         }
+        None => None,
     };
 
     let books = move || {
-        let maybe_templates = &*book_templates.read();
-        let templates = match maybe_templates {
-            Some(response) => match response {
-                Ok(templates) => templates,
-                Err(err) => {
-                    log!(Level::Error, "{}", err);
-                    return Default::default();
-                }
-            },
-            None => return Default::default(),
-        };
-
-        templates
+        request()
             .into_iter()
-            .map(|template| Book {
-                id: template.id,
-                title: template.title.clone(),
-                author: authors()
-                    .get(&template.author)
-                    .map(Clone::clone)
-                    .unwrap_or_default(),
-                published_at: template.published_at.clone(),
-                categories: template
-                    .categories
-                    .iter()
-                    .map(|id| categories().get(id).map(Clone::clone).unwrap_or_default())
-                    .collect(),
-            })
+            .map(|BookResponse { result, .. }| result)
+            .flatten()
             .collect::<Vec<_>>()
     };
 
@@ -170,8 +141,8 @@ pub fn book_list() -> impl IntoView {
             <input type="text" placeholder="Search" style="margin-left:0px; border-radius: 16px; height:19px; margin-top:0px;"/>
             <button class="button-pop" style="width: auto;">"Filter"</button>
             <select name="Sort" class="custom-select">
-                <option value="relevance">"Relevance"</option>  
-                <option value="alphabetically">"Alphabetically"</option>  
+                <option value="relevance">"Relevance"</option>
+                <option value="alphabetically">"Alphabetically"</option>
                 <option value="date">"Date published"</option>  =
             </select>
         </div>
