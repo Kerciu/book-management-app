@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+use leptos_router::hooks::*;
 use leptos::prelude::*;
 use log::Level;
 use serde::Deserialize;
@@ -65,7 +67,6 @@ fn book_info(book: Book) -> impl IntoView {
         published_at,
         language,
     } = book;
-
     let authors = authors
         .into_iter()
         .map(
@@ -88,13 +89,34 @@ fn book_info(book: Book) -> impl IntoView {
     // TODO: Make costanat variable out of this "100"
     let short_description = description[..100].to_string();
 
+    let navigate = use_navigate();
     view! {
-        "-----" <br/>
-        {title} " by " {authors} <br/>
-        "genres: " {genres} ". ISBN: " {isbn} <br/>
-        "Written in " {language} ". Published " {published_at} ". Page count: " {page_count} <br/>
-        {short_description} "..." <br/>
-        "-----" <br/>
+            <div class="book-display" on:click=move |_| {
+                    navigate("/books/details", Default::default());
+                    }>
+                    <div class="container-flex" style="padding: 0px;">
+                        //image url
+                        <img src="https://ecsmedia.pl/cdn-cgi/image/format=webp,width=544,height=544,/c/the-rust-programming-language-2nd-edition-b-iext138640655.jpg" alt="Description" class="image-side" style="margin-top: 20px; padding-bottom:20px;"></img>
+                        <div class="text-side" style="margin-top: 20px;">
+                            <div class="text-title" style="color: #FFFFFF; margin-left:0px;">{title}</div>
+                            <div class="body-text" style="color: #cac1ce; margin-left:0px;">{format!("by {}", author)}</div>
+                            <div class="body-text" style="color: #cac1ce; margin-left:0px;">{format!("Published: {}", published_at)}</div>
+                            <div class="body-text" style="color: #FFFFFF; margin-left:0px; font-size: 20px; margin-top:10px;">
+                                //description
+                                "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."
+                            </div>
+                            <div class="categories-container" style="margin-top:10px;">
+                                <div class="chips-container">
+                                    {genres.into_iter()
+                                        .map(|genre| view! { 
+                                            <span class="chip">{genre}</span> 
+                                        })
+                                        .collect_view()}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+            </div>
     }
 }
 
@@ -143,5 +165,23 @@ pub fn book_list(
 
     view! {
         {book_view_list}
+        //<div class="container-flex-row" style="padding:0px;">
+        //    <input type="text" placeholder="Search" style="margin-left:0px; border-radius: 16px; height:19px; margin-top:0px;"/>
+        //    <button class="button-pop" style="width: auto;">"Filter"</button>
+        //    <select name="Sort" class="custom-select">
+        //        <option value="relevance">"Relevance"</option>  
+        //        <option value="alphabetically">"Alphabetically"</option>  
+        //        <option value="date">"Date published"</option>  =
+       //     </select>
+       // </div>
+       // <For
+        //    each=move || books()
+        //    key=|book| book.id
+         //   children=move |book| {
+          //      view! {
+          //          <BookInfo book=book />
+           //     }
+           // }
+        ///>
     }
 }

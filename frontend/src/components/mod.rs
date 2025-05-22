@@ -4,12 +4,16 @@ mod category_select_list;
 mod login_form;
 mod registraction_form;
 mod reviews;
-
+mod book_details;
+mod book_list;
+mod friends_list;
 pub use book_list::BookList;
 use leptos::prelude::Action;
 pub use login_form::LoginForm;
 pub use registraction_form::RegistractionForm;
 pub use reviews::Reviews;
+pub use friends_list::FriendList;
+pub use book_details::BookDetails;
 
 use crate::BACKEND;
 pub use category_select_list::CategorySelectList;

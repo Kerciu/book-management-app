@@ -2,6 +2,7 @@ use anyhow::anyhow;
 use leptos::prelude::*;
 use log::Level;
 use serde::Serialize;
+use leptos_router::hooks::*;
 
 use crate::components::send_post_request;
 use crate::auth::email::Token as AuthToken;
@@ -60,6 +61,8 @@ async fn post(data: LoginRequest) -> anyhow::Result<LoginResponse> {
 
 #[component]
 pub fn login_form() -> impl IntoView {
+    let navigate = use_navigate();
+
     let request = LoginRequest::default();
 
     let send_request = move |request: &LoginRequest| {
@@ -91,31 +94,34 @@ pub fn login_form() -> impl IntoView {
         LoginResponse::Err(err) => err,
         LoginResponse::NoResponse => "Something went wrong, try again".to_string(),
         LoginResponse::NoRequest => "".to_string(),
-        LoginResponse::Waiting => "Waiting for server".to_string(),
+        LoginResponse::Waiting => "".to_string(),
     };
 
     Effect::new(move || {
         if let LoginResponse::Token(token) = response() {
             provide_context(token);
+            navigate("/books/list", Default::default());
         }
     });
 
     view! {
         <form>
             <div>
-                <label>"E-mail"</label>
-                <input type="email" bind:value=request.email required />
+                <input type="email" placeholder="Email" bind:value=request.email required />
             </div>
-            <div>
-                <label>"Password"</label>
-                <input type="password" bind:value=request.password required />
+            <div style="margin-top=12px;">
+                <input type="password" placeholder="Password" bind:value=request.password required />
             </div>
-            <input type="button" on:click=move |_| {
-                send_request.dispatch(request);
-            } value="Log in" />
+            <div class="container-flex" style="padding: 0px; align-items: center; justify-content: center;">
+                <input type="button" class="button-squash" on:click=move |_| {
+                    send_request.dispatch(request);
+                } value="Log in" />
+            </div>
         </form>
-        <p>
-            {response_display}
-        </p>
+        <div class="container-flex" style="padding: 0px; align-items: center; justify-content: center;">
+            <div class="body-text" style="color: #d6b5dc; text-align: center; margin-top: 20px;">
+                {response_display}
+            </div>
+        </div>
     }
 }
