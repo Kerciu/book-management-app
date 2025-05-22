@@ -23,26 +23,26 @@ pub fn App() -> impl IntoView {
 
     let (cat_name, set_cat_name) = signal(String::new());
 
-    view! {
-        "Category ame is " {cat_name}
-        <br/>
-        <CategorySelectList selected=set_cat_name />
-        <br/>
-        "end"
-    }
+    //view! {
+    //    "Category ame is " {cat_name}
+    //    <br/>
+    //    <CategorySelectList selected=set_cat_name />
+    //    <br/>
+    //    "end"
+    //}
 
-    // view! {
-    //     <Router>
-    //         <Routes fallback=|| view! { NotFound }>
-    //             <Route path=path!("/") view=HomePage />
-    //             <Route path=path!("/about") view=AboutPage />
-    //             <Route path=path!("/books/list") view=ListPage />
-    //             <Route path=path!("/books/details") view=BookPage />
-    //             <Route path=path!("/account") view=AccountPage />
-    //             <Route path=path!("/sign") view=SignPage />
-    //         </Routes>
-    //     </Router>
-    // }
+    view! {
+        <Router>
+            <Routes fallback=|| view! { NotFound }>
+                <Route path=path!("/") view=HomePage />
+                <Route path=path!("/about") view=AboutPage />
+                <Route path=path!("/books/list") view=ListPage />
+                <Route path=path!("/books/details") view=BookPage />
+                <Route path=path!("/account") view=AccountPage />
+                <Route path=path!("/sign") view=SignPage />
+            </Routes>
+        </Router>
+    }
 }
 
 fn main() {

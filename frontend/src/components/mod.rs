@@ -1,17 +1,16 @@
 mod book_info;
-mod book_list;
 mod category_select_list;
 mod login_form;
 mod registraction_form;
-mod reviews;
 mod book_details;
 mod book_list;
 mod friends_list;
+// mod reviews;
+// pub use reviews::Reviews;
 pub use book_list::BookList;
 use leptos::prelude::Action;
 pub use login_form::LoginForm;
 pub use registraction_form::RegistractionForm;
-pub use reviews::Reviews;
 pub use friends_list::FriendList;
 pub use book_details::BookDetails;
 

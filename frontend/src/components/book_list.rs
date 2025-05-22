@@ -99,7 +99,7 @@ fn book_info(book: Book) -> impl IntoView {
                         <img src="https://ecsmedia.pl/cdn-cgi/image/format=webp,width=544,height=544,/c/the-rust-programming-language-2nd-edition-b-iext138640655.jpg" alt="Description" class="image-side" style="margin-top: 20px; padding-bottom:20px;"></img>
                         <div class="text-side" style="margin-top: 20px;">
                             <div class="text-title" style="color: #FFFFFF; margin-left:0px;">{title}</div>
-                            <div class="body-text" style="color: #cac1ce; margin-left:0px;">{format!("by {}", author)}</div>
+                            <div class="body-text" style="color: #cac1ce; margin-left:0px;">"by "{authors}</div>
                             <div class="body-text" style="color: #cac1ce; margin-left:0px;">{format!("Published: {}", published_at)}</div>
                             <div class="body-text" style="color: #FFFFFF; margin-left:0px; font-size: 20px; margin-top:10px;">
                                 //description

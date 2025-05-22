@@ -4,7 +4,7 @@ use leptos::prelude::*;
 use log::Level;
 use serde::{Deserialize, Serialize};
 
-use super::Reviews;
+// use super::Reviews;
 use crate::components::send_get_request;
 
 // INFO: Copied from `book_list.rs`, should we move both
@@ -124,7 +124,7 @@ pub fn book_info(book_id: ReadSignal<usize>) -> impl IntoView {
                 "genres: " {genres} ". ISBN: " {isbn} <br/>
                 "Written in " {language} ". Published " {published_at} ". Page count: " {page_count} <br/>
                 {description} <br/>
-                <Reviews book_id=book_id />
+                // <Reviews book_id=book_id />
             })
         } else {
             None
