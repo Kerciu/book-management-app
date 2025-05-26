@@ -30,6 +30,7 @@ INSTALLED_APPS = [
     "django.contrib.sites",
     "django_extensions",
     "drf_spectacular",
+    "channels",
     # Add your apps here
     "authentication",
     "book",
@@ -38,6 +39,7 @@ INSTALLED_APPS = [
     "notification",
     "recommend",
     "statistic",
+    "review",
 ]
 
 SITE_ID = 1
@@ -71,6 +73,8 @@ TEMPLATES = [
     },
 ]
 
+ASGI_APPLICATION = "core.asgi.application"
+
 WSGI_APPLICATION = "core.wsgi.application"
 
 DATABASES = {
@@ -92,6 +96,16 @@ CACHES = {
         "LOCATION": os.environ.get("REDIS_LOCATION"),
         "OPTIONS": {
             "CLIENT_CLASS": "django_redis.client.DefaultClient",
+        },
+    }
+}
+
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [REDIS_LOCATION],
+            "symmetric_encryption_keys": [SECRET_KEY],
         },
     }
 }
@@ -135,6 +149,11 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
     "http://127.0.0.1:3000",
     "http://0.0.0.0:3000",
+]
+
+CSRF_TRUSTED_ORIGINS = [
+    "ws://localhost:3000",
+    "ws://0.0.0.0:3000",
 ]
 
 # REST Framework settings

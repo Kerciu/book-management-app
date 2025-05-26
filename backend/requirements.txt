@@ -3,6 +3,7 @@ djangorestframework
 djangorestframework-simplejwt
 psycopg2-binary
 django-cors-headers
+channels
 gunicorn
 python-dotenv
 django-sendgrid-v5
