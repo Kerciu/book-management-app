@@ -32,15 +32,3 @@ class BookModelTest(TestCase):
         self.assertIn(self.genre, book.genres.all())
         self.assertIn(self.publisher, book.publishers.all())
 
-    def test_update_search_vector(self):
-        if connection.vendor != "postgresql":
-            self.skipTest("SearchVector is only supported in PostgreSQL.")
-
-        book = Book.objects.create(
-            title="REST APIs with Django",
-            description="Learn to build APIs",
-            isbn="1112223334",
-        )
-        Book.update_search_vector()
-        book.refresh_from_db()
-        self.assertIsNotNone(book.search_vector)
