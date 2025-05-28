@@ -1,22 +1,18 @@
-mod book_info;
-mod category_select_list;
-mod login_form;
-mod registraction_form;
 mod book_details;
 mod book_list;
 mod friends_list;
-// mod reviews;
-// pub use reviews::Reviews;
+mod login_form;
+mod registraction_form;
+
+pub use book_details::BookDetails;
 pub use book_list::BookList;
-use leptos::prelude::Action;
+pub use friends_list::FriendList;
 pub use login_form::LoginForm;
 pub use registraction_form::RegistractionForm;
-pub use friends_list::FriendList;
-pub use book_details::BookDetails;
 
 use crate::BACKEND;
-pub use category_select_list::CategorySelectList;
 use gloo_net::http::{Request, Response};
+use leptos::prelude::*;
 use serde::{Deserialize, de::DeserializeOwned};
 
 /// Utility function to send POST requests as JSON

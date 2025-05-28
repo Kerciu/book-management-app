@@ -9,10 +9,11 @@ use web_sys::*;
 mod auth;
 mod components;
 mod pages;
-use components::*;
-use crate::pages::{home::HomePage, about::AboutPage, book::BookPage, account::AccountPage, 
-  list::ListPage, not_found::NotFound, sign::SignPage
+use crate::pages::{
+    about::AboutPage, account::AccountPage, book::BookPage, home::HomePage, list::ListPage,
+    not_found::NotFound, sign::SignPage,
 };
+use components::*;
 
 /// TODO: Replace with env String
 const BACKEND: &'static str = "http://localhost:8000";
@@ -20,16 +21,6 @@ const BACKEND: &'static str = "http://localhost:8000";
 #[component]
 pub fn App() -> impl IntoView {
     //provide_meta_context();
-
-    let (cat_name, set_cat_name) = signal(String::new());
-
-    //view! {
-    //    "Category ame is " {cat_name}
-    //    <br/>
-    //    <CategorySelectList selected=set_cat_name />
-    //    <br/>
-    //    "end"
-    //}
 
     view! {
         <Router>

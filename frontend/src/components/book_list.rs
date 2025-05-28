@@ -1,8 +1,8 @@
-use std::collections::HashMap;
-use leptos_router::hooks::*;
 use leptos::prelude::*;
+use leptos_router::hooks::*;
 use log::Level;
 use serde::Deserialize;
+use std::collections::HashMap;
 
 use super::send_get_request;
 use serde::Serialize;
@@ -24,9 +24,10 @@ struct Genre {
 
 #[derive(Deserialize, Debug, Clone)]
 struct Book {
+    id: usize,
     genres: Vec<Genre>,
     authors: Vec<Author>,
-    page_count: usize,
+    page_count: Option<usize>,
     title: String,
     description: String,
     isbn: String,
@@ -39,7 +40,7 @@ struct BookResponse {
     count: usize,
     next: Option<String>,
     previous: Option<String>,
-    result: Vec<Book>,
+    results: Vec<Book>,
 }
 
 #[derive(Serialize, Debug, Clone, Default)]
@@ -66,7 +67,9 @@ fn book_info(book: Book) -> impl IntoView {
         isbn,
         published_at,
         language,
+        ..
     } = book;
+    let navigate = use_navigate();
     let authors = authors
         .into_iter()
         .map(
@@ -80,16 +83,10 @@ fn book_info(book: Book) -> impl IntoView {
         .intersperse(", ".to_string())
         .collect_view();
 
-    let genres = genres
-        .into_iter()
-        .map(|Genre { name }| name)
-        .intersperse(", ".to_string())
-        .collect_view();
+    let genres = genres.into_iter().map(|Genre { name }| name).collect_view();
 
     // TODO: Make costanat variable out of this "100"
-    let short_description = description[..100].to_string();
-
-    let navigate = use_navigate();
+    let short_description = description.chars().take(100).collect::<String>();
     view! {
             <div class="book-display" on:click=move |_| {
                     navigate("/books/details", Default::default());
@@ -102,14 +99,13 @@ fn book_info(book: Book) -> impl IntoView {
                             <div class="body-text" style="color: #cac1ce; margin-left:0px;">"by "{authors}</div>
                             <div class="body-text" style="color: #cac1ce; margin-left:0px;">{format!("Published: {}", published_at)}</div>
                             <div class="body-text" style="color: #FFFFFF; margin-left:0px; font-size: 20px; margin-top:10px;">
-                                //description
-                                "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."
+                                {short_description}"..."
                             </div>
                             <div class="categories-container" style="margin-top:10px;">
                                 <div class="chips-container">
                                     {genres.into_iter()
-                                        .map(|genre| view! { 
-                                            <span class="chip">{genre}</span> 
+                                        .map(|genre| view! {
+                                            <span class="chip">{genre}</span>
                                         })
                                         .collect_view()}
                                 </div>
@@ -121,13 +117,13 @@ fn book_info(book: Book) -> impl IntoView {
 }
 
 #[component]
-pub fn book_list(
-    title: ReadSignal<String>,
-    genre: ReadSignal<String>,
-    isbn: ReadSignal<String>,
-    page: ReadSignal<usize>,
-) -> impl IntoView {
+pub fn book_list() -> impl IntoView {
     const ENDPOINT: &'static str = "/api/book/books/";
+    let (title, set_title) = signal(String::new());
+    let (genre, set_genre) = signal(String::new());
+    let (isbn, set_isbn) = signal(String::new());
+    let (page, set_page) = signal(String::new());
+
     let request_url = move || {
         format!(
             "{ENDPOINT}?title={}&genre={}&isbn={}&page={}",
@@ -142,46 +138,44 @@ pub fn book_list(
     let request = move || match &*request.read() {
         Some(Ok(res)) => Some(res.clone()),
         Some(Err(err)) => {
-            log::log!(Level::Error, "{err}");
+            log::log!(Level::Error, "{}", err);
             None
         }
         None => None,
     };
 
-    let book_list = move || {
+    let books = move || {
         request()
             .into_iter()
-            .map(|BookResponse { result, .. }| result)
+            .map(|BookResponse { results, .. }| results)
             .flatten()
+            .filter(move |Book { genres, .. }| {
+                genres
+                    .iter()
+                    .any(move |Genre { name }| name.contains(&genre()) || genre() == "")
+            })
             .collect::<Vec<_>>()
     };
 
-    let book_view_list = move || {
-        book_list()
-            .into_iter()
-            .map(|book| view! {<BookInfo book=book />})
-            .collect_view()
-    };
-
     view! {
-        {book_view_list}
-        //<div class="container-flex-row" style="padding:0px;">
-        //    <input type="text" placeholder="Search" style="margin-left:0px; border-radius: 16px; height:19px; margin-top:0px;"/>
-        //    <button class="button-pop" style="width: auto;">"Filter"</button>
-        //    <select name="Sort" class="custom-select">
-        //        <option value="relevance">"Relevance"</option>  
-        //        <option value="alphabetically">"Alphabetically"</option>  
-        //        <option value="date">"Date published"</option>  =
-       //     </select>
-       // </div>
-       // <For
-        //    each=move || books()
-        //    key=|book| book.id
-         //   children=move |book| {
-          //      view! {
-          //          <BookInfo book=book />
-           //     }
-           // }
-        ///>
+        <div class="container-flex-row" style="padding:0px; max-width:250px;">
+            <input type="text" placeholder="Title" style="margin-left:0px; border-radius: 16px; height:19px; margin-top:0px;" bind:value=(title, set_title)/>
+            <input type="text" placeholder="Genre" style="margin-left:0px; border-radius: 16px; height:19px; margin-top:0px;" bind:value=(genre, set_genre)/>
+            //<button class="button-pop" style="width: auto;">"Filter"</button>
+            <select name="Sort" class="custom-select">
+                <option value="relevance">"Relevance"</option>
+                <option value="alphabetically">"Alphabetically"</option>
+                <option value="date">"Date published"</option>  =
+            </select>
+        </div>
+        <For
+            each=move || books()
+            key=|book| book.id
+            children=move |book| {
+                view! {
+                    <BookInfo book=book />
+                }
+            }
+        />
     }
 }
