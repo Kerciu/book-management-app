@@ -12,10 +12,7 @@ mod pages;
 use crate::pages::{
     about::AboutPage, account::AccountPage, book::BookPage, home::HomePage, list::ListPage,
 };
-use crate::pages::{
-    about::AboutPage, account::AccountPage, book::BookPage, home::HomePage, list::ListPage,
-    not_found::NotFound, sign::SignPage,
-};
+use crate::pages::{not_found::NotFound, sign::SignPage};
 use components::*;
 
 /// TODO: Replace with env String
