@@ -50,10 +50,6 @@ class FriendshipRequest(models.Model):
         super().save(*args, **kwargs)
 
     def accept(self):
-        """
-        - Create exactly one Friendship(user1, user2) with user1.pk < user2.pk
-        - Delete this FriendshipRequest
-        """
         first, second = sorted([self.from_user, self.to_user], key=lambda u: u.pk)
         Friendship.objects.create(user1=first, user2=second)
         self.delete()
@@ -63,3 +59,44 @@ class FriendshipRequest(models.Model):
 
     def __str__(self):
         return f"Friend request: {self.from_user.username} → {self.to_user.username}"
+
+
+class Friendship(models.Model):
+    user1 = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name="friendships_as_user1"
+    )
+    user2 = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name="friendships_as_user2"
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        constraints = [
+            # enforce user1.pk < user2.pk so that each pair occurs only once
+            models.CheckConstraint(
+                check=Q(user1__lt=F('user2')),
+                name="friendship_user1_lt_user2"
+            ),
+            # only one unique pair (user1, user2)
+            UniqueConstraint(
+                fields=["user1", "user2"],
+                name="unique_friendship_pair"
+            ),
+        ]
+
+    def __str__(self):
+        return f"Friendship: {self.user1.username} ↔ {self.user2.username}"
+
+    @classmethod
+    def are_friends(cls, user1, user2) -> bool:
+        first, second = sorted([user1, user2], key=lambda u: u.pk)
+        return cls.objects.filter(user1=first, user2=second).exists()
+
+    @classmethod
+    def remove_friendship(cls, user1, user2):
+        first, second = sorted([user1, user2], key=lambda u: u.pk)
+        cls.objects.filter(user1=first, user2=second).delete()
