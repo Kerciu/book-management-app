@@ -7,26 +7,28 @@ User = get_user_model()
 
 
 class FriendshipRequest(models.Model):
+    STATUS_CHOICES = [
+        ('pending', 'Pending'),
+        ('accepted', 'Accepted'),
+        ('rejected', 'Rejected'),
+    ]
+
     from_user = models.ForeignKey(
-        User,
-        on_delete=models.CASCADE,
-        related_name="sent_friend_requests"
+        User, on_delete=models.CASCADE, related_name="sent_friend_requests"
     )
     to_user = models.ForeignKey(
-        User,
-        on_delete=models.CASCADE,
-        related_name="received_friend_requests"
+        User, on_delete=models.CASCADE, related_name="received_friend_requests"
     )
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='pending')
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         constraints = [
-            # cannot send more than one pending request from A → B
             UniqueConstraint(
                 fields=["from_user", "to_user"],
-                name="unique_friendship_request"
+                condition=Q(status='pending'),
+                name="unique_pending_friendship_request"
             ),
-            # cannot send a request to yourself: from_user != to_user
             models.CheckConstraint(
                 check=~Q(from_user=F('to_user')),
                 name="no_self_friend_request"
@@ -50,12 +52,18 @@ class FriendshipRequest(models.Model):
         super().save(*args, **kwargs)
 
     def accept(self):
+        if self.status != 'pending':
+            raise ValidationError("Only pending requests can be accepted.")
         first, second = sorted([self.from_user, self.to_user], key=lambda u: u.pk)
         Friendship.objects.create(user1=first, user2=second)
-        self.delete()
+        self.status = 'accepted'
+        self.save()
 
     def reject(self):
-        self.delete()
+        if self.status != 'pending':
+            raise ValidationError("Only pending requests can be rejected.")
+        self.status = 'rejected'
+        self.save()
 
     def __str__(self):
         return f"Friend request: {self.from_user.username} → {self.to_user.username}"
