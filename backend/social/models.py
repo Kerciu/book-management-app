@@ -100,3 +100,42 @@ class Friendship(models.Model):
     def remove_friendship(cls, user1, user2):
         first, second = sorted([user1, user2], key=lambda u: u.pk)
         cls.objects.filter(user1=first, user2=second).delete()
+
+
+class Follow(models.Model):
+    follower = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name="following"
+    )
+    followee = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name="followers"
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        constraints = [
+            # cannot follow yourself: follower != followee
+            models.CheckConstraint(
+                check=~Q(follower=F('followee')),
+                name="no_self_follow"
+            ),
+            # only one follow per (follower, followee)
+            UniqueConstraint(
+                fields=["follower", "followee"],
+                name="unique_follow_pair"
+            ),
+        ]
+
+    def clean(self):
+        if self.follower == self.followee:
+            raise ValidationError("Cannot follow yourself.")
+
+    def save(self, *args, **kwargs):
+        self.full_clean()
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return f"{self.follower.username} follows {self.followee.username}"
