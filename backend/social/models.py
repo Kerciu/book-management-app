@@ -11,6 +11,7 @@ class FriendshipRequest(models.Model):
         ('pending', 'Pending'),
         ('accepted', 'Accepted'),
         ('rejected', 'Rejected'),
+        ('cancelled', 'Cancelled'),
     ]
 
     from_user = models.ForeignKey(
