@@ -28,9 +28,10 @@ pub fn App() -> impl IntoView {
                 <Route path=path!("/") view=HomePage />
                 <Route path=path!("/about") view=AboutPage />
                 <Route path=path!("/books/list") view=ListPage />
-                <Route path=path!("/books/details") view=BookPage />
+                <Route path=path!("/books/details/:id") view=BookPage />
                 <Route path=path!("/account") view=AccountPage />
                 <Route path=path!("/sign") view=SignPage />
+                <Route path=path!("/verify") view=EmailVerificationForm />
             </Routes>
         </Router>
     }
