@@ -1,11 +1,15 @@
 mod book_details;
 mod book_list;
+mod email_resend_form;
+mod email_verify_form;
 mod friends_list;
+mod google_auth;
 mod login_form;
 mod registraction_form;
 
 pub use book_details::BookDetails;
 pub use book_list::BookList;
+pub use email_verify_form::EmailVerificationForm;
 pub use friends_list::FriendList;
 pub use login_form::LoginForm;
 pub use registraction_form::RegistractionForm;
