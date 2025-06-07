@@ -52,3 +52,47 @@ pub mod email {
         }
     }
 }
+
+pub mod github {
+    use web_sys::js_sys::{Object, Reflect};
+
+    #[derive(Debug, Clone)]
+    pub struct Token(pub String);
+
+    pub fn init() {
+        let params =
+            web_sys::UrlSearchParams::new_with_record_from_str_to_str(&get_settings()).unwrap();
+        web_sys::window()
+            .unwrap()
+            .location()
+            .set_href(&format!(
+                "{}?{}",
+                env!("GITHUB_OAUTH_URL"),
+                params.to_string()
+            ))
+            .unwrap();
+    }
+
+    fn get_settings() -> Object {
+        let crypto = web_sys::window().unwrap().crypto().unwrap();
+        let state = crypto.random_uuid();
+        web_sys::window()
+            .unwrap()
+            .local_storage()
+            .unwrap()
+            .unwrap()
+            .set_item("github_oauth_state", &state)
+            .unwrap();
+
+        let ret = Object::new();
+        Reflect::set(&ret, &"client_id".into(), &env!("GITHUB_CLIENT_ID").into()).unwrap();
+        Reflect::set(
+            &ret,
+            &"redirect_uri".into(),
+            &env!("GITHUB_REDIRECT_URI_SIMPLE").into(),
+        )
+        .unwrap();
+        Reflect::set(&ret, &"state".into(), &state.into()).unwrap();
+        ret
+    }
+}

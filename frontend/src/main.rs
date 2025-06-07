@@ -23,8 +23,10 @@ pub fn App() -> impl IntoView {
     //provide_meta_context();
 
     view! {
+        <GithubAuthButton />
         <Router>
             <Routes fallback=|| view! { NotFound }>
+                <Route path=path!("/github_auth") view=GithubAuthHandler />
                 <Route path=path!("/") view=HomePage />
                 <Route path=path!("/about") view=AboutPage />
                 <Route path=path!("/books/list") view=ListPage />

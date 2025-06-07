@@ -6,7 +6,9 @@ mod friends_list;
 mod google_auth;
 mod login_form;
 mod registraction_form;
+mod github_auth;
 
+pub use github_auth::{GithubAuthButton, GithubAuthHandler};
 pub use book_details::BookDetails;
 pub use book_list::BookList;
 pub use email_verify_form::EmailVerificationForm;

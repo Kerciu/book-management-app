@@ -48,7 +48,7 @@ pub fn google_auth_handler() -> impl IntoView {
                 .local_storage()
                 .unwrap()
                 .unwrap()
-                .get_item("state")
+                .get_item("google_oauth_state")
                 .unwrap()
                 .unwrap_or_default() =>
         {
