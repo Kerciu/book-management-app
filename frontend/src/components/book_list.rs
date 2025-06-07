@@ -67,7 +67,7 @@ fn book_info(book: Book) -> impl IntoView {
         isbn,
         published_at,
         language,
-        ..
+        id,
     } = book;
     let navigate = use_navigate();
     let authors = authors
@@ -89,7 +89,7 @@ fn book_info(book: Book) -> impl IntoView {
     let short_description = description.chars().take(100).collect::<String>();
     view! {
             <div class="book-display" on:click=move |_| {
-                    navigate("/books/details", Default::default());
+                    navigate(&format!("/books/details/{id}"), Default::default());
                     }>
                     <div class="container-flex" style="padding: 0px;">
                         //image url
