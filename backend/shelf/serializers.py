@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from .models import Shelf
+from book.models import Book
 
 
 class ShelfSerializer(serializers.ModelSerializer):
@@ -78,3 +79,18 @@ class ShelfSerializer(serializers.ModelSerializer):
                     "Cannot rename default shelves"
                 )
         return super().update(instance, validated_data)
+
+
+class AddBookToShelfSerializer(serializers.Serializer):
+    book_id = serializers.PrimaryKeyRelatedField(queryset=Book.objects.all())
+
+    def validate(self, attrs):
+        shelf = self.context['shelf']
+        book = attrs['book_id']
+        if shelf.books.filter(pk=book.pk).exists():
+            raise serializers.ValidationError("This book is already on the shelf.")
+        return attrs
+
+
+class RemoveBookFromShelfSerializer(serializers.Serializer):
+    book_id = serializers.PrimaryKeyRelatedField(queryset=Book.objects.all())
