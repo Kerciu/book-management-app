@@ -1,45 +1,44 @@
 pub mod google {
-    use std::any::TypeId;
-    use wasm_bindgen::prelude::*;
-    use web_sys::js_sys::{self, Reflect};
+    use web_sys::js_sys::{self, Object, Reflect};
 
-    #[wasm_bindgen]
-    unsafe extern "C" {
-        pub type Handle;
-
-        #[wasm_bindgen(js_namespace = gapi, js_name = load)]
-        fn load_auth(auth: &str, then: &Closure<dyn Fn()>);
-
-        #[wasm_bindgen(js_namespace = ["gapi", "auth2"], js_name = init)]
-        fn init_auth(settings: JsValue) -> JsValue;
-    }
-
-    fn prop_key() -> JsValue {
-        format!("{:?}__GOOGLE_AUTH", TypeId::of::<Handle>()).into()
-    }
-
-    /// initializes Google OAuth object and stores it in global context
-    #[wasm_bindgen(js_name = init_google_auth)]
     pub fn init() {
-        // TODO: should we use synchronization here?
-        //       or just optimistically assume Auth will be ready
-        //       by the time we need it?
-        let callback = Closure::new(move || {
-            let args = js_sys::Object::new();
-            // TODO: Error handling
-            let _ = js_sys::Reflect::set(&args, &"client_id".into(), &"TODO".into());
-            // TODO: Scope
-
-            let auth: Handle = init_auth(args.into()).into();
-            let _ = Reflect::set(&web_sys::window().unwrap(), &prop_key(), &auth);
-        });
-        load_auth("auth2", &callback);
+        let params =
+            web_sys::UrlSearchParams::new_with_record_from_str_to_str(&get_settings()).unwrap();
+        web_sys::window()
+            .unwrap()
+            .location()
+            .set_href(&format!(
+                "{}?{}",
+                env!("GOOGLE_OAUTH_URL"),
+                params.to_string()
+            ))
+            .unwrap();
     }
 
-    pub fn get_handle() -> Handle {
-        js_sys::Reflect::get(&web_sys::window().unwrap(), &prop_key())
+    fn get_settings() -> Object {
+        let crypto = web_sys::window().unwrap().crypto().unwrap();
+        let state = crypto.random_uuid();
+        web_sys::window()
             .unwrap()
-            .into()
+            .local_storage()
+            .unwrap()
+            .unwrap()
+            .set_item("google_oauth_state", &state)
+            .unwrap();
+
+        let ret = js_sys::Object::new();
+        Reflect::set(&ret, &"client_id".into(), &env!("GOOGLE_CLIENT_ID").into()).unwrap();
+        Reflect::set(&ret, &"scope".into(), &env!("GOOGLE_SCOPES").into()).unwrap();
+        Reflect::set(
+            &ret,
+            &"redirect_uri".into(),
+            &env!("GOOGLE_REDIRECT_URI_SIMPLE").into(),
+        )
+        .unwrap();
+        Reflect::set(&ret, &"response_type".into(), &"code".into()).unwrap();
+        Reflect::set(&ret, &"access_type".into(), &"offline".into()).unwrap();
+        Reflect::set(&ret, &"state".into(), &state.into()).unwrap();
+        ret
     }
 }
 
