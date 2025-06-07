@@ -20,8 +20,8 @@ pub fn ListPage() -> impl IntoView {
         <div class="container-books-list-page" style ="padding-top:0px;">
             <div style="padding-right: 20vw;">
                 <div class="text-title-list-page">"Books"</div>
-                //TODO: fix this by providing book list proper data
-                //<BookList/>
+                // TODO: fix this by providing book list proper data
+                <BookList/>
                 // book example
                 // <div class="book-display" on:click=move |_| {
                 //     book_nav_temp("/books/details", Default::default());
@@ -61,4 +61,3 @@ pub fn ListPage() -> impl IntoView {
         </div>
     }
 }
-
