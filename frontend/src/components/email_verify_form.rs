@@ -7,7 +7,7 @@ use crate::components::{handle_request, send_post_request};
 #[derive(Serialize, Clone, Debug, Default, Copy)]
 struct EmailVerifyRequest {
     email: RwSignal<String>,
-    code: RwSignal<String>,
+    otp: RwSignal<String>,
 }
 
 #[derive(Clone, Debug)]
@@ -24,7 +24,7 @@ enum EmailVerifyResponse {
 }
 
 async fn post(request: EmailVerifyRequest) -> anyhow::Result<EmailVerifyResponse> {
-    const ENDPOINT: &str = "/api/verify-user/";
+    const ENDPOINT: &str = "/api/auth/verify-user/";
     let res = send_post_request(request, ENDPOINT).await?;
 
     // HTTP Codes
@@ -75,7 +75,7 @@ pub fn EmailVerificationForm() -> impl IntoView {
             </div>
             <div>
                 <label>"Code"</label>
-                <input type="number" bind:value=request.code required />
+                <input type="number" bind:value=request.otp required />
             </div>
             <input type="button" on:click=move |_| {
                 send_request.dispatch(request);
