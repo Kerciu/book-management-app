@@ -7,6 +7,8 @@ mod google_auth;
 mod login_form;
 mod registraction_form;
 mod github_auth;
+mod review;
+mod review_list;
 
 pub use github_auth::{GithubAuthButton, GithubAuthHandler};
 pub use book_details::BookDetails;
@@ -16,7 +18,7 @@ pub use friends_list::FriendList;
 pub use login_form::LoginForm;
 pub use registraction_form::RegistractionForm;
 
-use crate::BACKEND;
+use crate::{auth, BACKEND};
 use gloo_net::http::{Request, Response};
 use leptos::prelude::*;
 use serde::{Deserialize, de::DeserializeOwned};
@@ -30,6 +32,7 @@ async fn send_post_request(
     let body = serde_json::to_string(&data)?;
     let response = Request::post(&endpoint)
         .header("Content-Type", "application/json")
+        .header("Authorization", &format!("Bearer {}", &use_context::<auth::Token>().unwrap_or_default() as &str))
         .body(body)?
         .send()
         .await?;
@@ -43,6 +46,7 @@ where
     let endpoint = format!("{BACKEND}{endpoint}");
     let response = Request::get(&endpoint)
         .header("Content-Type", "application/json")
+        .header("Authorization", &format!("Bearer {}", &use_context::<auth::Token>().unwrap_or_default() as &str))
         .send()
         .await?;
     Ok(response.json().await?)
