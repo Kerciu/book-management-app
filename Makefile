@@ -26,7 +26,9 @@ init:
 	make migrate
 
 build:
+	cp .env frontend/.env
 	docker compose up -d --build
+	rm frontend/.env
 
 
 clean:
