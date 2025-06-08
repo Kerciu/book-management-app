@@ -64,7 +64,7 @@ pub fn github_auth_handler() -> impl IntoView {
 
     let code = LocalResource::new(move || post(code().unwrap_or_default()));
     let code = move || code.read().as_ref().unwrap().as_ref().unwrap().code.clone();
-    Effect::new(move || provide_context(auth::github::Token(code())));
+    Effect::new(move || provide_context(auth::github::Token::new(code())));
     Effect::new(move || log::log!(Level::Debug, "{:?}", use_context::<auth::github::Token>()));
 
     view! {}

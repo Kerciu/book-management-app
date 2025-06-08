@@ -1,5 +1,27 @@
+use std::ops::Deref;
+
+#[derive(Debug, Clone, Default)]
+#[repr(transparent)]
+pub struct Token(String);
+
+impl Token {
+    pub fn new(data: String) -> Self {
+        Self(data)
+    }
+}
+
+impl Deref for Token {
+    type Target = str;
+
+    fn deref(&self) -> &Self::Target {
+        &self.0
+    }
+}
+
 pub mod google {
     use web_sys::js_sys::{self, Object, Reflect};
+
+    pub type Token = super::Token;
 
     pub fn init() {
         let params =
@@ -43,21 +65,13 @@ pub mod google {
 }
 
 pub mod email {
-    #[derive(Debug, Clone)]
-    pub struct Token(String);
-
-    impl Token {
-        pub fn new(token: String) -> Self {
-            Self(token)
-        }
-    }
+    pub type Token = super::Token;
 }
 
 pub mod github {
     use web_sys::js_sys::{Object, Reflect};
 
-    #[derive(Debug, Clone)]
-    pub struct Token(pub String);
+    pub type Token = super::Token;
 
     pub fn init() {
         let params =
