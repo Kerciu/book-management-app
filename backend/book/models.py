@@ -1,6 +1,4 @@
 from django.db import models
-from django.contrib.postgres.indexes import GinIndex
-from django.contrib.postgres.search import SearchVectorField, SearchVector
 
 # Create your models here.
 
@@ -27,7 +25,7 @@ class Author(models.Model):
 class Publisher(models.Model):
     name = models.CharField(max_length=255, unique=True, db_index=True)
 
-    website = models.URLField(blank=True, unique=True)
+    website = models.URLField(blank=True, null=True, unique=True)
     description = models.TextField(blank=True)
 
     def __str__(self):
@@ -43,7 +41,7 @@ class Genre(models.Model):
 
 class Book(models.Model):
     title = models.CharField(max_length=255, db_index=True)
-    description = models.TextField(blank=True)
+    description = models.TextField(blank=True, null=True)
     authors = models.ManyToManyField(Author)
 
     genres = models.ManyToManyField(Genre)
@@ -56,19 +54,10 @@ class Book(models.Model):
     page_count = models.PositiveIntegerField(null=True, blank=True)
     language = models.CharField(max_length=30, default="English")
 
-    cover_image = models.URLField(blank=True)
+    cover_image = models.URLField(blank=True, null=True)
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
-    search_vector = SearchVectorField(null=True)
-
-    class Meta:
-        indexes = [GinIndex(fields=["search_vector"])]
-
     def __str__(self):
         return self.title
-
-    @classmethod
-    def update_search_vector(cls):
-        cls.objects.update(search_vector=SearchVector("title", "description"))
