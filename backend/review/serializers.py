@@ -78,6 +78,7 @@ class ReviewCommentSerializer(serializers.ModelSerializer):
             "text",
             "created_at",
             "updated_at",
+            "can_edit"
         ]
         read_only_fields = ["user", "review", "created_at", "updated_at"]
 

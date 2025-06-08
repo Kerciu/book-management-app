@@ -11,6 +11,7 @@ urlpatterns = [
     path("api/auth/", include("authentication.urls")),
     path("api/book/", include("book.urls")),
     path("api/shelf/", include("shelf.urls")),
+    path("api/review/", include("review.urls")),
     # Docs
     path("api/schema/", SpectacularAPIView.as_view(), name="schema"),
     path("api/schema/redoc/", SpectacularRedocView.as_view(), name="schema-redoc"),
