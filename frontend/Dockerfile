@@ -16,6 +16,7 @@ RUN cargo chef cook --recipe-path recipe.json --target wasm32-unknown-unknown
 COPY src src
 COPY Cargo.toml Cargo.toml
 COPY index.html index.html
+COPY public public
 RUN trunk build
 
 FROM python:latest AS runtime
