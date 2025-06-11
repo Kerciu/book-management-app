@@ -158,14 +158,20 @@ pub fn book_list() -> impl IntoView {
     };
 
     view! {
-        <div class="container-flex-row" style="padding:0px; max-width:250px;">
-            <input type="text" placeholder="Title" style="margin-left:0px; border-radius: 16px; height:19px; margin-top:0px;" bind:value=(title, set_title)/>
-            <input type="text" placeholder="Genre" style="margin-left:0px; border-radius: 16px; height:19px; margin-top:0px;" bind:value=(genre, set_genre)/>
-            //<button class="button-pop" style="width: auto;">"Filter"</button>
-            <select name="Sort" class="custom-select">
-                <option value="relevance">"Relevance"</option>
-                <option value="alphabetically">"Alphabetically"</option>
-                <option value="date">"Date published"</option>  =
+        <div class="controls">
+            <input type="text" id="book-search" placeholder="Search books..." class="search-input" style="align-items: center; margin-top: 0px;"/>
+            <select id="genre-filter" class="filter-select" style="align-items: center;">
+                <option value="">All Genres</option>
+                <option value="fiction">Fiction</option>
+                <option value="non-fiction">Non-Fiction</option>
+                <option value="sci-fi">Sci-Fi</option>
+                <option value="mystery">Mystery</option>
+            </select>
+            <select id="sort-books" class="sort-select" style="align-items: center;">
+                <option value="title">Sort by Title</option>
+                <option value="author">Sort by Author</option>
+                <option value="rating">Sort by Rating</option>
+                <option value="date">Sort by Date Added</option>
             </select>
         </div>
         <For

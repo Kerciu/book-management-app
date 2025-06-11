@@ -35,10 +35,10 @@ pub fn friend_list() -> impl IntoView {
     let friend_temp = get_example_friend();
 
     view! {
-        <div class="container-flex-row" style="padding:0px;">
-            <input type="text" placeholder="Search" style="margin-left:0px; border-radius: 16px; height:19px; margin-top:0px;"/>
-            <button class="button-pop" style="width: auto;">"Add"</button>
-            <button class="button-pop" style="width: auto;">"Delete"</button>
+        <div class="controls">
+            <input type="text" placeholder="Search friends..." class="search-input" style="align-items: center; margin-top: 0px;"/>
+            <input type="text" placeholder="Add friend by username..." class="search-input" style="align-items: center; margin-top: 0px;"/>
+            <button  class="btn-primary" style="align-items: center;">"Add Friend"</button>
         </div>
         <FriendInfo friend=friend_temp />
     }
