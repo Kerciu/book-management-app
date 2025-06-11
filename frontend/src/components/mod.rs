@@ -7,6 +7,7 @@ mod google_auth;
 mod login_form;
 mod registraction_form;
 mod github_auth;
+mod recommendation_list;
 mod review;
 mod review_list;
 
@@ -17,6 +18,7 @@ pub use email_verify_form::EmailVerificationForm;
 pub use friends_list::FriendList;
 pub use login_form::LoginForm;
 pub use registraction_form::RegistractionForm;
+pub use recommendation_list::BookReccomendationList;
 
 use crate::{auth, BACKEND};
 use gloo_net::http::{Request, Response};

@@ -123,6 +123,7 @@ nav {
     align-items: center;
     gap: 8px;
     margin-top: 12px;
+    max-width: 400px; 
 }
 
 .chips-container {
@@ -555,7 +556,7 @@ nav {
 
 .btn-small {
   padding: 6px 12px;
-  font-size: 12px;
+  font-size: 18px;
   background: transparent;
   color: #8B5A96;
   border: 1px solid #8B5A96;
@@ -728,3 +729,63 @@ input::-webkit-input-placeholder { color: #cac1ce; }
       border-color: #251d2b;
       box-shadow: 0 0 0 3px #624e72;
     }
+
+.books-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(550px, 1fr));
+
+  gap: 25px;
+  margin-top: 30px;
+}
+
+.book-item {
+  background: rgba(139, 90, 150, 0.1);
+  border: 1px solid rgba(144, 144, 145, 0.2);
+  border-radius: 15px;
+  padding: 20px;
+  display: flex;
+  gap: 15px;
+  transition: all 0.3s ease;
+  align-items: flex-start;
+  width: auto;
+    max-width: fit-content;
+  flex-wrap: wrap;
+}
+
+.book-item:hover {
+  border-color: #E2BDFF;
+  transform: translateY(-2px);
+}
+
+
+
+.book-details {
+  flex: 1;
+}
+
+.book-details h4 {
+  color: #E2BDFF;
+  margin-bottom: 5px;
+  font-size: 1.1rem;
+}
+
+.book-details p {
+  color: #B8A9C9;
+  margin-bottom: 8px;
+}
+
+.genre-tag {
+  background: #8B5A96;
+  color: white;
+  padding: 4px 12px;
+  border-radius: 15px;
+  font-size: 0.8rem;
+  display: inline-block;
+  margin-bottom: 8px;
+}
+
+.book-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 10px;
+}

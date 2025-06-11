@@ -1,4 +1,4 @@
-use crate::components::{BookList, FriendList};
+use crate::components::{BookList, FriendList, BookReccomendationList};
 use leptos::html::*;
 use leptos::prelude::*;
 use leptos::*;
@@ -58,7 +58,7 @@ pub fn MainPage() -> impl IntoView {
                 >
                     "Recommendations"
                 </button>
-                <button class=button_style_books on:click=move |_| {
+                <button class=button_style_book_list on:click=move |_| {
                         set_books(true); 
                         set_my_books(false);
                         set_recommendations(false);
@@ -102,6 +102,7 @@ pub fn MainPage() -> impl IntoView {
                         <div class="section-header">
                             <h2>"Recommended for You"</h2>
                             <p>"Discover your next favorite book"</p>
+                            <BookReccomendationList/>
                         </div>
 
                     }

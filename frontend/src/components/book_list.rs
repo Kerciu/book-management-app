@@ -88,20 +88,21 @@ fn book_info(book: Book) -> impl IntoView {
     // TODO: Make costanat variable out of this "100"
     let short_description = description.chars().take(100).collect::<String>();
     view! {
-            <div class="book-display" on:click=move |_| {
+
+            <div class="book-item" style="margin-right: 20px;" on:click=move |_| {
                     navigate(&format!("/books/details/{id}"), Default::default());
                     }>
-                    <div class="container-flex" style="padding: 0px;">
-                        //image url
-                        <img src="https://ecsmedia.pl/cdn-cgi/image/format=webp,width=544,height=544,/c/the-rust-programming-language-2nd-edition-b-iext138640655.jpg" alt="Description" class="image-side" style="margin-top: 20px; padding-bottom:20px;"></img>
-                        <div class="text-side" style="margin-top: 20px;">
-                            <div class="text-title" style="color: #FFFFFF; margin-left:0px;">{title}</div>
-                            <div class="body-text" style="color: #cac1ce; margin-left:0px;">"by "{authors}</div>
-                            <div class="body-text" style="color: #cac1ce; margin-left:0px;">{format!("Published: {}", published_at)}</div>
-                            <div class="body-text" style="color: #FFFFFF; margin-left:0px; font-size: 20px; margin-top:10px;">
-                                {short_description}"..."
-                            </div>
-                            <div class="categories-container" style="margin-top:10px;">
+                <img src="https://ecsmedia.pl/cdn-cgi/image/format=webp,/c/the-rust-programming-language-2nd-edition-b-iext138640655.jpg" alt="Description"
+                    style="margin-top: 20px; padding-bottom:20px; height: 316px; object-fit: cover; width: auto; object-fit: contain; ">
+                </img>
+                <div class="book-details">
+                    <h4 style = "max-width: 400px;     word-wrap: break-word; overflow-wrap: break-word;">{title}</h4>
+                    <p style = "max-width: 400px;     word-wrap: break-word; overflow-wrap: break-word;">"by "{authors}</p>
+                    <p style = "max-width: 400px;     word-wrap: break-word; overflow-wrap: break-word;">{format!("Published: {}", published_at)}</p>
+                    <div class="body-text" style="color: #FFFFFF; margin-left:0px; font-size: 20px; margin-top:10px;">
+                        {short_description}"..."
+                    </div>
+                    <div class="categories-container" style="margin-top:20px;">
                                 <div class="chips-container">
                                     {genres.into_iter()
                                         .map(|genre| view! {
@@ -109,12 +110,67 @@ fn book_info(book: Book) -> impl IntoView {
                                         })
                                         .collect_view()}
                                 </div>
-                            </div>
-                        </div>
                     </div>
+                    <div class="book-actions">
+                        <button class="btn-small btn-danger">"Remove from the collection"</button>
+                    </div>
+                </div>
             </div>
     }
 }
+
+// temporary functions for testing
+
+pub fn get_example_book() -> Book {
+    Book {
+        id: 1,
+        genres: get_example_genres(),
+        authors: get_example_authors(),
+        page_count: Some(523),
+        title: "The Rust Programming Language".to_string(),
+        description: "The official book on Rust, written by the Rust development team at Mozilla. This book will teach you about Rust's unique features and how to use them effectively.".to_string(),
+        isbn: "978-1593278281".to_string(),
+        published_at: "2018-05-15".to_string(),
+        language: "English".to_string(),
+    }
+}
+
+fn get_example_genres() -> Vec<Genre> {
+    vec![
+        Genre {
+            name: "Programming".to_string(),
+        },
+        Genre {
+            name: "Technology".to_string(),
+        },
+        Genre {
+            name: "Computer Science".to_string(),
+        },
+    ]
+}
+
+fn get_example_authors() -> Vec<Author> {
+    vec![
+        Author {
+            first_name: "Steve".to_string(),
+            middle_name: "".to_string(),
+            last_name: "Klabnik".to_string(),
+            bio: "Steve Klabnik is a member of the Rust core team and has been involved in Rust documentation.".to_string(),
+            birth_date: "1985-02-02".to_string(),
+            death_date: "".to_string(),
+        },
+        Author {
+            first_name: "Carol".to_string(),
+            middle_name: "".to_string(),
+            last_name: "Nichols".to_string(),
+            bio: "Carol Nichols is a Rust developer and educator.".to_string(),
+            birth_date: "1984-05-08".to_string(),
+            death_date: "".to_string(),
+        },
+    ]
+}
+
+//
 
 #[component]
 pub fn book_list() -> impl IntoView {
@@ -174,14 +230,26 @@ pub fn book_list() -> impl IntoView {
                 <option value="date">Sort by Date Added</option>
             </select>
         </div>
-        <For
-            each=move || books()
-            key=|book| book.id
-            children=move |book| {
-                view! {
-                    <BookInfo book=book />
+        <div class="books-grid" id="books-grid">
+
+            //temp solution for testing
+            <BookInfo book=get_example_book()/>
+                        <BookInfo book=get_example_book()/>
+            <BookInfo book=get_example_book()/>
+            <BookInfo book=get_example_book()/>
+            <BookInfo book=get_example_book()/>
+
+            //
+
+            <For
+                each=move || books()
+                key=|book| book.id
+                children=move |book| {
+                    view! {
+                        <BookInfo book=book />
+                    }
                 }
-            }
-        />
+            />
+        </div>
     }
 }
