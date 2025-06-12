@@ -13,7 +13,7 @@ mod review_list;
 
 pub use github_auth::{GithubAuthButton, GithubAuthHandler};
 pub use book_details::BookDetails;
-pub use book_list::BookList;
+pub use book_list::{BookList, get_example_book};
 pub use email_verify_form::EmailVerificationForm;
 pub use friends_list::FriendList;
 pub use login_form::LoginForm;

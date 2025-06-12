@@ -112,8 +112,8 @@ pub fn MainPage() -> impl IntoView {
                     view! {
                         <div class="section-header">
                             <h2>"Book List"</h2>
-                            <p>"Check the list of books to broaden your horizons"</p>
-                            <BookList/>
+                            <p>"Check the list of books to find what you like"</p>
+                            <BookList is_library_page=false/>
                         </div>
 
                     }
@@ -123,6 +123,8 @@ pub fn MainPage() -> impl IntoView {
                         view! {
                             <div class="section-header">
                                 <h2>"My Library"</h2>
+                                <BookList is_library_page=true/>
+
                             </div>
 
                         }

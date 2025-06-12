@@ -789,3 +789,61 @@ input::-webkit-input-placeholder { color: #cac1ce; }
   gap: 8px;
   margin-top: 10px;
 }
+
+.friends-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 25px;
+  margin-top: 30px;
+}
+
+.friend-card {
+  background: rgba(139, 90, 150, 0.1);
+  border: 1px solid rgba(226, 189, 255, 0.2);
+  border-radius: 15px;
+  padding: 20px;
+  display: flex;
+  gap: 15px;
+  width: auto;
+  max-width: fit-content;
+  flex-wrap: wrap;
+  transition: all 0.3s ease;
+}
+
+.friend-card:hover {
+  border-color: #E2BDFF;
+  transform: translateY(-2px);
+}
+
+.friend-avatar {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: #8B5A96;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 1.2rem;
+  color: white;
+}
+
+.friend-info {
+  flex: 1;
+}
+
+.friend-info h4 {
+  color: #E2BDFF;
+  margin-bottom: 5px;
+}
+
+.friend-info p {
+  color: #B8A9C9;
+  margin-bottom: 10px;
+  font-size: 0.9rem;
+}
+
+.friend-actions {
+  display: flex;
+  gap: 8px;
+}

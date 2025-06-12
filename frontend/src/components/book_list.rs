@@ -57,7 +57,7 @@ async fn get(request: String) -> anyhow::Result<BookResponse> {
 }
 
 #[component]
-fn book_info(book: Book) -> impl IntoView {
+fn book_info(book: Book, is_library:bool) -> impl IntoView {
     let Book {
         genres,
         authors,
@@ -89,7 +89,7 @@ fn book_info(book: Book) -> impl IntoView {
     let short_description = description.chars().take(100).collect::<String>();
     view! {
 
-            <div class="book-item" style="margin-right: 20px;" on:click=move |_| {
+            <div class="book-item" style="margin-right: 20px; margin-left: 20px;" on:click=move |_| {
                     navigate(&format!("/books/details/{id}"), Default::default());
                     }>
                 <img src="https://ecsmedia.pl/cdn-cgi/image/format=webp,/c/the-rust-programming-language-2nd-edition-b-iext138640655.jpg" alt="Description"
@@ -111,9 +111,17 @@ fn book_info(book: Book) -> impl IntoView {
                                         .collect_view()}
                                 </div>
                     </div>
-                    <div class="book-actions">
-                        <button class="btn-small btn-danger">"Remove from the collection"</button>
-                    </div>
+                    <Show when=move || is_library fallback=move || 
+                        view! {
+                            <div class="book-actions">
+                                <button class="btn-small">"Add to the collection"</button>
+                            </div>
+                        }
+                    >
+                        <div class="book-actions">
+                            <button class="btn-small btn-danger">"Remove from the collection"</button>
+                        </div>
+                    </Show>
                 </div>
             </div>
     }
@@ -173,7 +181,7 @@ fn get_example_authors() -> Vec<Author> {
 //
 
 #[component]
-pub fn book_list() -> impl IntoView {
+pub fn book_list(is_library_page:bool) -> impl IntoView {
     const ENDPOINT: &'static str = "/api/book/books/";
     let (title, set_title) = signal(String::new());
     let (genre, set_genre) = signal(String::new());
@@ -233,11 +241,11 @@ pub fn book_list() -> impl IntoView {
         <div class="books-grid" id="books-grid">
 
             //temp solution for testing
-            <BookInfo book=get_example_book()/>
-                        <BookInfo book=get_example_book()/>
-            <BookInfo book=get_example_book()/>
-            <BookInfo book=get_example_book()/>
-            <BookInfo book=get_example_book()/>
+            <BookInfo book=get_example_book() is_library=is_library_page/>
+            <BookInfo book=get_example_book() is_library=is_library_page/>
+            <BookInfo book=get_example_book() is_library=is_library_page/>
+            <BookInfo book=get_example_book() is_library=is_library_page/>
+            <BookInfo book=get_example_book() is_library=is_library_page/>
 
             //
 
@@ -246,7 +254,7 @@ pub fn book_list() -> impl IntoView {
                 key=|book| book.id
                 children=move |book| {
                     view! {
-                        <BookInfo book=book />
+                        <BookInfo book=book is_library=false/>
                     }
                 }
             />
