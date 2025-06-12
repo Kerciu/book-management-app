@@ -6,6 +6,8 @@ use serde::Deserialize;
 
 use crate::components::{review::Review, send_get_request};
 
+
+
 #[derive(Deserialize, Clone, Debug)]
 struct ReviewResponse {
     count: usize,
@@ -18,6 +20,8 @@ async fn get(book_id: usize) -> anyhow::Result<ReviewResponse> {
     let endpoint = format!("/api/review/reviews/{book_id}/reviews/");
     send_get_request(&endpoint).await
 }
+
+
 
 #[component]
 pub fn review_list(book_id: impl Fn() -> usize + 'static) -> impl IntoView {
@@ -32,11 +36,14 @@ pub fn review_list(book_id: impl Fn() -> usize + 'static) -> impl IntoView {
     };
     let reviews = move || response().map(|ReviewResponse {results, ..}| results).unwrap_or_default();
 
+
     view! {
         <For
-            each=move || reviews().into_iter()
-            key=|review| review.id()
-            children=move |review| view! { <Review data=move || review.clone() /> }
-        />
+          each=move || reviews().into_iter()
+        key=|review| review.id()
+        children=move |review| view! { <Review data=move || review.clone() /> }
+       />
+
+
     }
 }

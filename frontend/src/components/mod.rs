@@ -19,6 +19,7 @@ pub use friends_list::FriendList;
 pub use login_form::LoginForm;
 pub use registraction_form::RegistractionForm;
 pub use recommendation_list::BookReccomendationList;
+pub use review_list::ReviewList;
 
 use crate::{auth, BACKEND};
 use gloo_net::http::{Request, Response};
