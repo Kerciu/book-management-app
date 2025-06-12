@@ -67,7 +67,7 @@ pub fn friend_list() -> impl IntoView {
             <FriendInfo friend=get_example_friend() />
             <FriendInfo friend=get_example_friend() />
             <FriendInfo friend=get_example_friend() />
-
+            //
         </div>
     }
 }
