@@ -2,39 +2,40 @@ use leptos::prelude::*;
 use leptos_router::hooks::*;
 use log::Level;
 use serde::Deserialize;
-use std::collections::HashMap;
 
 use super::send_get_request;
 use serde::Serialize;
 
+#[allow(dead_code, reason="Faithful representation of endpoint data")]
 #[derive(Deserialize, Debug, Clone)]
-struct Author {
-    first_name: String,
-    middle_name: String,
-    last_name: String,
-    bio: String,
-    birth_date: String,
-    death_date: String,
+pub struct Author {
+    pub first_name: String,
+    pub middle_name: String,
+    pub last_name: String,
+    pub bio: String,
+    pub birth_date: String,
+    pub death_date: String,
 }
 
 #[derive(Deserialize, Debug, Clone)]
-struct Genre {
-    name: String,
+pub struct Genre {
+    pub name: String,
 }
 
-#[derive(Deserialize, Debug, Clone)]
-struct Book {
-    id: usize,
-    genres: Vec<Genre>,
-    authors: Vec<Author>,
-    page_count: Option<usize>,
-    title: String,
-    description: String,
-    isbn: String,
-    published_at: String,
-    language: String,
+#[derive(Deserialize, Debug, Clone, Default)]
+pub struct Book {
+    pub id: usize,
+    pub genres: Vec<Genre>,
+    pub authors: Vec<Author>,
+    pub page_count: Option<usize>,
+    pub title: String,
+    pub description: String,
+    pub isbn: String,
+    pub published_at: String,
+    pub language: String,
 }
 
+#[allow(dead_code, reason="Faithful representation of endpoint data")]
 #[derive(Deserialize, Debug, Clone)]
 struct BookResponse {
     count: usize,
@@ -43,6 +44,7 @@ struct BookResponse {
     results: Vec<Book>,
 }
 
+#[allow(dead_code, reason="Faithful representation of endpoint data")]
 #[derive(Serialize, Debug, Clone, Default)]
 struct BookRequest {
     title: RwSignal<String>,

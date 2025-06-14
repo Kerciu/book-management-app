@@ -1,69 +1,13 @@
 use crate::components::send_get_request;
 use leptos::prelude::*;
 use log::Level;
-use serde::{Deserialize, Serialize};
-
-// INFO: Copied from `book_list.rs`, should we move both
-//       versions to common space?
-//       vvvvv COPIED vvvvv
-#[derive(Deserialize, Debug, Clone)]
-struct Author {
-    first_name: String,
-    middle_name: String,
-    last_name: String,
-    bio: String,
-    birth_date: String,
-    death_date: String,
-}
-
-#[derive(Deserialize, Debug, Clone)]
-struct Genre {
-    name: String,
-}
-
-#[derive(Deserialize, Debug, Clone, Default)]
-struct Book {
-    id: usize,
-    genres: Vec<Genre>,
-    authors: Vec<Author>,
-    page_count: usize,
-    title: String,
-    description: String,
-    isbn: String,
-    published_at: String,
-    language: String,
-}
-
-#[derive(Deserialize, Debug, Clone)]
-struct BookResponse {
-    count: usize,
-    next: Option<String>,
-    previous: Option<String>,
-    result: Vec<Book>,
-}
-
-#[derive(Serialize, Debug, Clone, Default)]
-struct BookRequest {
-    title: RwSignal<String>,
-    genre: RwSignal<String>,
-    isbn: RwSignal<String>,
-    page: RwSignal<usize>,
-}
-// INFO: ^^^^^ COPIED ^^^^^
+use super::book_list::{Author, Genre, Book};
 
 async fn get(book_id: usize) -> anyhow::Result<Book> {
     const ENDPOINT: &'static str = "/api/book/books/";
     let endpoint = format!("{ENDPOINT}{book_id}/");
     let res: Book = send_get_request(&endpoint).await?;
     Ok(res)
-}
-
-#[derive(Debug, Clone)]
-enum BookData {
-    Ok(Book),
-    Err,
-    NotExist,
-    Unknown,
 }
 
 #[component]
