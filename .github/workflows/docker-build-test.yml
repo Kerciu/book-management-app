@@ -28,6 +28,10 @@ jobs:
         EOF
         cat .env
 
+    - name: Copy .env to frontend
+      run: |
+        cp .env frontend/.env
+
     - name: Docker Compose Build
       run: docker compose build
 
