@@ -4,6 +4,7 @@ use crate::components::{LoginForm, RegistractionForm};
 #[component]
 pub fn SignPage() -> impl IntoView {
     let (show_sign_up, set_show_sign_up) = signal(true);
+    
     let query = use_query_map();
     let show = move || {
         query.with(|q| q

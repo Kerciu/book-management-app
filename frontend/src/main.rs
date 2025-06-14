@@ -10,7 +10,7 @@ mod auth;
 mod components;
 mod pages;
 use crate::pages::{
-    about::AboutPage, account::AccountPage, book::BookPage, home::HomePage, list::ListPage,
+    about::AboutPage, account::AccountPage, book::BookPage, home::HomePage, main_page::MainPage,
     not_found::NotFound, sign::SignPage,
 };
 use components::*;
@@ -23,13 +23,12 @@ pub fn App() -> impl IntoView {
     //provide_meta_context();
 
     view! {
-        <GithubAuthButton />
         <Router>
             <Routes fallback=|| view! { NotFound }>
                 <Route path=path!("/github_auth") view=GithubAuthHandler />
                 <Route path=path!("/") view=HomePage />
                 <Route path=path!("/about") view=AboutPage />
-                <Route path=path!("/books/list") view=ListPage />
+                <Route path=path!("/main") view=MainPage />
                 <Route path=path!("/books/details/:id") view=BookPage />
                 <Route path=path!("/account") view=AccountPage />
                 <Route path=path!("/sign") view=SignPage />

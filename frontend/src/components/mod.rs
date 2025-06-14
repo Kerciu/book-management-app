@@ -7,18 +7,22 @@ mod github_auth;
 mod google_auth;
 mod login_form;
 mod registraction_form;
+mod github_auth;
+mod recommendation_list;
 mod review;
 mod review_input;
 mod review_list;
 mod shelves_list;
 
 pub use book_details::BookDetails;
-pub use book_list::BookList;
+pub use book_list::{BookList, get_example_book};
 pub use email_verify_form::EmailVerificationForm;
 pub use friends_list::FriendList;
 pub use github_auth::{GithubAuthButton, GithubAuthHandler};
 pub use login_form::LoginForm;
 pub use registraction_form::RegistractionForm;
+pub use recommendation_list::BookReccomendationList;
+pub use review_list::ReviewList;
 
 use crate::{BACKEND, auth};
 use gloo_net::http::{Request, Response};
