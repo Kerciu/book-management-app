@@ -10,7 +10,7 @@ pub fn get_example_book() -> Book {
         id: 1,
         genres: get_example_genres(),
         authors: get_example_authors(),
-        page_count: 523,
+        page_count: Some(523),
         title: "The Rust Programming Language".to_string(),
         description: "The official book on Rust, written by the Rust development team at Mozilla. This book will teach you about Rust's unique features and how to use them effectively.".to_string(),
         isbn: "978-1593278281".to_string(),
@@ -62,7 +62,7 @@ async fn get(book_id: usize) -> anyhow::Result<Book> {
 }
 
 #[component]
-pub fn book_details(id: impl Fn() -> usize + Send + Sync + 'static) -> impl IntoView {
+pub fn book_details(id: impl Fn() -> usize + Send + Sync + Copy + 'static) -> impl IntoView {
     let book_request = LocalResource::new(move || get(id()));
     let book_data = move || {
         let req = book_request.read();
@@ -78,7 +78,6 @@ pub fn book_details(id: impl Fn() -> usize + Send + Sync + 'static) -> impl Into
 
     let book = move || book_data().unwrap_or_default();
 
-    let id = book().id;
     let genres = move || {
         book()
             .genres

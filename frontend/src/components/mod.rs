@@ -7,7 +7,6 @@ mod github_auth;
 mod google_auth;
 mod login_form;
 mod registraction_form;
-mod github_auth;
 mod recommendation_list;
 mod review;
 mod review_input;
