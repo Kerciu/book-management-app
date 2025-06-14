@@ -1,4 +1,5 @@
 from django.db import models
+from book.models import Book
 from django.contrib.auth import get_user_model
 from django.core.validators import MinLengthValidator
 from django.core.exceptions import ValidationError
@@ -23,6 +24,7 @@ class Shelf(models.Model):
         max_length=20, choices=SHELF_TYPES, blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    books = models.ManyToManyField(Book, related_name="shelves")
 
     class Meta:
         constraints = [
