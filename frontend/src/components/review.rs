@@ -1,9 +1,10 @@
 use leptos::prelude::*;
 use log::Level;
-use serde::{Deserialize, Serialize};
+use serde::Deserialize;
 
-use crate::components::send_get_request;
+use crate::components::{send_delete_request, send_get_request, send_post_request};
 
+#[allow(dead_code, reason="Faithful representation of endpoint data")]
 #[derive(Deserialize, Clone, Debug)]
 pub struct Review {
     id: usize,
@@ -25,6 +26,7 @@ impl Review {
     }
 }
 
+#[allow(dead_code, reason="Faithful representation of endpoint data")]
 #[derive(Deserialize, Clone, Debug)]
 pub struct CommentResponse {
     count: usize,
@@ -33,6 +35,7 @@ pub struct CommentResponse {
     results: Vec<Comment>,
 }
 
+#[allow(dead_code, reason="Faithful representation of endpoint data")]
 #[derive(Deserialize, Clone, Debug)]
 pub struct Comment {
     id: usize,
@@ -47,6 +50,16 @@ pub struct Comment {
 async fn get_comments(review_id: usize) -> anyhow::Result<CommentResponse> {
     let endpoint = format!("/api/review/reviews/{review_id}/comments/");
     send_get_request(&endpoint).await
+}
+
+async fn like_review(book_id: usize, review_id: usize) {
+    // TODO: Error Handling
+    let _ = send_post_request("", &format!("/api/review/reviews/{book_id}/reviews/{review_id}/like/")).await;
+}
+
+async fn dislike_review(book_id: usize, review_id: usize) {
+    // TODO: Error Handling
+    let _ = send_delete_request(&format!("/api/review/reviews/{book_id}/reviews/{review_id}/like/")).await;
 }
 
 #[component]

@@ -1,11 +1,11 @@
-use std::default;
-
 use leptos::prelude::*;
 use log::Level;
 use serde::Deserialize;
 
 use crate::components::{review::Review, send_get_request};
 
+
+#[allow(dead_code, reason="Faithful representation of endpoint data")]
 #[derive(Deserialize, Clone, Debug)]
 struct ReviewResponse {
     count: usize,
