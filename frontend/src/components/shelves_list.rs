@@ -1,7 +1,8 @@
 use leptos::prelude::*;
 use serde::Deserialize;
-
-use crate::components::send_get_request;
+use serde_json::json;
+use anyhow::anyhow;
+use crate::components::{book_list::Book, send_get_request, send_post_request};
 
 
 #[derive(Debug, Default, Deserialize, Clone)]
@@ -34,6 +35,35 @@ async fn get_shelves() -> anyhow::Result<Vec<Shelf>> {
     }
 
     Ok(ret.into_iter().map(|ShelvesResponse {results, ..}| results).flatten().collect())
+}
+
+async fn put_book_in_shelf(book_id: usize, shelf_id: usize) -> anyhow::Result<()> {
+    let endpoint= format!("/api/shelf/shelves/{shelf_id}/add_book");
+    let request = json!({"id": book_id});
+
+    let response = send_post_request(request, &endpoint).await?;
+
+    if response.ok() {
+        Ok(())
+    } else {
+        Err(anyhow!(response.text().await?))
+    }
+}
+async fn remove_book_from_shelf(book_id: usize, shelf_id: usize) -> anyhow::Result<()> {
+    let endpoint= format!("/api/shelf/shelves/{shelf_id}/remove_book");
+    let request = json!({"id": book_id});
+
+    let response = send_post_request(request, &endpoint).await?;
+
+    if response.ok() {
+        Ok(())
+    } else {
+        Err(anyhow!(response.text().await?))
+    }
+}
+
+async fn get_books_from_shelf(shelf_id: usize) -> anyhow::Result<Vec<Book>> {
+    todo!()
 }
 
 #[component]
