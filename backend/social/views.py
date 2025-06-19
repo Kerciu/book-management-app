@@ -4,8 +4,11 @@ from rest_framework.response import Response
 from rest_framework.exceptions import ValidationError, PermissionDenied, NotFound
 from django.db.models import Q
 
-from .models import FriendshipRequest
-from .serializers import FriendshipRequestSerializer
+from .models import FriendshipRequest, Friendship, Follow
+from .serializers import (
+    FriendshipRequestSerializer,
+    FriendshipSerializer,
+    FollowSerializer)
 
 
 class FriendshipRequestViewSet(viewsets.ModelViewSet):
@@ -96,3 +99,41 @@ class FriendshipRequestViewSet(viewsets.ModelViewSet):
         fr.reject()  # This sets status='rejected' and does NOT delete
         return Response({'detail': 'Friend request rejected.'},
                         status=status.HTTP_200_OK)
+
+
+class FriendshipViewSet(viewsets.ReadOnlyModelViewSet):
+    """
+    list:
+    Return all friendships for the current user.
+
+    retrieve:
+    Retrieve a specific friendship.
+    """
+    serializer_class = FriendshipSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        user = self.request.user
+        return (
+            Friendship.objects.filter(user1=user)
+            | Friendship.objects.filter(user2=user)
+        )
+
+
+class FollowViewSet(viewsets.ModelViewSet):
+    """
+    list:
+    List all users the current user follows or is followed by.
+
+    create:
+    Follow another user.
+
+    destroy:
+    Unfollow a user.
+    """
+    serializer_class = FollowSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        user = self.request.user
+        return Follow.objects.filter(follower=user)
