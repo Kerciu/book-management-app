@@ -22,9 +22,9 @@ async fn get(book_id: usize) -> anyhow::Result<ReviewResponse> {
 
 
 #[component]
-pub fn review_list(book_id: impl Fn() -> usize + 'static) -> impl IntoView {
-    let response = LocalResource::new(move || get(book_id()));
-    let response = move || match &*response.read() {
+pub fn review_list(book_id: Signal<usize>) -> impl IntoView {
+    let response_handle = LocalResource::new(move || get(book_id()));
+    let response = move || match &*response_handle.read() {
         Some(Ok(res)) => Some(res.clone()),
         Some(Err(err)) => {
             log::log!(Level::Error, "{err}");
@@ -39,7 +39,13 @@ pub fn review_list(book_id: impl Fn() -> usize + 'static) -> impl IntoView {
         <For
           each=move || reviews().into_iter()
         key=|review| review.id()
-        children=move |review| view! { <Review data=move || review.clone() /> }
+        children=move |review| view! { 
+                                        <Review 
+                                            book_id=Signal::derive(move || book_id()) 
+                                            data=Signal::derive(move || review.clone()) 
+                                            refetch_handle=Signal::derive(move || response_handle.refetch()) 
+                                        /> 
+                                    }
        />
 
 
