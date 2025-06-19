@@ -33,7 +33,7 @@ class BookFilter(filters.FilterSet):
             "title": ["icontains"],
             "isbn": ["exact"],
             "language": ["exact"],
-            "authors__last_name": ["icontains"],
+            "authors__name": ["icontains"],
             "genres__name": ["exact"],
             "page_count": ["exact"],
         }

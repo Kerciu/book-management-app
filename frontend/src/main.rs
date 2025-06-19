@@ -26,6 +26,7 @@ pub fn App() -> impl IntoView {
         <Router>
             <Routes fallback=|| view! { NotFound }>
                 <Route path=path!("/github_auth") view=GithubAuthHandler />
+                <Route path=path!("/google_auth") view=GoogleAuthHandler />
                 <Route path=path!("/") view=HomePage />
                 <Route path=path!("/about") view=AboutPage />
                 <Route path=path!("/main") view=MainPage />
@@ -33,6 +34,7 @@ pub fn App() -> impl IntoView {
                 <Route path=path!("/account") view=AccountPage />
                 <Route path=path!("/sign") view=SignPage />
                 <Route path=path!("/verify") view=EmailVerificationForm />
+                <Route path=path!("/books/select_collection/:book_id") view=ShelfSelect />
             </Routes>
         </Router>
     }

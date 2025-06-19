@@ -1,6 +1,6 @@
-use crate::auth;
+use crate::auth::{self, Token};
 use leptos::prelude::*;
-use leptos_router::hooks::use_query;
+use leptos_router::hooks::{use_navigate, use_query};
 use leptos_router::params::Params;
 use log::Level;
 use serde::{Deserialize, Serialize};
@@ -19,7 +19,9 @@ struct AuthRequest {
 }
 
 #[derive(Deserialize)]
-struct AuthResponse;
+struct AuthResponse {
+    code: String
+}
 
 #[component]
 pub fn google_auth_button() -> impl IntoView {
@@ -27,18 +29,21 @@ pub fn google_auth_button() -> impl IntoView {
 }
 
 async fn post(access_token: String) -> anyhow::Result<AuthResponse> {
-    let res = send_post_request(AuthRequest { access_token }, "/api/auth/google-auth/")
-        .await?
-        .json()
+    provide_context::<Option<Token>>(None);
+    let res = send_post_request(AuthRequest { access_token: access_token }, "/api/auth/google-auth/")
         .await?;
-    Ok(res)
+    if !res.ok() {
+        return Err(anyhow::anyhow!("{}", res.status_text()))
+    }
+    let res: serde_json::Value = serde_json::from_str(&res.text().await?)?;
+    Ok(AuthResponse { code: res["user"]["access"].to_string() })
 }
 
 #[component]
 pub fn google_auth_handler() -> impl IntoView {
     let params = use_query::<AuthData>();
 
-    Effect::new(move || match &*params.read() {
+    let code = move || match &*params.read() {
         Ok(AuthData {
             code: Some(code),
             state: Some(state),
@@ -52,12 +57,18 @@ pub fn google_auth_handler() -> impl IntoView {
                 .unwrap()
                 .unwrap_or_default() =>
         {
-            let code = code.clone();
-            let _ = LocalResource::new(move || post(code.clone()));
+            Some(code.clone())
         }
-        Err(err) => log::log!(Level::Error, "{err}"),
-        _ => log::log!(Level::Error, "bad params in url querry"),
+        Err(err) => {log::log!(Level::Error, "{err}"); None},
+        _ => {log::log!(Level::Error, "bad params in url querry"); None},
+    };
+
+    let code = LocalResource::new(move || post(code().unwrap_or_default()));
+    Effect::new(move || if let Some(Ok(AuthResponse { code })) = &*code.read() {
+        provide_context(Some(auth::google::Token::new(code.clone())));
+        use_navigate()("/books/list", Default::default());
     });
+    Effect::new(move || log::log!(Level::Debug, "{:?}", use_context::<auth::github::Token>()));
 
     view! {}
 }

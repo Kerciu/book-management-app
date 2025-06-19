@@ -1,6 +1,6 @@
 use leptos::prelude::*;
 use leptos_router::hooks::*;
-use crate::components::{LoginForm, RegistractionForm};
+use crate::{auth, components::{LoginForm, RegistractionForm}};
 #[component]
 pub fn SignPage() -> impl IntoView {
     let (show_sign_up, set_show_sign_up) = signal(true);
@@ -41,8 +41,8 @@ pub fn SignPage() -> impl IntoView {
                                 <div class="title-text-sign" style="color:rgb(255, 255, 255); margin-left:0px; margin-top:184px;">"Sign in"</div>
                                 <div class="container-flex" style="padding: 0px; align-items: center; justify-content: center;">
                                     <div class="social-container">
-                                        <a href="#" class="social"><i class="fab fa-github"></i></a>
-                                        <a href="#" class="social"><i class="fab fa-google"></i></a>
+                                        <a href="#" class="social" on:click=move |_| auth::github::init()><i class="fab fa-github"></i></a>
+                                        <a href="#" class="social" on:click=move |_| auth::google::init()><i class="fab fa-google"></i></a>
                                     </div>
                                 </div>
                                 <div class="body-text" style="color: #cac2ce; text-align: center; margin-top: 4px;">"or use your account"</div>
@@ -71,8 +71,8 @@ pub fn SignPage() -> impl IntoView {
                             <div class="title-text-sign" style="color:rgb(255, 255, 255); margin-left:0px; margin-top:12px;">"Sign up"</div>
                                 <div class="container-flex" style="padding: 0px; align-items: center; justify-content: center;">
                                     <div class="social-container">
-                                        <a href="#" class="social"><i class="fab fa-github"></i></a>
-                                        <a href="#" class="social"><i class="fab fa-google"></i></a>
+                                        <a href="#" class="social"><i class="fab fa-github" on:click=move |_| auth::github::init()></i></a>
+                                        <a href="#" class="social"><i class="fab fa-google" on:click=move |_| auth::google::init()></i></a>
                                     </div>
                                 </div>
                                 <div class="body-text" style="color: #cac2ce; text-align: center; margin-top: 4px;">"or use your email for registration"</div>

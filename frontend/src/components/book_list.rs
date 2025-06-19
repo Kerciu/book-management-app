@@ -1,23 +1,21 @@
+use std::{collections::BTreeSet, iter};
+
 use leptos::prelude::*;
 use leptos_router::hooks::*;
 use log::Level;
 use serde::Deserialize;
 use super::send_get_request;
 use serde::Serialize;
-use crate::components::{get_shelves, put_book_in_shelf};
 
-#[allow(dead_code, reason="Faithful representation of endpoint data")]
+#[allow(dead_code, reason = "Faithful representation of endpoint data")]
 #[derive(Deserialize, Debug, Clone)]
 pub struct Author {
-    pub first_name: String,
-    pub middle_name: String,
-    pub last_name: String,
-    pub bio: String,
-    pub birth_date: String,
-    pub death_date: String,
+    pub name: String,
+    pub birth_date: Option<String>,
+    pub death_date: Option<String>,
 }
 
-#[derive(Deserialize, Debug, Clone)]
+#[derive(Deserialize, Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
 pub struct Genre {
     pub name: String,
 }
@@ -35,7 +33,7 @@ pub struct Book {
     pub language: String,
 }
 
-#[allow(dead_code, reason="Faithful representation of endpoint data")]
+#[allow(dead_code, reason = "Faithful representation of endpoint data")]
 #[derive(Deserialize, Debug, Clone)]
 struct BookResponse {
     count: usize,
@@ -44,7 +42,7 @@ struct BookResponse {
     results: Vec<Book>,
 }
 
-#[allow(dead_code, reason="Faithful representation of endpoint data")]
+#[allow(dead_code, reason = "Faithful representation of endpoint data")]
 #[derive(Serialize, Debug, Clone, Default)]
 struct BookRequest {
     title: RwSignal<String>,
@@ -54,7 +52,7 @@ struct BookRequest {
 }
 
 async fn get(request: String) -> anyhow::Result<BookResponse> {
-    let res: BookResponse = send_get_request(&request).await?;
+    let res = send_get_request(&request).await?;
     Ok(res)
 }
 /// tempo
@@ -89,7 +87,7 @@ fn get_shelves_list(book_id: usize, set_show_shelves: WriteSignal<bool>) -> impl
             .map(|shelve| view!{
                 <div class="title-text" on:click=move |ev| {
                     ev.stop_propagation();
-                    put_book_in_shelf(book_id, shelve.id);
+                    //put_book_in_shelf(book_id, shelve.id);
                     set_show_shelves.set(false);
                     }>{shelve.name}</div>
             })
@@ -101,7 +99,7 @@ fn get_shelves_list(book_id: usize, set_show_shelves: WriteSignal<bool>) -> impl
 /// 
 
 #[component]
-fn book_info(book: Book, is_library:bool) -> impl IntoView {
+fn book_info(book: Book, is_library: bool) -> impl IntoView {
     let Book {
         genres,
         authors,
@@ -114,16 +112,10 @@ fn book_info(book: Book, is_library:bool) -> impl IntoView {
         id,
     } = book;
     let navigate = use_navigate();
+    let navigate_collection = navigate.clone();
     let authors = authors
         .into_iter()
-        .map(
-            |Author {
-                 first_name,
-                 middle_name,
-                 last_name,
-                 ..
-             }| { format!("{first_name} {middle_name} {last_name}") },
-        )
+        .map(|Author { name, .. }| name)
         .intersperse(", ".to_string())
         .collect_view();
 
@@ -136,14 +128,14 @@ fn book_info(book: Book, is_library:bool) -> impl IntoView {
     let short_description = description.chars().take(100).collect::<String>();
     view! {
 
-            <div class="book-item" style="margin-right: 20px; margin-left: 20px;" on:click=move |_| {
+            <div class="book-item" style="margin-right: 20px; margin-left: 20px;">
+                <img src="https://ecsmedia.pl/cdn-cgi/image/format=webp,/c/the-rust-programming-language-2nd-edition-b-iext138640655.jpg" alt="Description"
+                    style="margin-top: 20px; padding-bottom:20px; height: 316px; object-fit: cover; width: auto; object-fit: contain; " on:click=move |_| {
                     navigate(&format!("/books/details/{id}"), Default::default());
                     }>
-                <img src="https://ecsmedia.pl/cdn-cgi/image/format=webp,/c/the-rust-programming-language-2nd-edition-b-iext138640655.jpg" alt="Description"
-                    style="margin-top: 20px; padding-bottom:20px; height: 316px; object-fit: cover; width: auto; object-fit: contain; ">
                 </img>
                 <div class="book-details">
-                    <h4 style = "max-width: 400px;     word-wrap: break-word; overflow-wrap: break-word;">{title}</h4>
+                    <h4 style = "max-width: 400px;     word-wrap: break-word; overflow-wrap: break-word;"><a href=format!("/books/details/{id}")>{title}</a></h4>
                     <p style = "max-width: 400px;     word-wrap: break-word; overflow-wrap: break-word;">"by "{authors}</p>
                     <p style = "max-width: 400px;     word-wrap: break-word; overflow-wrap: break-word;">{format!("Published: {}", published_at)}</p>
                     <div class="body-text" style="color: #FFFFFF; margin-left:0px; font-size: 20px; margin-top:10px;">
@@ -157,96 +149,31 @@ fn book_info(book: Book, is_library:bool) -> impl IntoView {
                                         })
                                         .collect_view()}
                                 </div>
-                    </div>
-                    <Show when=move || is_library fallback=move || 
-                        view! {
-                            <div class="book-actions">
-                                <button class="btn-small" on:click=move |ev| {
-                                    ev.stop_propagation();
-                                    set_show_shelves(!show_shelves.get());
-                                }>"Add to the collection"</button>
-                            </div>
-                            <div class="shelf-list-container" class:hidden=move || !show_shelves.get()
-                                style=move || {
-                                if show_shelves.get() {
-                                    "position: absolute; z-index: 1000; background: #250633; max-height: 200px; overflow-y: auto; transition: max-height 0.3s ease; margin-top: 10px; border: 1px solid #ccc; border-radius: 8px; padding: 10px; width: 250px; box-shadow: 0 4px 12px rgba(0,0,0,0.15);".to_string()
-                                } else {
-                                    "display: none;".to_string()
-                                }
-                            }>
-                                    <GetShelvesList book_id=id set_show_shelves=set_show_shelves/>
-                            </div>
-                        }
-                    >
-                        <div class="book-actions">
+                    </div>  
+                        {move || { 
+                            let navigate_collection = navigate_collection.clone(); 
+                            (!is_library).then_some(view! {
+                                <div class="book-actions">
+                                    <button class="btn-small" on:click=move |_| navigate_collection(&format!("/books/select_collection/{id}"), Default::default())>"Add to the collection"</button>
+                                </div>
+                            })
+                        }}
+                        {move || is_library.then_some(view!{<div class="book-actions">
                             <button class="btn-small btn-danger">"Remove from the collection"</button>
-                        </div>
-                    </Show>
+                        </div>})}
                 </div>
             </div>
     }
 }
 
-// temporary functions for testing
-
-pub fn get_example_book() -> Book {
-    Book {
-        id: 1,
-        genres: get_example_genres(),
-        authors: get_example_authors(),
-        page_count: Some(523),
-        title: "The Rust Programming Language".to_string(),
-        description: "The official book on Rust, written by the Rust development team at Mozilla. This book will teach you about Rust's unique features and how to use them effectively.".to_string(),
-        isbn: "978-1593278281".to_string(),
-        published_at: "2018-05-15".to_string(),
-        language: "English".to_string(),
-    }
-}
-
-fn get_example_genres() -> Vec<Genre> {
-    vec![
-        Genre {
-            name: "Programming".to_string(),
-        },
-        Genre {
-            name: "Technology".to_string(),
-        },
-        Genre {
-            name: "Computer Science".to_string(),
-        },
-    ]
-}
-
-fn get_example_authors() -> Vec<Author> {
-    vec![
-        Author {
-            first_name: "Steve".to_string(),
-            middle_name: "".to_string(),
-            last_name: "Klabnik".to_string(),
-            bio: "Steve Klabnik is a member of the Rust core team and has been involved in Rust documentation.".to_string(),
-            birth_date: "1985-02-02".to_string(),
-            death_date: "".to_string(),
-        },
-        Author {
-            first_name: "Carol".to_string(),
-            middle_name: "".to_string(),
-            last_name: "Nichols".to_string(),
-            bio: "Carol Nichols is a Rust developer and educator.".to_string(),
-            birth_date: "1984-05-08".to_string(),
-            death_date: "".to_string(),
-        },
-    ]
-}
-
-//
-
 #[component]
-pub fn book_list(is_library_page:bool) -> impl IntoView {
+pub fn book_list(is_library_page: bool) -> impl IntoView {
     const ENDPOINT: &'static str = "/api/book/books/";
     let (title, set_title) = signal(String::new());
     let (genre, set_genre) = signal(String::new());
     let (isbn, set_isbn) = signal(String::new());
     let (page, set_page) = signal(String::new());
+    let (sort, set_sort) = signal(String::new());
 
     let request_url = move || {
         format!(
@@ -278,37 +205,55 @@ pub fn book_list(is_library_page:bool) -> impl IntoView {
                     .iter()
                     .any(move |Genre { name }| name.contains(&genre()) || genre() == "")
             })
+            .filter(move |book| {
+                book.title.to_ascii_lowercase().contains(&title().to_ascii_lowercase()) || title() == ""
+            })
             .collect::<Vec<_>>()
     };
 
+    let books = move || {
+        let mut books = books();
+        books.sort_by_key(move |book| match &sort() as &str {
+            "title" => book.title.clone(),
+            "author" => book.authors[0].name.clone(),
+            "date" =>  book.published_at.clone(),
+            _ => unreachable!()
+        });
+        books
+    };
+
+    let all_genres = move || {
+        request()
+            .into_iter()
+            .map(|BookResponse { results, .. }| results)
+            .flatten()
+            .map(|Book {genres, ..}| genres)
+            .flatten()
+            .collect::<BTreeSet<_>>()
+    };
+
+    let all_genres = move || {
+        all_genres()
+            .into_iter()
+            .map(|Genre { name }| view! {<option value=name.clone()>{name.clone()}</option>}.into_any())
+            .chain(iter::once(view! {<option value="">Select genre</option>}.into_any()))
+            .rev()
+            .collect_view()
+        };
+
     view! {
         <div class="controls">
-            <input type="text" id="book-search" placeholder="Search books..." class="search-input" style="align-items: center; margin-top: 0px;"/>
-            <select id="genre-filter" class="filter-select" style="align-items: center;">
-                <option value="">All Genres</option>
-                <option value="fiction">Fiction</option>
-                <option value="non-fiction">Non-Fiction</option>
-                <option value="sci-fi">Sci-Fi</option>
-                <option value="mystery">Mystery</option>
+            <input type="text" id="book-search" placeholder="Search books..." class="search-input" style="align-items: center; margin-top: 0px;" bind:value=(title, set_title)/>
+            <select id="genre-filter" class="filter-select" style="align-items: center;" bind:value=(genre, set_genre)>
+                {move || all_genres()}
             </select>
-            <select id="sort-books" class="sort-select" style="align-items: center;">
+            <select id="sort-books" class="sort-select" style="align-items: center;" bind:value=(sort, set_sort)>
                 <option value="title">Sort by Title</option>
                 <option value="author">Sort by Author</option>
-                <option value="rating">Sort by Rating</option>
                 <option value="date">Sort by Date Added</option>
             </select>
         </div>
         <div class="books-grid" id="books-grid">
-
-            //temp solution for testing
-            <BookInfo book=get_example_book() is_library=is_library_page/>
-            <BookInfo book=get_example_book() is_library=is_library_page/>
-            <BookInfo book=get_example_book() is_library=is_library_page/>
-            <BookInfo book=get_example_book() is_library=is_library_page/>
-            <BookInfo book=get_example_book() is_library=is_library_page/>
-
-            //
-
             <For
                 each=move || books()
                 key=|book| book.id

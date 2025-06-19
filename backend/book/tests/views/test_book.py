@@ -30,8 +30,8 @@ class BookViewSetTest(APITestCase):
             password="password2137",
         )
 
-        self.author1 = Author.objects.create(first_name="John", last_name="Doe")
-        self.author2 = Author.objects.create(first_name="Jane", last_name="Smith")
+        self.author1 = Author.objects.create(name="John Doe")
+        self.author2 = Author.objects.create(name="Jane Smith")
         self.genre1 = Genre.objects.create(name="Fiction")
         self.genre2 = Genre.objects.create(name="Science Fiction")
         self.publisher1 = Publisher.objects.create(
@@ -94,7 +94,7 @@ class BookViewSetTest(APITestCase):
         self.assertEqual(response.data["results"][0]["id"], self.book2.id)
 
     def test_filter_books_by_published_date_range(self):
-        author = Author.objects.create(first_name="Emily", last_name="Bronte")
+        author = Author.objects.create(name="Emily Bronte")
         genre = Genre.objects.create(name="Classic")
         book = Book.objects.create(
             title="Wuthering Heights",
@@ -177,7 +177,7 @@ class BookViewSetTest(APITestCase):
         genre_name = "TestFiction"
         genre = Genre.objects.create(name=genre_name)
 
-        author = Author.objects.create(first_name="John", last_name="Doe")
+        author = Author.objects.create(name="John Doe")
 
         data = {
             "title": "New Book",

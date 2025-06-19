@@ -1,7 +1,7 @@
-use crate::auth;
+use crate::auth::{self, Token};
 use anyhow::anyhow;
 use leptos::prelude::*;
-use leptos_router::hooks::use_query;
+use leptos_router::hooks::{use_navigate, use_query};
 use leptos_router::params::Params;
 use log::Level;
 use serde::{Deserialize, Serialize};
@@ -30,12 +30,14 @@ pub fn github_auth_button() -> impl IntoView {
 }
 
 async fn post(code: String) -> anyhow::Result<AuthResponse> {
+    provide_context::<Option<Token>>(None);
     let res = send_post_request(AuthRequest { code }, "/api/auth/github-auth/")
         .await?;
     if !res.ok() {
         return Err(anyhow!("{}", res.status_text()))
     }
-    Ok(res.json().await?)
+    let res: serde_json::Value = serde_json::from_str(&res.text().await?)?;
+    Ok(AuthResponse { code: res["user"]["access"].to_string() })
 }
 
 #[component]
@@ -63,8 +65,10 @@ pub fn github_auth_handler() -> impl IntoView {
     };
 
     let code = LocalResource::new(move || post(code().unwrap_or_default()));
-    let code = move || code.read().as_ref().unwrap().as_ref().unwrap().code.clone();
-    Effect::new(move || provide_context(auth::github::Token::new(code())));
+    Effect::new(move || if let Some(Ok(AuthResponse { code })) = &*code.read() {
+        provide_context(Some(auth::github::Token::new(code.clone())));
+        use_navigate()("/books/list", Default::default());
+    });
     Effect::new(move || log::log!(Level::Debug, "{:?}", use_context::<auth::github::Token>()));
 
     view! {}
