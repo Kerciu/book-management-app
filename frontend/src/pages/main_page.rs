@@ -3,6 +3,9 @@ use leptos::html::*;
 use leptos::prelude::*;
 use leptos::*;
 use leptos_router::hooks::*;
+use web_sys::window;
+use leptos::mount::*;
+
 
 #[component]
 pub fn MainPage() -> impl IntoView {
@@ -44,6 +47,44 @@ pub fn MainPage() -> impl IntoView {
             "nav-btn"
         }
     };
+
+    let (section, set_section) = signal("recommendations".to_string());
+
+    let (did_init,set_did_init )= signal(false);
+    Effect::new(move |_| {
+        if !did_init.get() {
+            set_did_init(true);
+
+            if let Some(storage) = window().and_then(|w| w.local_storage().ok().flatten()) {
+                if let Ok(Some(saved)) = storage.get_item("main_section") {
+                    match saved.as_str() {
+                        "recommendations" => {
+                            set_books(false); 
+                            set_my_books(false); 
+                            set_recommendations(true);
+                        }
+                        "book_list" => {
+                            set_books(true); 
+                            set_my_books(false); 
+                            set_recommendations(false);
+                        }
+                        "my_books" => {
+                            set_books(false); 
+                            set_my_books(true); 
+                            set_recommendations(false);
+                        }
+                        "friends" => {
+                            set_books(false); 
+                            set_my_books(false); 
+                            set_recommendations(false);
+                        }
+                        _ => {}
+                    }
+                }
+            }
+        }
+    });
+
     view! {
         <header style="display: flex; align-items: center; justify-content: space-between; padding: 1rem;">
             <div class="text-title" style="margin-top: 0px; flex: 1;">"BookUp"</div>
@@ -54,6 +95,9 @@ pub fn MainPage() -> impl IntoView {
                         set_books(false); 
                         set_my_books(false);
                         set_recommendations(true);
+                        if let Some(storage) = window().and_then(|w| w.local_storage().ok().flatten()) {
+                            let _ = storage.set_item("main_section", "recommendations");
+                        }
                     }
                 >
                     "Recommendations"
@@ -62,6 +106,9 @@ pub fn MainPage() -> impl IntoView {
                         set_books(true); 
                         set_my_books(false);
                         set_recommendations(false);
+                        if let Some(storage) = window().and_then(|w| w.local_storage().ok().flatten()) {
+                            let _ = storage.set_item("main_section", "book_list");
+                        }
                     }
                 >
                     "Book List"
@@ -70,6 +117,9 @@ pub fn MainPage() -> impl IntoView {
                         set_books(false); 
                         set_my_books(true);
                         set_recommendations(false);
+                        if let Some(storage) = window().and_then(|w| w.local_storage().ok().flatten()) {
+                            let _ = storage.set_item("main_section", "my_books");
+                        }
                     }
                 >
                     "My Books"
@@ -78,6 +128,9 @@ pub fn MainPage() -> impl IntoView {
                         set_books(false); 
                         set_my_books(false);
                         set_recommendations(false);
+                        if let Some(storage) = window().and_then(|w| w.local_storage().ok().flatten()) {
+                            let _ = storage.set_item("main_section", "friends");
+                        }
                     }
                 >
                     "Friends"
