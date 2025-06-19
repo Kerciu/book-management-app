@@ -48,8 +48,9 @@ class FriendshipRequest(models.Model):
         ).exists():
             raise ValidationError("You are already friends with this user.")
 
-    def save(self, *args, **kwargs):
-        self.full_clean()
+    def save(self, *args, skip_clean=False, **kwargs):
+        if not skip_clean:
+            self.full_clean()
         super().save(*args, **kwargs)
 
     def accept(self):
@@ -58,7 +59,7 @@ class FriendshipRequest(models.Model):
         first, second = sorted([self.from_user, self.to_user], key=lambda u: u.pk)
         Friendship.objects.create(user1=first, user2=second)
         self.status = 'accepted'
-        self.save()
+        self.save(skip_clean=True)
 
     def reject(self):
         if self.status != 'pending':
@@ -67,7 +68,7 @@ class FriendshipRequest(models.Model):
         self.save()
 
     def __str__(self):
-        return f"Friend request: {self.from_user.username} -> {self.to_user.username}"
+        return f"{self.from_user.username} friend requests {self.to_user.username}"
 
 
 class Friendship(models.Model):
@@ -98,7 +99,7 @@ class Friendship(models.Model):
         ]
 
     def __str__(self):
-        return f"Friendship: {self.user1.username} - {self.user2.username}"
+        return f"{self.user1.username} friends {self.user2.username}"
 
     @classmethod
     def are_friends(cls, user1, user2) -> bool:
