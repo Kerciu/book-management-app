@@ -34,7 +34,8 @@ class FriendshipModelTests(TestCase):
         req = FriendshipRequest.objects.create(from_user=self.user1, to_user=self.user2)
         self.assertEqual(req.from_user, self.user1)
         self.assertEqual(req.to_user, self.user2)
-        self.assertEqual(str(req), f"{self.user1.username} -> {self.user2.username}")
+        self.assertEqual(str(req),
+                         f"{self.user1.username} friend requests {self.user2.username}")
 
     def test_cannot_send_request_to_self(self):
         with self.assertRaises(ValidationError):
@@ -58,7 +59,7 @@ class FriendshipModelTests(TestCase):
         self.assertEqual(friendship.user1, self.user1)
         self.assertEqual(friendship.user2, self.user2)
         self.assertEqual(str(friendship),
-                         f"{self.user1.username} - {self.user2.username}")
+                         f"{self.user1.username} friends {self.user2.username}")
 
     def test_cannot_duplicate_friendship(self):
         Friendship.objects.create(user1=self.user1, user2=self.user2)
@@ -117,31 +118,31 @@ class FollowModelTests(TestCase):
         )
 
     def test_create_follow(self):
-        follow = Follow.objects.create(follower=self.user1, following=self.user2)
+        follow = Follow.objects.create(follower=self.user1, followee=self.user2)
         self.assertEqual(follow.follower, self.user1)
-        self.assertEqual(follow.following, self.user2)
+        self.assertEqual(follow.followee, self.user2)
         self.assertEqual(str(follow),
                          f"{self.user1.username} follows {self.user2.username}")
 
     def test_cannot_follow_self(self):
         with self.assertRaises(ValidationError):
-            Follow(follower=self.user1, following=self.user1).full_clean()
+            Follow(follower=self.user1, followee=self.user1).full_clean()
 
     def test_cannot_duplicate_follow(self):
-        Follow.objects.create(follower=self.user1, following=self.user2)
+        Follow.objects.create(follower=self.user1, followee=self.user2)
         with self.assertRaises(Exception):
-            Follow.objects.create(follower=self.user1, following=self.user2)
+            Follow.objects.create(follower=self.user1, followee=self.user2)
 
     def test_different_users_can_follow_same_target(self):
-        Follow.objects.create(follower=self.user1, following=self.user2)
+        Follow.objects.create(follower=self.user1, followee=self.user2)
         try:
-            Follow.objects.create(follower=self.user3, following=self.user2)
+            Follow.objects.create(follower=self.user3, followee=self.user2)
         except Exception:
             self.fail("Different users should be allowed to follow the same target")
 
     def test_following_is_directional(self):
-        Follow.objects.create(follower=self.user1, following=self.user2)
+        Follow.objects.create(follower=self.user1, followee=self.user2)
         try:
-            Follow.objects.create(follower=self.user2, following=self.user1)
+            Follow.objects.create(follower=self.user2, followee=self.user1)
         except Exception:
             self.fail("Reverse follow should be allowed")
