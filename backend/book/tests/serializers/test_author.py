@@ -7,8 +7,7 @@ from ...serializers import AuthorSerializer
 class AuthorSerializerTest(TestCase):
     def setUp(self):
         self.valid_data = {
-            "first_name": "George",
-            "last_name": "Orwell",
+            "name": "George Orwell",
             "birth_date": "1906-06-25",
             "death_date": "1950-01-21",
         }
