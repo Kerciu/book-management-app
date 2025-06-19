@@ -46,6 +46,10 @@ jobs:
         # Redis settings
         REDIS_LOCATION=redis://redis:6379/1
         EOF
+      
+    - name: Copy .env to frontend
+      run: |
+        cp .env frontend/.env
 
     - name: Build and start Docker services
       run: |

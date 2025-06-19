@@ -1,11 +1,12 @@
 use anyhow::anyhow;
 use leptos::prelude::*;
+use leptos_router::hooks::*;
 use log::Level;
 use serde::Serialize;
-use leptos_router::hooks::*;
 
-use crate::components::send_post_request;
 use crate::auth::email::Token as AuthToken;
+use crate::auth::Token;
+use crate::components::send_post_request;
 
 #[derive(Serialize, Clone, Copy, Default)]
 /// contains items necesary to send request
@@ -30,6 +31,13 @@ enum LoginResponse {
 
 async fn post(data: LoginRequest) -> anyhow::Result<LoginResponse> {
     const ENDPOINT: &str = "/api/auth/login/";
+    let _ = web_sys::window()
+        .unwrap()
+        .local_storage()
+        .unwrap()
+        .unwrap()
+        .remove_item("access_token");
+    provide_context::<Option<Token>>(None);
     let res = send_post_request(data, ENDPOINT).await?;
 
     if res.ok() {
@@ -37,13 +45,13 @@ async fn post(data: LoginRequest) -> anyhow::Result<LoginResponse> {
         let token = res
             .get("user")
             .ok_or(anyhow!("Response malformed, can't find parameter \"user\""))?
-            .get("refresh")
+            .get("access")
             .ok_or(anyhow!(
-                "Response malformed, cant' find parameter \"user.refresh\""
+                "Response malformed, cant' find parameter \"user.access\""
             ))?;
         let token = token
             .as_str()
-            .ok_or(anyhow!("user.refresh - expected String, got {:?}", token))?
+            .ok_or(anyhow!("user.access - expected String, got {:?}", token))?
             .to_string();
         return Ok(LoginResponse::Token(AuthToken::new(token)));
     } else {
@@ -99,8 +107,14 @@ pub fn login_form() -> impl IntoView {
 
     Effect::new(move || {
         if let LoginResponse::Token(token) = response() {
-            provide_context(token);
-            navigate("/books/list", Default::default());
+            provide_context(token.clone());
+            let _ = web_sys::window()
+                .unwrap()
+                .local_storage()
+                .unwrap()
+                .unwrap()
+                .set_item("access_token", &token.clone());
+            navigate("/main", Default::default());
         }
     });
 

@@ -1,40 +1,40 @@
+use std::{collections::BTreeSet, iter};
+
 use leptos::prelude::*;
 use leptos_router::hooks::*;
 use log::Level;
 use serde::Deserialize;
-use std::collections::HashMap;
 
 use super::send_get_request;
 use serde::Serialize;
 
+#[allow(dead_code, reason = "Faithful representation of endpoint data")]
 #[derive(Deserialize, Debug, Clone)]
-struct Author {
-    first_name: String,
-    middle_name: String,
-    last_name: String,
-    bio: String,
-    birth_date: String,
-    death_date: String,
+pub struct Author {
+    pub name: String,
+    pub birth_date: Option<String>,
+    pub death_date: Option<String>,
 }
 
-#[derive(Deserialize, Debug, Clone)]
-struct Genre {
-    name: String,
+#[derive(Deserialize, Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
+pub struct Genre {
+    pub name: String,
 }
 
-#[derive(Deserialize, Debug, Clone)]
-struct Book {
-    id: usize,
-    genres: Vec<Genre>,
-    authors: Vec<Author>,
-    page_count: Option<usize>,
-    title: String,
-    description: String,
-    isbn: String,
-    published_at: String,
-    language: String,
+#[derive(Deserialize, Debug, Clone, Default)]
+pub struct Book {
+    pub id: usize,
+    pub genres: Vec<Genre>,
+    pub authors: Vec<Author>,
+    pub page_count: Option<usize>,
+    pub title: String,
+    pub description: String,
+    pub isbn: String,
+    pub published_at: String,
+    pub language: String,
 }
 
+#[allow(dead_code, reason = "Faithful representation of endpoint data")]
 #[derive(Deserialize, Debug, Clone)]
 struct BookResponse {
     count: usize,
@@ -43,6 +43,7 @@ struct BookResponse {
     results: Vec<Book>,
 }
 
+#[allow(dead_code, reason = "Faithful representation of endpoint data")]
 #[derive(Serialize, Debug, Clone, Default)]
 struct BookRequest {
     title: RwSignal<String>,
@@ -52,12 +53,12 @@ struct BookRequest {
 }
 
 async fn get(request: String) -> anyhow::Result<BookResponse> {
-    let res: BookResponse = send_get_request(&request).await?;
+    let res = send_get_request(&request).await?;
     Ok(res)
 }
 
 #[component]
-fn book_info(book: Book) -> impl IntoView {
+fn book_info(book: Book, is_library: bool) -> impl IntoView {
     let Book {
         genres,
         authors,
@@ -70,16 +71,10 @@ fn book_info(book: Book) -> impl IntoView {
         id,
     } = book;
     let navigate = use_navigate();
+    let navigate_collection = navigate.clone();
     let authors = authors
         .into_iter()
-        .map(
-            |Author {
-                 first_name,
-                 middle_name,
-                 last_name,
-                 ..
-             }| { format!("{first_name} {middle_name} {last_name}") },
-        )
+        .map(|Author { name, .. }| name)
         .intersperse(", ".to_string())
         .collect_view();
 
@@ -88,20 +83,21 @@ fn book_info(book: Book) -> impl IntoView {
     // TODO: Make costanat variable out of this "100"
     let short_description = description.chars().take(100).collect::<String>();
     view! {
-            <div class="book-display" on:click=move |_| {
+
+            <div class="book-item" style="margin-right: 20px; margin-left: 20px;">
+                <img src="https://ecsmedia.pl/cdn-cgi/image/format=webp,/c/the-rust-programming-language-2nd-edition-b-iext138640655.jpg" alt="Description"
+                    style="margin-top: 20px; padding-bottom:20px; height: 316px; object-fit: cover; width: auto; object-fit: contain; " on:click=move |_| {
                     navigate(&format!("/books/details/{id}"), Default::default());
                     }>
-                    <div class="container-flex" style="padding: 0px;">
-                        //image url
-                        <img src="https://ecsmedia.pl/cdn-cgi/image/format=webp,width=544,height=544,/c/the-rust-programming-language-2nd-edition-b-iext138640655.jpg" alt="Description" class="image-side" style="margin-top: 20px; padding-bottom:20px;"></img>
-                        <div class="text-side" style="margin-top: 20px;">
-                            <div class="text-title" style="color: #FFFFFF; margin-left:0px;">{title}</div>
-                            <div class="body-text" style="color: #cac1ce; margin-left:0px;">"by "{authors}</div>
-                            <div class="body-text" style="color: #cac1ce; margin-left:0px;">{format!("Published: {}", published_at)}</div>
-                            <div class="body-text" style="color: #FFFFFF; margin-left:0px; font-size: 20px; margin-top:10px;">
-                                {short_description}"..."
-                            </div>
-                            <div class="categories-container" style="margin-top:10px;">
+                </img>
+                <div class="book-details">
+                    <h4 style = "max-width: 400px;     word-wrap: break-word; overflow-wrap: break-word;"><a href=format!("/books/details/{id}")>{title}</a></h4>
+                    <p style = "max-width: 400px;     word-wrap: break-word; overflow-wrap: break-word;">"by "{authors}</p>
+                    <p style = "max-width: 400px;     word-wrap: break-word; overflow-wrap: break-word;">{format!("Published: {}", published_at)}</p>
+                    <div class="body-text" style="color: #FFFFFF; margin-left:0px; font-size: 20px; margin-top:10px;">
+                        {short_description}"..."
+                    </div>
+                    <div class="categories-container" style="margin-top:20px;">
                                 <div class="chips-container">
                                     {genres.into_iter()
                                         .map(|genre| view! {
@@ -109,20 +105,31 @@ fn book_info(book: Book) -> impl IntoView {
                                         })
                                         .collect_view()}
                                 </div>
-                            </div>
-                        </div>
-                    </div>
+                    </div>  
+                        {move || { 
+                            let navigate_collection = navigate_collection.clone(); 
+                            (!is_library).then_some(view! {
+                                <div class="book-actions">
+                                    <button class="btn-small" on:click=move |_| navigate_collection(&format!("/books/select_collection/{id}"), Default::default())>"Add to the collection"</button>
+                                </div>
+                            })
+                        }}
+                        {move || is_library.then_some(view!{<div class="book-actions">
+                            <button class="btn-small btn-danger">"Remove from the collection"</button>
+                        </div>})}
+                </div>
             </div>
     }
 }
 
 #[component]
-pub fn book_list() -> impl IntoView {
+pub fn book_list(is_library_page: bool) -> impl IntoView {
     const ENDPOINT: &'static str = "/api/book/books/";
     let (title, set_title) = signal(String::new());
     let (genre, set_genre) = signal(String::new());
     let (isbn, set_isbn) = signal(String::new());
     let (page, set_page) = signal(String::new());
+    let (sort, set_sort) = signal(String::new());
 
     let request_url = move || {
         format!(
@@ -154,28 +161,64 @@ pub fn book_list() -> impl IntoView {
                     .iter()
                     .any(move |Genre { name }| name.contains(&genre()) || genre() == "")
             })
+            .filter(move |book| {
+                book.title.to_ascii_lowercase().contains(&title().to_ascii_lowercase()) || title() == ""
+            })
             .collect::<Vec<_>>()
     };
 
+    let books = move || {
+        let mut books = books();
+        books.sort_by_key(move |book| match &sort() as &str {
+            "title" => book.title.clone(),
+            "author" => book.authors[0].name.clone(),
+            "date" =>  book.published_at.clone(),
+            _ => book.title.clone()
+        });
+        books
+    };
+
+    let all_genres = move || {
+        request()
+            .into_iter()
+            .map(|BookResponse { results, .. }| results)
+            .flatten()
+            .map(|Book {genres, ..}| genres)
+            .flatten()
+            .collect::<BTreeSet<_>>()
+    };
+
+    let all_genres = move || {
+        all_genres()
+            .into_iter()
+            .map(|Genre { name }| view! {<option value=name.clone()>{name.clone()}</option>}.into_any())
+            .chain(iter::once(view! {<option value="">Select genre</option>}.into_any()))
+            .rev()
+            .collect_view()
+        };
+
     view! {
-        <div class="container-flex-row" style="padding:0px; max-width:250px;">
-            <input type="text" placeholder="Title" style="margin-left:0px; border-radius: 16px; height:19px; margin-top:0px;" bind:value=(title, set_title)/>
-            <input type="text" placeholder="Genre" style="margin-left:0px; border-radius: 16px; height:19px; margin-top:0px;" bind:value=(genre, set_genre)/>
-            //<button class="button-pop" style="width: auto;">"Filter"</button>
-            <select name="Sort" class="custom-select">
-                <option value="relevance">"Relevance"</option>
-                <option value="alphabetically">"Alphabetically"</option>
-                <option value="date">"Date published"</option>  =
+        <div class="controls">
+            <input type="text" id="book-search" placeholder="Search books..." class="search-input" style="align-items: center; margin-top: 0px;" bind:value=(title, set_title)/>
+            <select id="genre-filter" class="filter-select" style="align-items: center;" bind:value=(genre, set_genre)>
+                {move || all_genres()}
+            </select>
+            <select id="sort-books" class="sort-select" style="align-items: center;" bind:value=(sort, set_sort)>
+                <option value="title">Sort by Title</option>
+                <option value="author">Sort by Author</option>
+                <option value="date">Sort by Date Added</option>
             </select>
         </div>
-        <For
-            each=move || books()
-            key=|book| book.id
-            children=move |book| {
-                view! {
-                    <BookInfo book=book />
+        <div class="books-grid" id="books-grid">
+            <For
+                each=move || books()
+                key=|book| book.id
+                children=move |book| {
+                    view! {
+                        <BookInfo book=book is_library=false/>
+                    }
                 }
-            }
-        />
+            />
+        </div>
     }
 }
