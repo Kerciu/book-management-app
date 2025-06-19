@@ -100,7 +100,7 @@ pub fn login_form() -> impl IntoView {
     Effect::new(move || {
         if let LoginResponse::Token(token) = response() {
             provide_context(token);
-            navigate("/books/list", Default::default());
+            navigate("/main", Default::default());
         }
     });
 
