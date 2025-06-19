@@ -6,6 +6,7 @@ os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'your_project_name.settings')
 django.setup()
 
 from book.models import *
+from authentication.models import *
 import json
 
 def readAuthors(path):
@@ -45,9 +46,14 @@ def readBooks(path):
             published_at = book["release_date"]
             description = book["description"]
             language = book["language"]["language"].split(";")[-1].strip()
-            publisherID = random.sample(range(1, maxPublisher+1), random.randrange(1, maxPublisher+1))
-            authorID = random.sample(range(1, maxAuthor+1), random.randrange(1, maxAuthor+1))
-            genreID = random.sample(range(1, maxGenre+1), random.randrange(1, maxGenre+1))
+            imageURL = None
+            try:
+                imageURL = book["images"][0]["url"]
+            except:
+                pass
+            publisherID = random.sample(range(1, maxPublisher+1), random.randrange(1, min(4, maxPublisher+1)))
+            authorID = random.sample(range(1, maxAuthor+1), random.randrange(1, min(4,maxAuthor+1)))
+            genreID = random.sample(range(1, maxGenre+1), random.randrange(1, min(5,maxGenre+1)))
             publisher = []
             for ID in publisherID:
                 publisher.append(Publisher.objects.get(id=ID))
@@ -65,13 +71,35 @@ def readBooks(path):
                     isbn=isbn,
                     published_at=published_at,
                     page_count=page_count,
-                    language=language
+                    language=language,
+                    cover_image=imageURL
                 )
                 book_obj.authors.set(author)
                 book_obj.genres.set(genre)
                 book_obj.publishers.set(publisher)
             except Exception:
                 print("sth went wrong")
+
+def addUser():
+    name = 1
+    lname = 1
+    mail = "@gmail.com"
+    for _ in range(30):
+        nameChar = chr(name%26 + 65)
+        lnameChar = chr(lname%26 + 65)
+        if name > 26:
+            nameChar += chr(name%26 + 65)
+            lnameChar += chr(lname%26 + 65)
+        name += 1
+        lname += 1
+        email = nameChar + lnameChar + mail
+        try:
+            CustomUser.objects.create(username=name+lname, email=email, first_name=nameChar, last_name=lnameChar)
+        except Exception:
+            print(email)
+
+
+
 
 def fillDB():
     authorsPath = "author.json"
@@ -82,6 +110,7 @@ def fillDB():
     readPublishers(publishersPath)
     readGenres(genresPath)
     readBooks(booksPath)
+    addUser()
 
 def main():
     fillDB()
