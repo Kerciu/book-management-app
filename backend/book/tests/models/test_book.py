@@ -6,7 +6,7 @@ from ...models import Author, Publisher, Genre, Book
 
 class BookModelTest(TestCase):
     def setUp(self):
-        self.author = Author.objects.create(first_name="John", last_name="Doe")
+        self.author = Author.objects.create(name="John Doe")
         self.genre = Genre.objects.create(name="Science Fiction")
         self.publisher = Publisher.objects.create(
             name="SciPub", website="https://sci.pub"
