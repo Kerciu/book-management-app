@@ -78,3 +78,7 @@ backend_logs:
 
 createsuperuser:
 	docker compose exec backend python manage.py createsuperuser
+
+
+fillDB:
+	docker compose exec backend python scripts/fillDB.py
