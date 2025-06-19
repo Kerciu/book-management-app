@@ -101,7 +101,6 @@ class BookSerializer(serializers.ModelSerializer):
     class Meta:
         model = Book
         fields = "__all__"
-        read_only_fields = ("created_at", "updated_at")
 
     def validate(self, attrs):
         published_at = attrs.get("published_at")

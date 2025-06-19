@@ -11,3 +11,4 @@ dist/
 .nvim.lua
 .vscode/
 .pytest-cache/
+.apiKey
