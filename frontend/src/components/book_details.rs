@@ -130,7 +130,7 @@ pub fn book_details(id: impl Fn() -> usize + Send + Sync + Copy + 'static) -> im
             <div class="divider"></div>
             <div style="flex-grow: 1; margin-right:20px;">
                <div class="text-title" style="color: #FFFFFF; margin-left:0px; margin-top:30px;">"Reviews"</div>
-               <ReviewList book_id= move || id()/>
+               <ReviewList book_id=Signal::derive(move || id())/>
             </div>
         </div> 
         //TODO add writing reviews

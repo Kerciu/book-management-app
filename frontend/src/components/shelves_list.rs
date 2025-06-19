@@ -3,7 +3,7 @@ use serde::Deserialize;
 use serde_json::json;
 use anyhow::anyhow;
 use crate::components::{book_list::Book, send_get_request, send_post_request};
-
+use log::Level;
 
 #[derive(Debug, Default, Deserialize, Clone)]
 struct ShelvesResponse {
@@ -63,10 +63,25 @@ async fn remove_book_from_shelf(book_id: usize, shelf_id: usize) -> anyhow::Resu
 }
 
 async fn get_books_from_shelf(shelf_id: usize) -> anyhow::Result<Vec<Book>> {
-    todo!()
+    let endpoint = format!("/api/shelf/shelves/{shelf_id}/books");
+    return send_get_request(&endpoint).await;
 }
 
 #[component]
 pub fn shelves_list() -> impl IntoView {
 
+}
+
+pub fn shelf_book_list(shelf_id: Signal<usize>) -> impl IntoView {
+    let books = LocalResource::new(move || get_books_from_shelf(shelf_id()));
+    let books = move || match &*books.read() {
+        Some(res) => match res {
+            Ok(vec) => vec.clone(),
+            Err(err) => {
+                log::log!(Level::Error, "{err}");
+                Default::default()
+            }
+        },
+        None => Default::default(),
+    };
 }
