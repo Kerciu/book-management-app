@@ -15,7 +15,7 @@ struct AuthData {
 
 #[derive(Serialize, Debug)]
 struct AuthRequest {
-    id_token: String,
+    access_token: String,
 }
 
 #[derive(Deserialize)]
@@ -30,7 +30,7 @@ pub fn google_auth_button() -> impl IntoView {
 
 async fn post(access_token: String) -> anyhow::Result<AuthResponse> {
     provide_context::<Option<Token>>(None);
-    let res = send_post_request(AuthRequest { id_token: access_token }, "/api/auth/google-auth/")
+    let res = send_post_request(AuthRequest { access_token: access_token }, "/api/auth/google-auth/")
         .await?;
     if !res.ok() {
         return Err(anyhow::anyhow!("{}", res.status_text()))
