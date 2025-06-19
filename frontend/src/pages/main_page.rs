@@ -123,7 +123,7 @@ pub fn MainPage() -> impl IntoView {
                         view! {
                             <div class="section-header">
                                 <h2>"My Library"</h2>
-                                <BookList is_library_page=true/>
+                                <ShelvesList/>
 
                             </div>
 

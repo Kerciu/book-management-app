@@ -2,7 +2,7 @@ use leptos::prelude::*;
 use serde::Deserialize;
 use serde_json::json;
 use anyhow::anyhow;
-use crate::components::{book_list::Book, send_get_request, send_post_request};
+use crate::components::{book_list::Book, send_get_request, send_post_request, BookList};
 use log::Level;
 
 #[derive(Debug, Default, Deserialize, Clone)]
@@ -24,7 +24,7 @@ struct Shelf {
     updated_at: String
 }
 
-async fn get_shelves() -> anyhow::Result<Vec<Shelf>> {
+pub async fn get_shelves() -> anyhow::Result<Vec<Shelf>> {
     const ENDPOINT: &str = "/api/shelf/shelves/";
     let mut res: ShelvesResponse = send_get_request(ENDPOINT).await?;
     let mut ret = vec![res];
@@ -37,7 +37,7 @@ async fn get_shelves() -> anyhow::Result<Vec<Shelf>> {
     Ok(ret.into_iter().map(|ShelvesResponse {results, ..}| results).flatten().collect())
 }
 
-async fn put_book_in_shelf(book_id: usize, shelf_id: usize) -> anyhow::Result<()> {
+pub async fn put_book_in_shelf(book_id: usize, shelf_id: usize) -> anyhow::Result<()> {
     let endpoint= format!("/api/shelf/shelves/{shelf_id}/add_book");
     let request = json!({"id": book_id});
 
@@ -69,7 +69,33 @@ async fn get_books_from_shelf(shelf_id: usize) -> anyhow::Result<Vec<Book>> {
 
 #[component]
 pub fn shelves_list() -> impl IntoView {
+    let expanded = RwSignal::new(false);
 
+    let toggle = move |_| {
+        expanded.update(|e| *e = !*e);
+    };
+
+    view! {
+        <div class="expandable-container">
+            <div style="display: flex;   flex-direction: row; align-items:center; margin-left:20px;">
+                <div class="title-text">"Name"</div>
+                <button class="toggle-button" on:click=toggle>
+                    {move || if expanded() { "Collapse Section" } else { "Expand Section" }}
+                </button>
+            </div>
+            <div class={move || {
+                if expanded() {
+                    "expandable-content expanded"
+                } else {
+                    "expandable-content"
+                }
+            }}>
+                <div>
+                    <BookList is_library_page=true/>
+                </div>
+            </div>
+        </div>
+    }
 }
 
 pub fn shelf_book_list(shelf_id: Signal<usize>) -> impl IntoView {

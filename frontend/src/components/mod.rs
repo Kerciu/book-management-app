@@ -23,7 +23,7 @@ pub use registraction_form::RegistractionForm;
 pub use recommendation_list::BookReccomendationList;
 pub use review_list::ReviewList;
 pub use review_input::ReviewInput;
-pub use shelves_list::ShelvesList;
+pub use shelves_list::{ShelvesList, put_book_in_shelf, get_shelves};
 
 use crate::{BACKEND, auth};
 use gloo_net::http::{Request, Response};

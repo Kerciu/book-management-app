@@ -1030,3 +1030,38 @@ input::-webkit-input-placeholder { color: #cac1ce; }
     rotate: 0;
   }
 }
+/* expandable shelf*/
+.expandable-container {
+  margin: 20px;
+  width: 100%;
+  height: fit-content;
+}
+
+.toggle-button {
+  padding: 10px 20px;
+  background-color: #8B5A96;
+  color: white;
+  border: none;
+  cursor: pointer;
+  border-radius: 8px;
+  transition: background-color 0.3s;
+}
+
+.toggle-button:hover {
+  background-color: #A173B3;
+}
+
+.expandable-content {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.5s ease, padding 0.7s ease;
+  padding: 0 10px;
+  border-radius: 8px;
+  margin-top: 10px;
+}
+
+.expandable-content.expanded {
+  max-height: fit-content;
+  width: 100%;
+  padding: 10px;
+}
