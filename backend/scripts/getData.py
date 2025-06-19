@@ -39,17 +39,9 @@ def getData(auth):
     editions(
       where: {isbn_10: {_is_null: false}, pages: {_is_null: false}, description: {_is_null: false}, publisher_id: {_is_null: false}, book: {book_category_id: {_is_null: false}}, language: {language: {_is_null: false}}}
     ) {
-      book_id
       isbn_10
       title
-      book {
-        book_category_id
-      }
       pages
-      publisher_id
-      contributions {
-        author_id
-      }
       release_date
       description
       language {
@@ -62,7 +54,6 @@ def getData(auth):
     publisherQuery = """
     query MyQuery {
     publishers {
-      id
       name
     }
   }
@@ -71,7 +62,6 @@ def getData(auth):
     genreQuery = """
     query MyQuery {
     book_categories {
-        id
         name
     }
     }
@@ -80,7 +70,6 @@ def getData(auth):
     authorQuery = """
     query MyQuery {
     authors {
-      id
       name
       death_date
       born_date
