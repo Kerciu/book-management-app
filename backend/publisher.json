@@ -1,403 +1,303 @@
 {
   "publishers": [
     {
-      "id": 183806,
       "name": "Tuff Leadership Training"
     },
     {
-      "id": 68,
       "name": "Sunburst Books"
     },
     {
-      "id": 147044,
       "name": "Guo jia tu shu guan chu ban she"
     },
     {
-      "id": 9273,
       "name": "Macmillan Publishing Co., Inc"
     },
     {
-      "id": 183807,
       "name": "Tuffleadershiptraining"
     },
     {
-      "id": 64,
       "name": "The Gnost House"
     },
     {
-      "id": 15495,
       "name": "Mission Boulevard Press"
     },
     {
-      "id": 6359,
       "name": "5 Spot"
     },
     {
-      "id": 4218,
       "name": "Texas A & M University Press"
     },
     {
-      "id": 4418,
       "name": "Random House/Schwartz & Wade"
     },
     {
-      "id": 5086,
       "name": "Carpenter's Son Publishing"
     },
     {
-      "id": 39701,
       "name": "Muktabodha Indological Research Institute in association with Motilal Banarsidass Publishers"
     },
     {
-      "id": 84,
       "name": "Houghton Mifflin Harcourt P"
     },
     {
-      "id": 9276,
       "name": "Perennial Classics"
     },
     {
-      "id": 15496,
       "name": "Box of Crayons Press"
     },
     {
-      "id": 15497,
       "name": "getAbstract AG"
     },
     {
-      "id": 74,
       "name": "Kendall/Hunt Publishing Company"
     },
     {
-      "id": 113,
       "name": "Golden Gryphon Press"
     },
     {
-      "id": 6368,
       "name": "34"
     },
     {
-      "id": 63,
       "name": "Gnost House"
     },
     {
-      "id": 6381,
       "name": "\u041d\u0456\u043a\u0430-\u0426\u0435\u043d\u0442\u0440; \u0412\u0438\u0434\u0430\u0432\u043d\u0438\u0446\u0442\u0432\u043e \u0410\u043d\u0435\u0442\u0442\u0438 \u0410\u043d\u0442\u043e\u043d\u0435\u043d\u043a\u043e"
     },
     {
-      "id": 6399,
       "name": "Daylight"
     },
     {
-      "id": 25362,
       "name": "Random House of Canada, Limited"
     },
     {
-      "id": 31716,
       "name": "Media Pustaka Qalam"
     },
     {
-      "id": 4427,
       "name": "Stephen F. Austin University Press"
     },
     {
-      "id": 4437,
       "name": "Austin State University Press, Stephen F."
     },
     {
-      "id": 53,
       "name": "Voyager / HarperCollins Publishers"
     },
     {
-      "id": 6981,
       "name": "OwlKids"
     },
     {
-      "id": 51439,
       "name": "YMCA Press"
     },
     {
-      "id": 49648,
       "name": "The Society"
     },
     {
-      "id": 87,
       "name": "Simon  Schuster Books for Young Readers"
     },
     {
-      "id": 92,
       "name": "Signet Books"
     },
     {
-      "id": 61929,
       "name": "Darrell Drake"
     },
     {
-      "id": 61,
       "name": "SpaceBattles.com"
     },
     {
-      "id": 99,
       "name": "Bloomsbury Methuen Drama"
     },
     {
-      "id": 16106,
       "name": "Ch. Links Verlag"
     },
     {
-      "id": 85,
       "name": "DK CHILDREN"
     },
     {
-      "id": 61930,
       "name": "David Belisle"
     },
     {
-      "id": 97,
       "name": "Vermilion"
     },
     {
-      "id": 104,
       "name": "Charisma House"
     },
     {
-      "id": 71,
       "name": "Gallimard (folio)"
     },
     {
-      "id": 31718,
       "name": "Group Publishing (Company)"
     },
     {
-      "id": 114,
       "name": "W Publishing Group"
     },
     {
-      "id": 208117,
       "name": "Groundworks"
     },
     {
-      "id": 4202,
       "name": "Hugo poche"
     },
     {
-      "id": 208125,
       "name": "Watershed Media Press"
     },
     {
-      "id": 31717,
       "name": "Route"
     },
     {
-      "id": 77007,
       "name": "Erika"
     },
     {
-      "id": 4352,
       "name": "Frances Lincoln Childrens Books"
     },
     {
-      "id": 191258,
       "name": "SilverStone Books"
     },
     {
-      "id": 19884,
       "name": "Inner Traditions International, Limited"
     },
     {
-      "id": 112,
       "name": "Van Nostrand Reinhold Company"
     },
     {
-      "id": 8,
       "name": "Penguin Viking"
     },
     {
-      "id": 4444,
       "name": "Hyperion Press"
     },
     {
-      "id": 94,
       "name": "Best Sellers Illustrated"
     },
     {
-      "id": 77009,
       "name": "Kalibr"
     },
     {
-      "id": 7,
       "name": "Diversified Publishing"
     },
     {
-      "id": 4203,
       "name": "Hugo Poche"
     },
     {
-      "id": 117,
       "name": "Just Us Books"
     },
     {
-      "id": 77010,
       "name": "Clarkson Potter / Ten Speed"
     },
     {
-      "id": 77011,
       "name": "Le P\u00e9r\u00e9grinateur"
     },
     {
-      "id": 123,
       "name": "Black Rose Bks, Canada"
     },
     {
-      "id": 95953,
       "name": "Press of Zion's Printing and Publishing Company"
     },
     {
-      "id": 15498,
       "name": "Pen and Sword Transport"
     },
     {
-      "id": 19881,
       "name": "Strange Worlds Press"
     },
     {
-      "id": 31719,
       "name": "Turre Publishing"
     },
     {
-      "id": 140,
       "name": "Simon  Schuster/Paula Wiseman Books"
     },
     {
-      "id": 147,
       "name": "Silver Burdett Company"
     },
     {
-      "id": 12012,
       "name": "Malpaso Ediciones SL"
     },
     {
-      "id": 183808,
       "name": "Jesenski i Turk, Zagreb / Heliks, Smederevo"
     },
     {
-      "id": 168,
       "name": "LSU Press"
     },
     {
-      "id": 9285,
       "name": "Council of Europe"
     },
     {
-      "id": 198932,
       "name": "Kinneret, Zmore-Bitan, Dvir - Publishing House"
     },
     {
-      "id": 9275,
       "name": "Threel Media"
     },
     {
-      "id": 137,
       "name": "HMH Books for Young Readers"
     },
     {
-      "id": 116,
       "name": "Barnes  Noble Classics"
     },
     {
-      "id": 160,
       "name": "G.P Putnam's Sons"
     },
     {
-      "id": 31721,
       "name": "Executive Excellence Publishing"
     },
     {
-      "id": 31722,
       "name": "Spiro Press"
     },
     {
-      "id": 5088,
       "name": "Firefly Press"
     },
     {
-      "id": 39702,
       "name": "Macmillan Publishers | Scribner's Sons"
     },
     {
-      "id": 165,
       "name": "Booksellers House"
     },
     {
-      "id": 5087,
       "name": "Atria"
     },
     {
-      "id": 5090,
       "name": "Radcliffe Medical"
     },
     {
-      "id": 8965,
       "name": "Ullstein Buchverlage"
     },
     {
-      "id": 173,
       "name": "Julian Messner"
     },
     {
-      "id": 61931,
       "name": "Cathy Kennedy"
     },
     {
-      "id": 186,
       "name": "Ace Hardcover"
     },
     {
-      "id": 12011,
       "name": "West Group"
     },
     {
-      "id": 4206,
       "name": "Summersdale Self Help"
     },
     {
-      "id": 25363,
       "name": "Kong & Park Incorporated"
     },
     {
-      "id": 63749,
       "name": "Milford"
     },
     {
-      "id": 9284,
       "name": "Real World"
     },
     {
-      "id": 177,
       "name": "Cinco Puntos Press"
     },
     {
-      "id": 121,
       "name": "Music Sales"
     },
     {
-      "id": 157,
       "name": "Marion Boyars Publishers"
     },
     {
-      "id": 115,
       "name": "Barnes & Noble Classics"
     },
     {
-      "id": 9286,
       "name": "Reproductive Justice: A New Vision for the 21st Century"
     },
     {
-      "id": 146,
       "name": "Warner Adult"
     },
     {
-      "id": 9287,
       "name": "Lantern Books"
     }
   ]

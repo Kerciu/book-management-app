@@ -37,8 +37,11 @@ def getData(auth):
     bookQuery = """
     query MyQuery {
     editions(
-      where: {isbn_10: {_is_null: false}, pages: {_is_null: false}, description: {_is_null: false}, publisher_id: {_is_null: false}, book: {book_category_id: {_is_null: false}}, language: {language: {_is_null: false}}}
+      where: {isbn_10: {_is_null: false}, pages: {_is_null: false}, description: {_is_null: false}, publisher_id: {_is_null: false}, book: {book_category_id: {_is_null: false}, image: {url: {_is_null: false}}}, language: {language: {_is_null: false}}}
     ) {
+      images {
+        url
+      }
       isbn_10
       title
       pages

@@ -46,9 +46,14 @@ def readBooks(path):
             published_at = book["release_date"]
             description = book["description"]
             language = book["language"]["language"].split(";")[-1].strip()
-            publisherID = random.sample(range(1, maxPublisher+1), random.randrange(1, maxPublisher+1))
-            authorID = random.sample(range(1, maxAuthor+1), random.randrange(1, maxAuthor+1))
-            genreID = random.sample(range(1, maxGenre+1), random.randrange(1, maxGenre+1))
+            imageURL = None
+            try:
+                imageURL = book["images"][0]["url"]
+            except:
+                pass
+            publisherID = random.sample(range(1, maxPublisher+1), random.randrange(1, min(4, maxPublisher+1)))
+            authorID = random.sample(range(1, maxAuthor+1), random.randrange(1, min(4,maxAuthor+1)))
+            genreID = random.sample(range(1, maxGenre+1), random.randrange(1, min(5,maxGenre+1)))
             publisher = []
             for ID in publisherID:
                 publisher.append(Publisher.objects.get(id=ID))
@@ -66,7 +71,8 @@ def readBooks(path):
                     isbn=isbn,
                     published_at=published_at,
                     page_count=page_count,
-                    language=language
+                    language=language,
+                    cover_image=imageURL
                 )
                 book_obj.authors.set(author)
                 book_obj.genres.set(genre)
