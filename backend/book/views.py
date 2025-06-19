@@ -49,7 +49,7 @@ class BookViewSet(viewsets.ModelViewSet):
         "title",
         "description",
         "isbn",
-        "authors__last_name",
+        "authors__name",
         "genres__name",
     ]
 

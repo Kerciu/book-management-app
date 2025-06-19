@@ -4,9 +4,9 @@ from django.db import models
 
 
 class Author(models.Model):
-    first_name = models.CharField(max_length=100)
-    middle_name = models.CharField(max_length=100, blank=True)
-    last_name = models.CharField(max_length=100, db_index=True)
+    name = models.CharField(max_length=100) # we denormalize db 
+    # middle_name = models.CharField(max_length=100, blank=True)
+    # last_name = models.CharField(max_length=100, db_index=True)
 
     bio = models.TextField(blank=True)
 
@@ -15,11 +15,11 @@ class Author(models.Model):
 
     class Meta:
         indexes = [
-            models.Index(fields=["last_name", "first_name"]),
+            models.Index(fields=["name"]),
         ]
 
     def __str__(self):
-        return f"{self.first_name} {self.last_name}"
+        return f"{self.name}"
 
 
 class Publisher(models.Model):
@@ -43,7 +43,7 @@ class Book(models.Model):
 
     genres = models.ManyToManyField(Genre)
 
-    isbn = models.CharField(max_length=17, unique=True)  # 17 for hyphen storage
+    isbn = models.CharField(max_length=17, unique=True)
 
     published_at = models.DateField(null=True, blank=True, db_index=True)
     publishers = models.ManyToManyField(Publisher)
