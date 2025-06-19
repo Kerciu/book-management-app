@@ -4,6 +4,7 @@ from django.db import models
 
 
 class Author(models.Model):
+    id = models.IntegerField(primary_key=True)
     name = models.CharField(max_length=100) # we denormalize db 
     # middle_name = models.CharField(max_length=100, blank=True)
     # last_name = models.CharField(max_length=100, db_index=True)
@@ -23,6 +24,7 @@ class Author(models.Model):
 
 
 class Publisher(models.Model):
+    id = models.IntegerField(primary_key=True)
     name = models.CharField(max_length=255, unique=True, db_index=True)
 
     def __str__(self):
@@ -30,6 +32,7 @@ class Publisher(models.Model):
 
 
 class Genre(models.Model):
+    id = models.IntegerField(primary_key=True)
     name = models.CharField(max_length=100, unique=True, db_index=True)
 
     def __str__(self):
@@ -37,6 +40,7 @@ class Genre(models.Model):
 
 
 class Book(models.Model):
+    id = models.IntegerField(primary_key=True)
     title = models.CharField(max_length=255, db_index=True)
     description = models.TextField(blank=True, null=True)
     authors = models.ManyToManyField(Author)
@@ -52,9 +56,6 @@ class Book(models.Model):
     language = models.CharField(max_length=30, default="English")
 
     cover_image = models.URLField(blank=True, null=True)
-
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return self.title
