@@ -37,13 +37,13 @@ async fn post(data: LoginRequest) -> anyhow::Result<LoginResponse> {
         let token = res
             .get("user")
             .ok_or(anyhow!("Response malformed, can't find parameter \"user\""))?
-            .get("refresh")
+            .get("access")
             .ok_or(anyhow!(
-                "Response malformed, cant' find parameter \"user.refresh\""
+                "Response malformed, cant' find parameter \"user.access\""
             ))?;
         let token = token
             .as_str()
-            .ok_or(anyhow!("user.refresh - expected String, got {:?}", token))?
+            .ok_or(anyhow!("user.access - expected String, got {:?}", token))?
             .to_string();
         return Ok(LoginResponse::Token(AuthToken::new(token)));
     } else {
