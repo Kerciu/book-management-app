@@ -25,8 +25,6 @@ class UserManager(BaseUserManager):
         self, username, email, first_name, last_name, password=None, **other_fields
     ):
 
-        auth_provider = other_fields.get("auth_provider", "email")
-
         if not username:
             raise ValueError("Username is required.")
 
@@ -47,7 +45,7 @@ class UserManager(BaseUserManager):
             **other_fields,
         )
 
-        if auth_provider == "email" and password:
+        if password:
             user.set_password(password)
         else:
             user.set_unusable_password()

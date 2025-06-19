@@ -4,6 +4,7 @@ from rest_framework_simplejwt.views import TokenRefreshView
 from .views import (
     GithubSignInView,
     GoogleSignInView,
+    GithubLoginCallbackView,
     LoginUserView,
     LogoutUserView,
     PasswordResetConfirmView,
@@ -30,4 +31,9 @@ urlpatterns = [
     path("logout/", LogoutUserView.as_view(), name="logout"),
     path("google-auth/", GoogleSignInView.as_view(), name="google-auth"),
     path("github-auth/", GithubSignInView.as_view(), name="github-auth"),
+    path(
+        "github-auth/callback/",
+        GithubLoginCallbackView.as_view(),
+        name="github-callback",
+    ),
 ]

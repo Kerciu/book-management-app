@@ -227,17 +227,13 @@ class LogoutUserView(GenericAPIView):
 
 
 class GoogleSignInView(GenericAPIView):
-
     serializer_class = GoogleSignInSerializer
     permission_classes = [AllowAny]
 
     def post(self, request):
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
-
-        data = (serializer.validated_data)["access_token"]
-
-        return Response(data, status=status.HTTP_200_OK)
+        return Response(serializer.validated_data, status=status.HTTP_200_OK)
 
 
 class GithubSignInView(GenericAPIView):
@@ -247,6 +243,26 @@ class GithubSignInView(GenericAPIView):
 
     def post(self, request):
         serializer = self.serializer_class(data=request.data)
+        if serializer.is_valid(raise_exception=True):
+            data = (serializer.validated_data)["code"]
+            return Response(data, status=status.HTTP_200_OK)
+
+        return Response(data=serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class GithubLoginCallbackView(GenericAPIView):
+    serializer_class = GithubSignInSerializer
+    permission_classes = [AllowAny]
+
+    def get(self, request):
+        code = request.query_params.get("code")
+        if not code:
+            return Response(
+                {"error": "Code parameter is required"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        serializer = self.serializer_class(data={"code": code})
         if serializer.is_valid(raise_exception=True):
             data = (serializer.validated_data)["code"]
             return Response(data, status=status.HTTP_200_OK)
