@@ -72,6 +72,7 @@ pub fn shelves_list() -> impl IntoView {
 
 }
 
+#[component]
 pub fn shelf_book_list(shelf_id: Signal<usize>) -> impl IntoView {
     let books = LocalResource::new(move || get_books_from_shelf(shelf_id()));
     let books = move || match &*books.read() {
