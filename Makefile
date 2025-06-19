@@ -16,10 +16,6 @@ init:
 	docker compose exec backend python manage.py migrate sites
 	docker compose exec backend python manage.py makemigrations notification
 	docker compose exec backend python manage.py migrate notification
-	# docker compose exec backend python manage.py makemigrations rating
-	# docker compose exec backend python manage.py migrate rating
-	# docker compose exec backend python manage.py makemigrations recommend
-	# docker compose exec backend python manage.py migrate recommend
 	docker compose exec backend python manage.py makemigrations review
 	docker compose exec backend python manage.py migrate review
 	docker compose exec backend python manage.py makemigrations social
@@ -47,7 +43,6 @@ docker_run:
 		exit 1; \
 	fi
 	docker compose exec backend python manage.py $(argument)
-
 
 migrate:
 	make docker_run argument="migrate"
@@ -87,3 +82,6 @@ runmigrations:
 	docker compose exec backend python manage.py migrate social
 	make makemigrations
 	make migrate
+
+fillDB:
+	docker compose exec backend python scripts/fillDB.py

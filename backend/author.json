@@ -1,0 +1,604 @@
+{
+  "authors": [
+    {
+      "id": 731550,
+      "name": "Staffan Ulfstrand",
+      "death_date": null,
+      "born_date": null
+    },
+    {
+      "id": 920721,
+      "name": "Abel Symposium (5th 2008 Troms\u00f8, Norway)",
+      "death_date": null,
+      "born_date": null
+    },
+    {
+      "id": 752520,
+      "name": "ZIHO",
+      "death_date": null,
+      "born_date": null
+    },
+    {
+      "id": 856192,
+      "name": "Atie Van der Meer",
+      "death_date": null,
+      "born_date": null
+    },
+    {
+      "id": 767735,
+      "name": "The Springwatch Team",
+      "death_date": null,
+      "born_date": null
+    },
+    {
+      "id": 653491,
+      "name": "Linda Waite, Maggie Gallagher",
+      "death_date": null,
+      "born_date": null
+    },
+    {
+      "id": 856193,
+      "name": "Lerner Publications Company. Geography Department",
+      "death_date": null,
+      "born_date": null
+    },
+    {
+      "id": 856194,
+      "name": "Zavisca",
+      "death_date": null,
+      "born_date": null
+    },
+    {
+      "id": 159977,
+      "name": "Graham Thomas",
+      "death_date": null,
+      "born_date": null
+    },
+    {
+      "id": 119481,
+      "name": "Marianne Bivins",
+      "death_date": null,
+      "born_date": null
+    },
+    {
+      "id": 126851,
+      "name": "Gavin Lewis",
+      "death_date": null,
+      "born_date": null
+    },
+    {
+      "id": 159966,
+      "name": "Matthew Mcgough",
+      "death_date": null,
+      "born_date": null
+    },
+    {
+      "id": 205603,
+      "name": "Jean E. Collins",
+      "death_date": null,
+      "born_date": null
+    },
+    {
+      "id": 205624,
+      "name": "M. S. Sequeira",
+      "death_date": null,
+      "born_date": null
+    },
+    {
+      "id": 270242,
+      "name": "Charles de Saint-\u00c9vremond",
+      "death_date": null,
+      "born_date": null
+    },
+    {
+      "id": 270244,
+      "name": "Konrad Mueller",
+      "death_date": null,
+      "born_date": null
+    },
+    {
+      "id": 117685,
+      "name": "Catherine Cookson (1906-1998)",
+      "death_date": null,
+      "born_date": null
+    },
+    {
+      "id": 739351,
+      "name": "Jonathan Digby",
+      "death_date": null,
+      "born_date": null
+    },
+    {
+      "id": 755842,
+      "name": "Ton van der Lee",
+      "death_date": null,
+      "born_date": null
+    },
+    {
+      "id": 920683,
+      "name": "B. Kruglikov",
+      "death_date": null,
+      "born_date": null
+    },
+    {
+      "id": 792434,
+      "name": "Rodney Turner",
+      "death_date": null,
+      "born_date": null
+    },
+    {
+      "id": 481946,
+      "name": "Nicole Cypher",
+      "death_date": null,
+      "born_date": null
+    },
+    {
+      "id": 992548,
+      "name": "JW Tobey",
+      "death_date": null,
+      "born_date": null
+    },
+    {
+      "id": 787440,
+      "name": "Phil Factor",
+      "death_date": null,
+      "born_date": null
+    },
+    {
+      "id": 538026,
+      "name": "Ophthalmological Society of the United Kingdom",
+      "death_date": null,
+      "born_date": null
+    },
+    {
+      "id": 731756,
+      "name": "Calia Quinn",
+      "death_date": null,
+      "born_date": null
+    },
+    {
+      "id": 800882,
+      "name": "Robert J. Wolfe",
+      "death_date": null,
+      "born_date": null
+    },
+    {
+      "id": 78833,
+      "name": "Linda Kelsey",
+      "death_date": null,
+      "born_date": null
+    },
+    {
+      "id": 270238,
+      "name": "Don Brautigam",
+      "death_date": null,
+      "born_date": null
+    },
+    {
+      "id": 856196,
+      "name": "Vanessa Preast",
+      "death_date": null,
+      "born_date": null
+    },
+    {
+      "id": 826983,
+      "name": "Ian Fenton",
+      "death_date": null,
+      "born_date": null
+    },
+    {
+      "id": 347225,
+      "name": "Colleen Macklin",
+      "death_date": null,
+      "born_date": null
+    },
+    {
+      "id": 826984,
+      "name": "William W. Hunt",
+      "death_date": null,
+      "born_date": null
+    },
+    {
+      "id": 205641,
+      "name": "Marilyn Allen",
+      "death_date": null,
+      "born_date": null
+    },
+    {
+      "id": 752412,
+      "name": "Sudarmaji & Ahmad Santoso",
+      "death_date": null,
+      "born_date": null
+    },
+    {
+      "id": 754270,
+      "name": "Jayaram Easwaran",
+      "death_date": null,
+      "born_date": null
+    },
+    {
+      "id": 371351,
+      "name": "Ieke Moerdijk",
+      "death_date": null,
+      "born_date": null
+    },
+    {
+      "id": 758986,
+      "name": "Marc Askew",
+      "death_date": null,
+      "born_date": null
+    },
+    {
+      "id": 920722,
+      "name": "Jack Copeland",
+      "death_date": null,
+      "born_date": null
+    },
+    {
+      "id": 289788,
+      "name": "James A. Baker",
+      "death_date": null,
+      "born_date": null
+    },
+    {
+      "id": 734615,
+      "name": "Roan Parrish, Avon Gale",
+      "death_date": null,
+      "born_date": null
+    },
+    {
+      "id": 538027,
+      "name": "John P. Farrell",
+      "death_date": null,
+      "born_date": null
+    },
+    {
+      "id": 735731,
+      "name": "Pedro Orgambide",
+      "death_date": null,
+      "born_date": null
+    },
+    {
+      "id": 78859,
+      "name": "John Tait",
+      "death_date": null,
+      "born_date": null
+    },
+    {
+      "id": 828344,
+      "name": "Wendi Guff",
+      "death_date": null,
+      "born_date": null
+    },
+    {
+      "id": 653498,
+      "name": "Andrew J. Cherlin",
+      "death_date": null,
+      "born_date": null
+    },
+    {
+      "id": 737869,
+      "name": "\u0415\u0432\u0433\u0435\u043d\u0438\u044f \u0413\u043e\u0440\u0434\u0435\u0435\u0432\u0430",
+      "death_date": null,
+      "born_date": null
+    },
+    {
+      "id": 756616,
+      "name": "Joana Breidenbach",
+      "death_date": null,
+      "born_date": null
+    },
+    {
+      "id": 538028,
+      "name": "Michael L. Fineberg",
+      "death_date": null,
+      "born_date": null
+    },
+    {
+      "id": 734614,
+      "name": "Jill Haven, Aiden Bates",
+      "death_date": null,
+      "born_date": null
+    },
+    {
+      "id": 538029,
+      "name": "Kris L Reddy",
+      "death_date": null,
+      "born_date": null
+    },
+    {
+      "id": 538030,
+      "name": "Howard M. Vollmer",
+      "death_date": null,
+      "born_date": null
+    },
+    {
+      "id": 653492,
+      "name": "Claire Mackintosh",
+      "death_date": null,
+      "born_date": null
+    },
+    {
+      "id": 826985,
+      "name": "O'Neill",
+      "death_date": null,
+      "born_date": null
+    },
+    {
+      "id": 731882,
+      "name": "Leanna Jones",
+      "death_date": null,
+      "born_date": null
+    },
+    {
+      "id": 732442,
+      "name": "Nathan Groezinger",
+      "death_date": null,
+      "born_date": null
+    },
+    {
+      "id": 736754,
+      "name": "Muriel Gray, A. J. Elwood",
+      "death_date": null,
+      "born_date": null
+    },
+    {
+      "id": 205601,
+      "name": "Jove Dimitrija Talevski",
+      "death_date": null,
+      "born_date": null
+    },
+    {
+      "id": 773288,
+      "name": "Joanne Buggey",
+      "death_date": null,
+      "born_date": null
+    },
+    {
+      "id": 826986,
+      "name": "George Kirschner",
+      "death_date": null,
+      "born_date": null
+    },
+    {
+      "id": 538031,
+      "name": "Peter Van Gucht",
+      "death_date": null,
+      "born_date": null
+    },
+    {
+      "id": 289789,
+      "name": "Steve Fiffer",
+      "death_date": null,
+      "born_date": null
+    },
+    {
+      "id": 992550,
+      "name": "Anonymous GWAL",
+      "death_date": null,
+      "born_date": null
+    },
+    {
+      "id": 365141,
+      "name": "John Murray (Firm)",
+      "death_date": null,
+      "born_date": null
+    },
+    {
+      "id": 653493,
+      "name": "Sarah Moorhead",
+      "death_date": null,
+      "born_date": null
+    },
+    {
+      "id": 119514,
+      "name": "Thomas D. Mays",
+      "death_date": null,
+      "born_date": null
+    },
+    {
+      "id": 653497,
+      "name": "Susi",
+      "death_date": null,
+      "born_date": null
+    },
+    {
+      "id": 205651,
+      "name": "E. Glenn Hinson",
+      "death_date": null,
+      "born_date": null
+    },
+    {
+      "id": 205670,
+      "name": "Pete Fromm",
+      "death_date": null,
+      "born_date": null
+    },
+    {
+      "id": 270257,
+      "name": "Amy Hanson",
+      "death_date": null,
+      "born_date": null
+    },
+    {
+      "id": 744641,
+      "name": "John Rogove",
+      "death_date": null,
+      "born_date": null
+    },
+    {
+      "id": 319474,
+      "name": "Charles H Chen",
+      "death_date": null,
+      "born_date": null
+    },
+    {
+      "id": 992549,
+      "name": "Julian Zabalbeascoa",
+      "death_date": null,
+      "born_date": null
+    },
+    {
+      "id": 734616,
+      "name": "Ashe Moon, Ashe Moon",
+      "death_date": null,
+      "born_date": null
+    },
+    {
+      "id": 763737,
+      "name": "J.R. Reardon",
+      "death_date": null,
+      "born_date": null
+    },
+    {
+      "id": 78916,
+      "name": "Rajendra Pal Singh",
+      "death_date": null,
+      "born_date": null
+    },
+    {
+      "id": 920723,
+      "name": "Daniel Perrin",
+      "death_date": null,
+      "born_date": null
+    },
+    {
+      "id": 270256,
+      "name": "John Gustafson",
+      "death_date": null,
+      "born_date": null
+    },
+    {
+      "id": 78921,
+      "name": "S. G. Fedosin",
+      "death_date": null,
+      "born_date": null
+    },
+    {
+      "id": 731891,
+      "name": "Tommy Sissons",
+      "death_date": null,
+      "born_date": null
+    },
+    {
+      "id": 159982,
+      "name": "Naeem Siddiqi",
+      "death_date": null,
+      "born_date": null
+    },
+    {
+      "id": 270243,
+      "name": "Jos\u00e9 Laur\u00eanio de Mello",
+      "death_date": null,
+      "born_date": null
+    },
+    {
+      "id": 763010,
+      "name": "Brian Azzarello, Maria Llovet",
+      "death_date": null,
+      "born_date": null
+    },
+    {
+      "id": 920724,
+      "name": "S. H. Lavington",
+      "death_date": null,
+      "born_date": null
+    },
+    {
+      "id": 159981,
+      "name": "J. Christoph Amberger",
+      "death_date": null,
+      "born_date": null
+    },
+    {
+      "id": 538034,
+      "name": "Rick Wilson",
+      "death_date": null,
+      "born_date": null
+    },
+    {
+      "id": 538032,
+      "name": "Rick Rohde",
+      "death_date": null,
+      "born_date": null
+    },
+    {
+      "id": 205605,
+      "name": "Shlomo Simonsohn",
+      "death_date": null,
+      "born_date": null
+    },
+    {
+      "id": 992551,
+      "name": "Amy Hackett",
+      "death_date": null,
+      "born_date": null
+    },
+    {
+      "id": 289791,
+      "name": "Timothy Naftali",
+      "death_date": null,
+      "born_date": null
+    },
+    {
+      "id": 205632,
+      "name": "United Methodist Church (U.S.)",
+      "death_date": null,
+      "born_date": null
+    },
+    {
+      "id": 205654,
+      "name": "Marian Hope Moreland",
+      "death_date": null,
+      "born_date": null
+    },
+    {
+      "id": 289793,
+      "name": "Jeannine Glista",
+      "death_date": null,
+      "born_date": null
+    },
+    {
+      "id": 538033,
+      "name": "Timm Hoffman",
+      "death_date": null,
+      "born_date": null
+    },
+    {
+      "id": 208147,
+      "name": "Allison Weiss Entrekin",
+      "death_date": null,
+      "born_date": null
+    },
+    {
+      "id": 208152,
+      "name": "James A. Schmitendorf",
+      "death_date": null,
+      "born_date": null
+    },
+    {
+      "id": 653494,
+      "name": "St\u00e9phanie Buelens",
+      "death_date": null,
+      "born_date": null
+    },
+    {
+      "id": 734617,
+      "name": "Sara T. Bond",
+      "death_date": null,
+      "born_date": null
+    },
+    {
+      "id": 653496,
+      "name": "N.J. Crosskey",
+      "death_date": null,
+      "born_date": null
+    },
+    {
+      "id": 347258,
+      "name": "Simon Ockley",
+      "death_date": null,
+      "born_date": null
+    }
+  ]
+}
