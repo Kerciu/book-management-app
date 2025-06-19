@@ -18,8 +18,11 @@ init:
 	docker compose exec backend python manage.py migrate notification
 	docker compose exec backend python manage.py makemigrations review
 	docker compose exec backend python manage.py migrate review
+	docker compose exec backend python manage.py makemigrations social
+	docker compose exec backend python manage.py migrate social
 	make makemigrations
 	make migrate
+	make fillDB
 
 build:
 	cp .env frontend/.env
@@ -50,6 +53,15 @@ migrate:
 makemigrations:
 	make docker_run argument="makemigrations"
 
+runserver:
+	make docker_run argument="runserver 0.0.0.0:8000"
+
+backend_logs:
+	docker compose logs backend
+
+createsuperuser:
+	docker compose exec backend python manage.py createsuperuser
+
 runmigrations:
 	docker compose exec backend python manage.py makemigrations authentication
 	docker compose exec backend python manage.py migrate authentication
@@ -69,18 +81,10 @@ runmigrations:
 	docker compose exec backend python manage.py migrate notification
 	docker compose exec backend python manage.py makemigrations review
 	docker compose exec backend python manage.py migrate review
+	docker compose exec backend python manage.py makemigrations social
+	docker compose exec backend python manage.py migrate social
 	make makemigrations
 	make migrate
-
-runserver:
-	make docker_run argument="runserver 0.0.0.0:8000"
-
-backend_logs:
-	docker compose logs backend
-
-createsuperuser:
-	docker compose exec backend python manage.py createsuperuser
-
 
 fillDB:
 	docker compose exec backend python scripts/fillDB.py

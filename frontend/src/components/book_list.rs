@@ -217,7 +217,7 @@ pub fn book_list(is_library_page: bool) -> impl IntoView {
             "title" => book.title.clone(),
             "author" => book.authors[0].name.clone(),
             "date" =>  book.published_at.clone(),
-            _ => unreachable!()
+            _ => book.title.clone()
         });
         books
     };

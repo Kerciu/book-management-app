@@ -190,7 +190,7 @@ Authenticates a user using Google OAuth2.
 
 #### Request Body (JSON):
 ```json
-{ "access_token": "<google_access_token>" }
+{ "id_token": "<google_id_token>" }
 ```
 
 #### Responses:

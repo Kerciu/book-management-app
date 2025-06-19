@@ -1,4 +1,6 @@
-use crate::auth::{self, Token};
+use crate::auth::google::Token;
+use crate::auth::{self};
+use gloo_net::http::Request;
 use leptos::prelude::*;
 use leptos_router::hooks::{use_navigate, use_query};
 use leptos_router::params::Params;
@@ -15,12 +17,12 @@ struct AuthData {
 
 #[derive(Serialize, Debug)]
 struct AuthRequest {
-    access_token: String,
+    id_token: String,
 }
 
 #[derive(Deserialize)]
 struct AuthResponse {
-    code: String
+    access_token: String,
 }
 
 #[component]
@@ -28,15 +30,44 @@ pub fn google_auth_button() -> impl IntoView {
     view! { <button on:click=move |_| auth::google::init()>"Google OAuth"</button> }
 }
 
-async fn post(access_token: String) -> anyhow::Result<AuthResponse> {
+async fn post(code: String) -> anyhow::Result<AuthResponse> {
     provide_context::<Option<Token>>(None);
-    let res = send_post_request(AuthRequest { access_token: access_token }, "/api/auth/google-auth/")
-        .await?;
+    let _ = web_sys::window()
+        .unwrap()
+        .local_storage()
+        .unwrap()
+        .unwrap()
+        .remove_item("access_token");
+    let token = get_id_token(code).await?;
+    let res = send_post_request(
+        AuthRequest {
+            id_token: token.to_string(),
+        },
+        "/api/auth/google-auth/",
+    )
+    .await?;
     if !res.ok() {
-        return Err(anyhow::anyhow!("{}", res.status_text()))
+        return Err(anyhow::anyhow!("{}", res.status_text()));
     }
-    let res: serde_json::Value = serde_json::from_str(&res.text().await?)?;
-    Ok(AuthResponse { code: res["user"]["access"].to_string() })
+    Ok(AuthResponse {
+        access_token: res.json::<serde_json::Value>().await?["access_token"].to_string(),
+    })
+}
+
+async fn get_id_token(code: String) -> anyhow::Result<Token> {
+    let data = format!(
+        "code={}&redirect_uri={}&client_id={}&client_secret={}&grant_type=authorization_code",
+        code,
+        env!("GOOGLE_REDIRECT_URI_SIMPLE"),
+        env!("GOOGLE_CLIENT_ID"),
+        env!("GOOGLE_CLIENT_SECRET")
+    );
+
+    let endpoint = env!("GOOGLE_TOKEN_GET_URL");
+    let res = Request::post(endpoint).header("content-type", "application/x-www-form-urlencoded").body(data)?.send().await?;
+    Ok(Token::new(
+        res.json::<serde_json::Value>().await?["id_token"].to_string(),
+    ))
 }
 
 #[component]
@@ -59,14 +90,22 @@ pub fn google_auth_handler() -> impl IntoView {
         {
             Some(code.clone())
         }
-        Err(err) => {log::log!(Level::Error, "{err}"); None},
-        _ => {log::log!(Level::Error, "bad params in url querry"); None},
+        Err(err) => {
+            log::log!(Level::Error, "{err}");
+            None
+        }
+        _ => {
+            log::log!(Level::Error, "bad params in url querry");
+            None
+        }
     };
 
     let code = LocalResource::new(move || post(code().unwrap_or_default()));
-    Effect::new(move || if let Some(Ok(AuthResponse { code })) = &*code.read() {
-        provide_context(Some(auth::google::Token::new(code.clone())));
-        use_navigate()("/books/list", Default::default());
+    Effect::new(move || {
+        if let Some(Ok(AuthResponse { access_token })) = &*code.read() {
+            provide_context(Some(auth::google::Token::new(access_token.clone())));
+            use_navigate()("/main", Default::default());
+        }
     });
     Effect::new(move || log::log!(Level::Debug, "{:?}", use_context::<auth::github::Token>()));
 
