@@ -22,6 +22,7 @@ init:
 	docker compose exec backend python manage.py migrate social
 	make makemigrations
 	make migrate
+	make fillDB
 
 build:
 	docker compose up -d --build

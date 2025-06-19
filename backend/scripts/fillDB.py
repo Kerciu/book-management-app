@@ -6,6 +6,7 @@ os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'your_project_name.settings')
 django.setup()
 
 from book.models import *
+from authentication.models import *
 import json
 
 def readAuthors(path):
@@ -73,6 +74,27 @@ def readBooks(path):
             except Exception:
                 print("sth went wrong")
 
+def addUser():
+    name = 1
+    lname = 1
+    mail = "@gmail.com"
+    for _ in range(30):
+        nameChar = chr(name%26 + 65)
+        lnameChar = chr(lname%26 + 65)
+        if name > 26:
+            nameChar += chr(name%26 + 65)
+            lnameChar += chr(lname%26 + 65)
+        name += 1
+        lname += 1
+        email = nameChar + lnameChar + mail
+        try:
+            CustomUser.objects.create(username=name+lname, email=email, first_name=nameChar, last_name=lnameChar)
+        except Exception:
+            print(email)
+
+
+
+
 def fillDB():
     authorsPath = "author.json"
     publishersPath = "publisher.json"
@@ -82,6 +104,7 @@ def fillDB():
     readPublishers(publishersPath)
     readGenres(genresPath)
     readBooks(booksPath)
+    addUser()
 
 def main():
     fillDB()
