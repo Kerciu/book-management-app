@@ -22,6 +22,8 @@ pub use login_form::LoginForm;
 pub use registraction_form::RegistractionForm;
 pub use recommendation_list::BookReccomendationList;
 pub use review_list::ReviewList;
+pub use review_input::ReviewInput;
+pub use shelves_list::ShelvesList;
 
 use crate::{BACKEND, auth};
 use gloo_net::http::{Request, Response};
