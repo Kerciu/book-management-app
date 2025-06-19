@@ -1,6 +1,5 @@
 import requests as api_requests
 from django.conf import settings
-from django.contrib.auth import authenticate
 from google.auth.transport import requests
 from google.oauth2 import id_token
 from rest_framework.exceptions import AuthenticationFailed
@@ -11,19 +10,28 @@ from .models import CustomUser
 class GoogleAuth:
 
     @staticmethod
-    def validate(access_token):
+    def validate(token):
         try:
             id_info = id_token.verify_oauth2_token(
-                access_token,
+                token,
                 requests.Request(),
                 settings.GOOGLE_CLIENT_ID,
+                clock_skew_in_seconds=300,
             )
 
-            if "accounts.google.com" in id_info["iss"]:
-                return id_info
+            client_id = settings.GOOGLE_CLIENT_ID
+            aud = id_info["aud"]
 
-        except Exception as e:
-            return "Token is invalid or has expired", str(e)
+            if isinstance(aud, list):
+                if client_id not in aud:
+                    return None
+            elif aud != client_id:
+                return None
+
+            return id_info
+
+        except Exception:
+            return None
 
 
 class GithubAuth:
@@ -36,76 +44,100 @@ class GithubAuth:
             "code": code,
         }
 
-        res = requests.post(
-            settings.GITHUB_TOKEN_URL,
-            data=param_payload,
-            headers={"Accept": "application/json"},
-        )
+        try:
 
-        payload = res.json()
-        return payload.get("access_token")
+            res = api_requests.post(
+                settings.GITHUB_TOKEN_URL,
+                data=param_payload,
+                headers={"Accept": "application/json"},
+            )
+
+            if res.status_code != 200:
+                raise AuthenticationFailed(f"GitHub token exchange failed: {res.text}")
+
+            payload = res.json()
+            token = payload.get("access_token")
+            if not token:
+                raise AuthenticationFailed(f"GitHub token missing: {payload}")
+
+            return token
+
+        except Exception as e:
+            raise AuthenticationFailed(f"GitHub authentication failed: {str(e)}")
 
     @staticmethod
     def retrieve_user_info(access_token):
-        headers = {
-            "Authorization": f"Bearer {access_token}",
-        }
+        headers = {"Authorization": f"Bearer {access_token}"}
 
         try:
-            res = api_requests.get(settings.GITHUB_USER_URL, headers=headers)
+            user_res = api_requests.get("https://api.github.com/user", headers=headers)
+            if user_res.status_code != 200:
+                raise AuthenticationFailed(
+                    f"""
+                    Failed to fetch user data: {user_res.status_code} - {user_res.text}
+                """
+                )
 
-            return res.json()
+            user_data = user_res.json()
+            username = user_data.get("login", "githubuser")
+
+            email_res = api_requests.get(
+                "https://api.github.com/user/emails", headers=headers
+            )
+            email_data = email_res.json() if email_res.status_code == 200 else []
+
+            primary_email = None
+            for email_info in email_data:
+                if email_info.get("primary") and email_info.get("verified"):
+                    primary_email = email_info["email"]
+                    break
+
+            if primary_email:
+                user_data["email"] = primary_email
+            else:
+                user_data["email"] = f"{username}@users.noreply.github.com"
+
+            return user_data
 
         except Exception as e:
-            return AuthenticationFailed("Token is invalid or has expired", str(e))
+            raise AuthenticationFailed(f"GitHub API error: {str(e)}")
 
 
 class OAuth2Registerer:
-
     @staticmethod
-    def login_user(email, password):
-        user = authenticate(email=email, password=password)
-        if not user:
+    def login_user(email):
+        try:
             user = CustomUser.objects.get(email=email)
+        except CustomUser.DoesNotExist:
+            raise AuthenticationFailed("User not found")
 
         tokens = user.tokens()
-
         return {
             "email": user.email,
             "full_name": user.full_name,
-            "refresh": str(tokens.get("refresh")),
-            "access": str(tokens.get("access")),
+            "refresh": tokens["refresh"],
+            "access": tokens["access"],
         }
 
     @staticmethod
     def register_user(provider, email, username, first_name, last_name):
-        user = CustomUser.objects.filter(email=email)
-
-        if user.exists():
-            if provider == user[0].auth_provider:
-                return OAuth2Registerer.login_user(email, settings.SOCIAL_AUTH_PASSWORD)
-
-            else:
+        try:
+            user = CustomUser.objects.get(email=email)
+            if user.auth_provider != provider:
                 raise AuthenticationFailed(
-                    detail="Please continue your login using " + user[0].auth_provider,
+                    detail=f"Please continue with {user.auth_provider}",
                     code=403,
                 )
-
-        else:
-            new_user = {
-                "email": email,
-                "username": username,
-                "first_name": first_name,
-                "last_name": last_name,
-                "auth_provider": provider,
-            }
-
-            registered_user = CustomUser.objects.create_user(**new_user)
-            registered_user.auth_provider = provider
-            registered_user.is_verified = True
-
-            registered_user.save()
-
-            return OAuth2Registerer.login_user(
-                email=registered_user.email, password=settings.SOCIAL_AUTH_PASSWORD
+            return OAuth2Registerer.login_user(email)
+        except CustomUser.DoesNotExist:
+            new_user = CustomUser.objects.create_user(
+                email=email,
+                username=username,
+                first_name=first_name,
+                last_name=last_name,
+                auth_provider=provider,
+                password=None,
             )
+            new_user.is_verified = True
+            new_user.save()
+            return OAuth2Registerer.login_user(email)

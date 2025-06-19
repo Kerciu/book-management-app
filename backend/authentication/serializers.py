@@ -1,7 +1,5 @@
-from django.conf import settings
 from django.contrib.auth import authenticate
 
-# from django.contrib.auth.password_validation import validate_password
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from django.utils.encoding import force_str
 from django.utils.http import urlsafe_base64_decode
@@ -163,22 +161,20 @@ class LogoutUserSerializer(serializers.Serializer):
 
 
 class GoogleSignInSerializer(serializers.Serializer):
-    access_token = serializers.CharField(min_length=6)
+    id_token = serializers.CharField(min_length=6)
 
-    def validate_access_token(self, access_token):
-        google_user_data = GoogleAuth.validate(access_token)
+    def validate(self, attrs):
+        id_token = attrs.get("id_token")
+        google_user_data = GoogleAuth.validate(id_token)
 
-        if not isinstance(google_user_data, dict):
+        if not google_user_data:
             raise serializers.ValidationError("This token is invalid or has expired")
 
-        if google_user_data["aud"] != settings.GOOGLE_CLIENT_ID:
-            raise AuthenticationFailed(detail="Could not authenticate user", code=401)
-
-        email = google_user_data["email"]
-        first_name = google_user_data["given_name"]
-        last_name = google_user_data["family_name"]
+        email = google_user_data.get("email")
+        first_name = google_user_data.get("given_name", "")
+        last_name = google_user_data.get("family_name", "")
         provider = "google"
-        username = google_user_data["sub"]
+        username = google_user_data.get("sub", email.split("@")[0])
 
         return OAuth2Registerer.register_user(
             provider=provider,
@@ -190,34 +186,30 @@ class GoogleSignInSerializer(serializers.Serializer):
 
 
 class GithubSignInSerializer(serializers.Serializer):
-    code = serializers.CharField(min_length=2)
+    code = serializers.CharField(min_length=10)
 
     def validate_code(self, code):
-        access_token = GithubAuth.exchange_code_for_token(code)
-        if access_token is None:
-            raise serializers.ValidationError("This token is invalid or has expired")
+        try:
+            access_token = GithubAuth.exchange_code_for_token(code)
+            user_info = GithubAuth.retrieve_user_info(access_token)
 
-        user_info = GithubAuth.retrieve_user_info(access_token)
+            email = user_info["email"]
+            username = user_info["login"]
 
-        email = user_info.get("email")
-        if not email:
-            raise serializers.ValidationError("Email is required for registration")
-
-        username = user_info.get("login")
-        provider = "github"
-
-        full_name = user_info.get("name", "")
-        if full_name:
-            name_parts = full_name.split(" ", 1)
-            first_name = name_parts[0]
+            full_name = user_info.get("name", "")
+            name_parts = full_name.split(" ", 1) if full_name else []
+            first_name = name_parts[0] if name_parts else ""
             last_name = name_parts[1] if len(name_parts) > 1 else ""
-        else:
-            first_name = last_name = ""
 
-        return OAuth2Registerer.register_user(
-            provider=provider,
-            email=email,
-            username=username,
-            first_name=first_name,
-            last_name=last_name,
-        )
+            return OAuth2Registerer.register_user(
+                provider="github",
+                email=email,
+                username=username,
+                first_name=first_name,
+                last_name=last_name,
+            )
+
+        except AuthenticationFailed as e:
+            raise serializers.ValidationError(str(e.detail))
+        except Exception as e:
+            raise serializers.ValidationError(f"Authentication failed: {str(e)}")
