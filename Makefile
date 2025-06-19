@@ -22,6 +22,8 @@ init:
 	# docker compose exec backend python manage.py migrate recommend
 	docker compose exec backend python manage.py makemigrations review
 	docker compose exec backend python manage.py migrate review
+	docker compose exec backend python manage.py makemigrations social
+	docker compose exec backend python manage.py migrate social
 	make makemigrations
 	make migrate
 
@@ -61,3 +63,27 @@ backend_logs:
 
 createsuperuser:
 	docker compose exec backend python manage.py createsuperuser
+
+runmigrations:
+	docker compose exec backend python manage.py makemigrations authentication
+	docker compose exec backend python manage.py migrate authentication
+	docker compose exec backend python manage.py makemigrations book
+	docker compose exec backend python manage.py migrate book
+	docker compose exec backend python manage.py makemigrations shelf
+	docker compose exec backend python manage.py migrate shelf
+	docker compose exec backend python manage.py makemigrations admin
+	docker compose exec backend python manage.py migrate admin
+	docker compose exec backend python manage.py makemigrations token_blacklist
+	docker compose exec backend python manage.py migrate token_blacklist
+	docker compose exec backend python manage.py makemigrations sessions
+	docker compose exec backend python manage.py migrate sessions
+	docker compose exec backend python manage.py makemigrations sites
+	docker compose exec backend python manage.py migrate sites
+	docker compose exec backend python manage.py makemigrations notification
+	docker compose exec backend python manage.py migrate notification
+	docker compose exec backend python manage.py makemigrations review
+	docker compose exec backend python manage.py migrate review
+	docker compose exec backend python manage.py makemigrations social
+	docker compose exec backend python manage.py migrate social
+	make makemigrations
+	make migrate
