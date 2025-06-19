@@ -186,34 +186,30 @@ class GoogleSignInSerializer(serializers.Serializer):
 
 
 class GithubSignInSerializer(serializers.Serializer):
-    code = serializers.CharField(min_length=2)
+    code = serializers.CharField(min_length=10)
 
     def validate_code(self, code):
-        access_token = GithubAuth.exchange_code_for_token(code)
-        if access_token is None:
-            raise serializers.ValidationError("This token is invalid or has expired")
+        try:
+            access_token = GithubAuth.exchange_code_for_token(code)
+            user_info = GithubAuth.retrieve_user_info(access_token)
 
-        user_info = GithubAuth.retrieve_user_info(access_token)
+            email = user_info["email"]
+            username = user_info["login"]
 
-        email = user_info.get("email")
-        if not email:
-            raise serializers.ValidationError("Email is required for registration")
-
-        username = user_info.get("login")
-        provider = "github"
-
-        full_name = user_info.get("name", "")
-        if full_name:
-            name_parts = full_name.split(" ", 1)
-            first_name = name_parts[0]
+            full_name = user_info.get("name", "")
+            name_parts = full_name.split(" ", 1) if full_name else []
+            first_name = name_parts[0] if name_parts else ""
             last_name = name_parts[1] if len(name_parts) > 1 else ""
-        else:
-            first_name = last_name = ""
 
-        return OAuth2Registerer.register_user(
-            provider=provider,
-            email=email,
-            username=username,
-            first_name=first_name,
-            last_name=last_name,
-        )
+            return OAuth2Registerer.register_user(
+                provider="github",
+                email=email,
+                username=username,
+                first_name=first_name,
+                last_name=last_name,
+            )
+
+        except AuthenticationFailed as e:
+            raise serializers.ValidationError(str(e.detail))
+        except Exception as e:
+            raise serializers.ValidationError(f"Authentication failed: {str(e)}")

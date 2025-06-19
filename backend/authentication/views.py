@@ -237,17 +237,13 @@ class GoogleSignInView(GenericAPIView):
 
 
 class GithubSignInView(GenericAPIView):
-
     serializer_class = GithubSignInSerializer
     permission_classes = [AllowAny]
 
     def post(self, request):
         serializer = self.serializer_class(data=request.data)
-        if serializer.is_valid(raise_exception=True):
-            data = (serializer.validated_data)["code"]
-            return Response(data, status=status.HTTP_200_OK)
-
-        return Response(data=serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        serializer.is_valid(raise_exception=True)
+        return Response(serializer.validated_data, status=status.HTTP_200_OK)
 
 
 class GithubLoginCallbackView(GenericAPIView):
@@ -263,8 +259,5 @@ class GithubLoginCallbackView(GenericAPIView):
             )
 
         serializer = self.serializer_class(data={"code": code})
-        if serializer.is_valid(raise_exception=True):
-            data = (serializer.validated_data)["code"]
-            return Response(data, status=status.HTTP_200_OK)
-
-        return Response(data=serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        serializer.is_valid(raise_exception=True)
+        return Response(serializer.validated_data, status=status.HTTP_200_OK)

@@ -44,28 +44,63 @@ class GithubAuth:
             "code": code,
         }
 
-        res = requests.post(
-            settings.GITHUB_TOKEN_URL,
-            data=param_payload,
-            headers={"Accept": "application/json"},
-        )
+        try:
 
-        payload = res.json()
-        return payload.get("access_token")
+            res = api_requests.post(
+                settings.GITHUB_TOKEN_URL,
+                data=param_payload,
+                headers={"Accept": "application/json"},
+            )
+
+            if res.status_code != 200:
+                raise AuthenticationFailed(f"GitHub token exchange failed: {res.text}")
+
+            payload = res.json()
+            token = payload.get("access_token")
+            if not token:
+                raise AuthenticationFailed(f"GitHub token missing: {payload}")
+
+            return token
+
+        except Exception as e:
+            raise AuthenticationFailed(f"GitHub authentication failed: {str(e)}")
 
     @staticmethod
     def retrieve_user_info(access_token):
-        headers = {
-            "Authorization": f"Bearer {access_token}",
-        }
+        headers = {"Authorization": f"Bearer {access_token}"}
 
         try:
-            res = api_requests.get(settings.GITHUB_USER_URL, headers=headers)
+            user_res = api_requests.get("https://api.github.com/user", headers=headers)
+            if user_res.status_code != 200:
+                raise AuthenticationFailed(
+                    f"""
+                    Failed to fetch user data: {user_res.status_code} - {user_res.text}
+                """
+                )
 
-            return res.json()
+            user_data = user_res.json()
+            username = user_data.get("login", "githubuser")
+
+            email_res = api_requests.get(
+                "https://api.github.com/user/emails", headers=headers
+            )
+            email_data = email_res.json() if email_res.status_code == 200 else []
+
+            primary_email = None
+            for email_info in email_data:
+                if email_info.get("primary") and email_info.get("verified"):
+                    primary_email = email_info["email"]
+                    break
+
+            if primary_email:
+                user_data["email"] = primary_email
+            else:
+                user_data["email"] = f"{username}@users.noreply.github.com"
+
+            return user_data
 
         except Exception as e:
-            return AuthenticationFailed("Token is invalid or has expired", str(e))
+            raise AuthenticationFailed(f"GitHub API error: {str(e)}")
 
 
 class OAuth2Registerer:

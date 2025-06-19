@@ -6,6 +6,9 @@ from django.core.validators import validate_email
 class UserManager(BaseUserManager):
 
     def email_validator(self, email):
+        if "@users.noreply.github.com" in email:
+            return
+
         try:
             validate_email(email)
         except ValidationError:
