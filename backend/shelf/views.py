@@ -1,7 +1,13 @@
-from rest_framework import viewsets, permissions
+from rest_framework import viewsets, permissions, status
+from rest_framework.decorators import action
+from rest_framework.response import Response
 from rest_framework.exceptions import ValidationError
 from .models import Shelf
-from .serializers import ShelfSerializer
+from .serializers import (
+    ShelfSerializer,
+    AddBookToShelfSerializer,
+    RemoveBookFromShelfSerializer)
+from book.serializers import BookSerializer
 
 
 class ShelfViewSet(viewsets.ModelViewSet):
@@ -21,3 +27,37 @@ class ShelfViewSet(viewsets.ModelViewSet):
         if instance.is_default:
             raise ValidationError("Cannot delete default shelves")
         instance.delete()
+
+    @action(detail=True, methods=["get"])
+    def books(self, request, pk=None):
+        """GET /shelves/{id}/books/ - List books on a shelf"""
+        shelf = self.get_object()
+        books = shelf.books.all()
+        serializer = BookSerializer(books, many=True)
+        return Response(serializer.data)
+
+    @action(detail=True, methods=["post"])
+    def add_book(self, request, pk=None):
+        """POST /shelves/{id}/add_book/ - Add a book to the shelf"""
+        shelf = self.get_object()
+        serializer = AddBookToShelfSerializer(
+            data=request.data, context={'shelf': shelf})
+        serializer.is_valid(raise_exception=True)
+        shelf.books.add(serializer.validated_data['book_id'])
+        return Response({"detail": "Book added to shelf."}, status=status.HTTP_200_OK)
+
+    @action(detail=True, methods=["post"])
+    def remove_book(self, request, pk=None):
+        """POST /shelves/{id}/remove_book/ - Remove a book from the shelf"""
+        shelf = self.get_object()
+        serializer = RemoveBookFromShelfSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        book = serializer.validated_data['book_id']
+
+        if not shelf.books.filter(id=book.id).exists():
+            return Response(
+                {"detail": "Book not in shelf."}, status=status.HTTP_400_BAD_REQUEST)
+
+        shelf.books.remove(book)
+        return Response(
+            {"detail": "Book removed from shelf."}, status=status.HTTP_200_OK)
