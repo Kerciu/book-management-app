@@ -67,7 +67,7 @@ class FriendshipRequest(models.Model):
         self.save()
 
     def __str__(self):
-        return f"Friend request: {self.from_user.username} → {self.to_user.username}"
+        return f"Friend request: {self.from_user.username} -> {self.to_user.username}"
 
 
 class Friendship(models.Model):
@@ -98,7 +98,7 @@ class Friendship(models.Model):
         ]
 
     def __str__(self):
-        return f"Friendship: {self.user1.username} ↔ {self.user2.username}"
+        return f"Friendship: {self.user1.username} - {self.user2.username}"
 
     @classmethod
     def are_friends(cls, user1, user2) -> bool:
