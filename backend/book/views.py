@@ -23,7 +23,7 @@ class IsAdminOrReadOnly(BasePermission):
         if request.method in SAFE_METHODS:
             return True
 
-        return True
+        return request.user and request.user.is_staff ### ? to powinno byc tak @Kacper
 
 
 class BookViewSet(viewsets.ModelViewSet):
@@ -33,7 +33,7 @@ class BookViewSet(viewsets.ModelViewSet):
         "genres",
     )
     serializer_class = BookSerializer
-    permission_classes = []  # [IsAdminOrReadOnly]
+    permission_classes = [IsAdminOrReadOnly]
 
     throttle_scope = "books"
 
@@ -71,19 +71,19 @@ class BookViewSet(viewsets.ModelViewSet):
 class AuthorViewSet(viewsets.ModelViewSet):
     queryset = Author.objects.all()
     serializer_class = AuthorSerializer
-    permission_classes = []  # [IsAdminOrReadOnly]
+    permission_classes = [IsAdminOrReadOnly]
 
 
 class PublisherViewSet(viewsets.ModelViewSet):
     queryset = Publisher.objects.all()
     serializer_class = PublisherSerializer
-    permission_classes = []  # [IsAdminOrReadOnly]
+    permission_classes = [IsAdminOrReadOnly]
 
 
 class GenreViewSet(viewsets.ModelViewSet):
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
-    permission_classes = []  # [IsAdminOrReadOnly]
+    permission_classes = [IsAdminOrReadOnly]
     filterset_class = GenreFilter
 
     def destroy(self, request, *args, **kwargs):
