@@ -1,6 +1,7 @@
 use leptos::prelude::*;
 use log::Level;
 use serde::Deserialize;
+use serde::Serialize;
 
 use crate::components::{handle_request, send_delete_request, send_get_request, send_post_request};
 
@@ -24,6 +25,11 @@ impl Review {
     pub fn id(&self) -> usize {
         self.id
     }
+}
+
+#[derive(Serialize, Default, Debug, Clone)]
+struct CommentPostRequest {
+    text: String,
 }
 
 #[allow(dead_code, reason="Faithful representation of endpoint data")]
@@ -57,6 +63,10 @@ struct LikeData {
 async fn get_comments(review_id: usize) -> anyhow::Result<CommentResponse> {
     let endpoint = format!("/api/review/reviews/{review_id}/comments/");
     send_get_request(&endpoint).await
+}
+
+async fn post_comment((review_id, data): (usize, CommentPostRequest)){
+
 }
 
 async fn like_review(LikeData { book_id, review_id , refetch_handle}: LikeData) {
@@ -107,6 +117,12 @@ pub fn review(book_id: Signal<usize>, data: Signal<Review>, refetch_handle: Sign
     let likes = move || data().likes_count;
     let review_id = move || data().id;
 
+    let comment_text = RwSignal::new(String::new());
+    let send_request = handle_request(&post_comment);
+    let request =  move || CommentPostRequest {
+        text: comment_text(),
+    };
+
     let do_like = handle_request(&like_review);
     let do_dislike = handle_request(&dislike_review);
 
@@ -154,14 +170,18 @@ pub fn review(book_id: Signal<usize>, data: Signal<Review>, refetch_handle: Sign
 
             </div>
             //Coments section
+            
             //Write comment
             <div style="display: flex;   flex-direction: row; align-items:center; margin-left:0px;">
                 <textarea placeholder="Write comment..." 
                     class="styled-textarea"
                     style="width:60%; margin-top:20px; resize: vertical; min-height: 40px; overflow-wrap: break-word;"
-                    oninput="this.style.height = ''; this.style.height = this.scrollHeight + 'px'">
+                    oninput="this.style.height = ''; this.style.height = this.scrollHeight + 'px'"
+                    bind:value=comment_text>
                 </textarea>
-                <button class="btn-small" style="margin-left:10px; text-align: start; width:fit-content;  margin-top: 0px;">"Write"</button>
+                <button class="btn-small" style="margin-left:10px; text-align: start; width:fit-content;  margin-top: 0px;" on:click=move |_| { 
+                    send_request.dispatch((review_id(), request()));
+                }>"Write"</button>
             </div>
             //Coments
             <For

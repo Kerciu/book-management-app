@@ -1,4 +1,4 @@
-use crate::components::{BookList, FriendList, BookReccomendationList};
+use crate::components::{BookList, FriendList, BookReccomendationList, ShelvesList};
 use leptos::html::*;
 use leptos::prelude::*;
 use leptos::*;

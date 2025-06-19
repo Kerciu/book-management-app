@@ -38,16 +38,47 @@ pub fn review_input(book_id: impl Fn() -> usize + 'static) -> impl IntoView {
     let send_request = handle_request(&post);
 
     view! {
-        <button on:click=move |_| rating(1)>"1"</button>
-        <button on:click=move |_| rating(2)>"2"</button>
-        <button on:click=move |_| rating(3)>"3"</button>
-        <button on:click=move |_| rating(4)>"4"</button>
-        <button on:click=move |_| rating(5)>"5"</button>
-        <input type="checkbox" bind:value=has_spoilers id="spoilers"/>
-        <label for="spoilers">"Has spoilers?"</label>
-        <input type="checkbox" bind:value=is_public id="public"/>
-        <label for="public">"Is public?"</label>
-        <textarea bind:value=text />
-        <button on:click=move |_| { send_request.dispatch((book_id(), request())); }>"Submit"</button>
+        <div style="display: flex;   flex-direction: row; align-items:center; margin-left:20px;">
+            <div class="rating" style="align-items: center;">
+                <input value="5" name="rating" id="star5" type="radio"
+                    on:change=move |_| rating(5)></input>
+                <label for="star5"></label>
+                <input value="4" name="rating" id="star4" type="radio"
+                    on:change=move |_| rating(4)></input>
+                <label for="star4"></label>
+                <input value="3" name="rating" id="star3" type="radio"
+                    on:change=move |_| rating(3)></input>
+                <label for="star3"></label>
+                <input value="2" name="rating" id="star2" type="radio"
+                    on:change=move |_| rating(2)></input>
+                <label for="star2"></label>
+                <input value="1" name="rating" id="star1" type="radio"
+                    on:change=move |_| rating(1)></input>
+                <label for="star1"></label>
+            </div>
+            <label for="spoilers" style="display: flex; align-items: center;  margin-left:20px; margin-top:5px;">"Has spoilers:"</label>
+            <label class="container-checkbox" style="margin-top:5px; margin-left:10px;">
+                <input type="checkbox"
+                    bind:value=has_spoilers id="spoilers"></input>
+                <div class="checkmark"></div>
+            </label>
+            <label for="public" style="display: flex; align-items: center;  margin-left:20px; margin-top:5px;">"Is public:"</label>
+            <label class="container-checkbox" style="margin-top:5px; margin-left:10px;">
+                <input type="checkbox"
+                    bind:value=is_public id="public"></input>
+                <div class="checkmark"></div>
+            </label>
+            <button class="btn-small" style="margin-left:10px; text-align: start; width:fit-content;  margin-top: 5px; margin-left:20px;" on:click=move |_| { 
+                send_request.dispatch((book_id(), request())); 
+            }>"Submit"</button>
+        </div>
+        <div style="display: flex;   flex-direction: row; align-items:center; margin-left:20px;">
+            <textarea placeholder="Write comment..." 
+                class="styled-textarea"
+                style="width:800px; margin-top:20px; resize: vertical; min-height: 40px; overflow-wrap: break-word;"
+                oninput="this.style.height = ''; this.style.height = this.scrollHeight + 'px'"
+                bind:value=text>
+            </textarea>
+        </div>
     }
 }
