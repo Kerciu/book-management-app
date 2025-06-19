@@ -6,24 +6,26 @@ mod friends_list;
 mod github_auth;
 mod google_auth;
 mod login_form;
-mod registraction_form;
 mod recommendation_list;
+mod registraction_form;
 mod review;
 mod review_input;
 mod review_list;
 mod shelves_list;
 
 pub use book_details::BookDetails;
-pub use book_list::{BookList, get_example_book};
+pub use book_list::BookList;
 pub use email_verify_form::EmailVerificationForm;
 pub use friends_list::FriendList;
 pub use github_auth::{GithubAuthButton, GithubAuthHandler};
 pub use login_form::LoginForm;
-pub use registraction_form::RegistractionForm;
 pub use recommendation_list::BookReccomendationList;
-pub use review_list::ReviewList;
+pub use registraction_form::RegistractionForm;
 pub use review_input::ReviewInput;
+pub use review_list::ReviewList;
 pub use shelves_list::ShelvesList;
+pub use shelves_list::ShelfSelect;
+pub use google_auth::GoogleAuthHandler;
 
 use crate::{BACKEND, auth};
 use gloo_net::http::{Request, Response};
@@ -38,7 +40,16 @@ async fn send_post_request(
     let endpoint = format!("{BACKEND}{endpoint}");
     let body = serde_json::to_string(&data)?;
     let mut request = Request::post(&endpoint).header("Content-Type", "application/json");
-    if let Some(token) = use_context::<auth::Token>() {
+    if let Some(Some(token)) = use_context::<Option<auth::Token>>() {
+        request = request.header("Authorization", &format!("Bearer {}", &token as &str))
+    } else if let Some(token) = web_sys::window()
+        .unwrap()
+        .local_storage()
+        .unwrap()
+        .unwrap()
+        .get_item("access_token")
+        .unwrap()
+    {
         request = request.header("Authorization", &format!("Bearer {}", &token as &str))
     }
     let response = request.body(body)?.send().await?;
@@ -48,7 +59,16 @@ async fn send_post_request(
 async fn send_delete_request(endpoint: &str) -> anyhow::Result<()> {
     let endpoint = format!("{BACKEND}{endpoint}");
     let mut request = Request::delete(&endpoint).header("Content-Type", "application/json");
-    if let Some(token) = use_context::<auth::Token>() {
+    if let Some(Some(token)) = use_context::<Option<auth::Token>>() {
+        request = request.header("Authorization", &format!("Bearer {}", &token as &str))
+    } else if let Some(token) = web_sys::window()
+        .unwrap()
+        .local_storage()
+        .unwrap()
+        .unwrap()
+        .get_item("access_token")
+        .unwrap()
+    {
         request = request.header("Authorization", &format!("Bearer {}", &token as &str))
     }
     let _ = request.send().await?;
@@ -61,7 +81,16 @@ where
 {
     let endpoint = format!("{BACKEND}{endpoint}");
     let mut request = Request::get(&endpoint).header("Content-Type", "application/json");
-    if let Some(token) = use_context::<auth::Token>() {
+    if let Some(Some(token)) = use_context::<Option<auth::Token>>() {
+        request = request.header("Authorization", &format!("Bearer {}", &token as &str))
+    } else if let Some(token) = web_sys::window()
+        .unwrap()
+        .local_storage()
+        .unwrap()
+        .unwrap()
+        .get_item("access_token")
+        .unwrap()
+    {
         request = request.header("Authorization", &format!("Bearer {}", &token as &str))
     }
     let response = request.send().await?;

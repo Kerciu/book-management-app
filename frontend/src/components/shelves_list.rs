@@ -1,8 +1,9 @@
 use leptos::prelude::*;
+use leptos_router::hooks::{use_navigate, use_params, use_params_map};
 use serde::Deserialize;
 use serde_json::json;
 use anyhow::anyhow;
-use crate::components::{book_list::Book, send_get_request, send_post_request};
+use crate::components::{book_list::Book, handle_request, send_get_request, send_post_request};
 use log::Level;
 
 #[derive(Debug, Default, Deserialize, Clone)]
@@ -37,9 +38,9 @@ async fn get_shelves() -> anyhow::Result<Vec<Shelf>> {
     Ok(ret.into_iter().map(|ShelvesResponse {results, ..}| results).flatten().collect())
 }
 
-async fn put_book_in_shelf(book_id: usize, shelf_id: usize) -> anyhow::Result<()> {
-    let endpoint= format!("/api/shelf/shelves/{shelf_id}/add_book");
-    let request = json!({"id": book_id});
+pub async fn put_book_in_shelf((book_id, shelf_id): (usize, usize)) -> anyhow::Result<()> {
+    let endpoint= format!("/api/shelf/shelves/{shelf_id}/add_book/");
+    let request = json!({"book_id": book_id});
 
     let response = send_post_request(request, &endpoint).await?;
 
@@ -49,8 +50,8 @@ async fn put_book_in_shelf(book_id: usize, shelf_id: usize) -> anyhow::Result<()
         Err(anyhow!(response.text().await?))
     }
 }
-async fn remove_book_from_shelf(book_id: usize, shelf_id: usize) -> anyhow::Result<()> {
-    let endpoint= format!("/api/shelf/shelves/{shelf_id}/remove_book");
+pub async fn remove_book_from_shelf(book_id: usize, shelf_id: usize) -> anyhow::Result<()> {
+    let endpoint= format!("/api/shelf/shelves/{shelf_id}/remove_book/");
     let request = json!({"id": book_id});
 
     let response = send_post_request(request, &endpoint).await?;
@@ -63,14 +64,61 @@ async fn remove_book_from_shelf(book_id: usize, shelf_id: usize) -> anyhow::Resu
 }
 
 async fn get_books_from_shelf(shelf_id: usize) -> anyhow::Result<Vec<Book>> {
-    let endpoint = format!("/api/shelf/shelves/{shelf_id}/books");
+    let endpoint = format!("/api/shelf/shelves/{shelf_id}/books/");
     return send_get_request(&endpoint).await;
 }
 
 #[component]
 pub fn shelves_list() -> impl IntoView {
+    let shelves = LocalResource::new(move || get_shelves());
+    let shelves = move || match &*shelves.read() {
+        Some(Ok(res)) => res.clone(),
+        // TODO: Error handling
+        _ => Default::default(),
+    };
 
+    let (shelf_id, set_shelf_id) = signal(None);
+
+    view! {
+        <For
+            each=move || shelves()
+            key=|shelf| shelf.id
+            children=move |shelf| {
+                view! {
+                    <button on:click=move |_| set_shelf_id(Some(shelf.id))></button>
+                }
+            }
+        />
+        {move || shelf_id().map(|id| view! { <ShelfBookList shelf_id=id.into() />})}
+    }
 }
+
+#[component]
+pub fn shelf_select() -> impl IntoView {
+    let navigate = use_navigate();
+    let book_id = move || use_params_map().read().get("book_id").unwrap().parse::<usize>().unwrap();
+    let shelves = LocalResource::new(move || get_shelves());
+    let shelves = move || match &*shelves.read() {
+        Some(Ok(res)) => res.clone(),
+        // TODO: Error handling
+        _ => Default::default(),
+    };
+    let shelves = move || shelves().into_iter().map(move |s| (book_id(), s));
+    let action = handle_request(&put_book_in_shelf);
+
+    view! {
+        <For
+            each=move || shelves()
+            key=|(_, shelf)| shelf.id
+            children=move |(book_id, shelf)| {
+                let navigate = navigate.clone();
+                view! {
+                    <button on:click=move |_| { action.dispatch((book_id, shelf.id.clone())); navigate("/main", Default::default()); }>{move || shelf.name.clone()}</button>
+                }
+            }
+        />
+    }
+} 
 
 #[component]
 pub fn shelf_book_list(shelf_id: Signal<usize>) -> impl IntoView {

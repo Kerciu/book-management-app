@@ -1,4 +1,4 @@
-use crate::auth;
+use crate::auth::{self, Token};
 use anyhow::anyhow;
 use leptos::prelude::*;
 use leptos_router::hooks::{use_navigate, use_query};
@@ -30,6 +30,7 @@ pub fn github_auth_button() -> impl IntoView {
 }
 
 async fn post(code: String) -> anyhow::Result<AuthResponse> {
+    provide_context::<Option<Token>>(None);
     let res = send_post_request(AuthRequest { code }, "/api/auth/github-auth/")
         .await?;
     if !res.ok() {
@@ -65,7 +66,7 @@ pub fn github_auth_handler() -> impl IntoView {
 
     let code = LocalResource::new(move || post(code().unwrap_or_default()));
     Effect::new(move || if let Some(Ok(AuthResponse { code })) = &*code.read() {
-        provide_context(auth::github::Token::new(code.clone()));
+        provide_context(Some(auth::github::Token::new(code.clone())));
         use_navigate()("/books/list", Default::default());
     });
     Effect::new(move || log::log!(Level::Debug, "{:?}", use_context::<auth::github::Token>()));

@@ -65,8 +65,10 @@ async fn get_comments(review_id: usize) -> anyhow::Result<CommentResponse> {
     send_get_request(&endpoint).await
 }
 
-async fn post_comment((review_id, data): (usize, CommentPostRequest)){
-
+async fn post_comment((review_id, data): (usize, CommentPostRequest)) -> anyhow::Result<()> {
+    let endpoint = format!("/api/review/reviews/{review_id}/comments/");
+    let _ = send_post_request(data, &endpoint).await?;
+    Ok(())
 }
 
 async fn like_review(LikeData { book_id, review_id , refetch_handle}: LikeData) {
