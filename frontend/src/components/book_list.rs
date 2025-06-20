@@ -78,12 +78,13 @@ fn get_shelves_list(book_id: usize, set_show_shelves: WriteSignal<bool>) -> impl
             key=|shelf| shelf.id
             children=move |shelf| {
                 view! {
-                    <div class="title-text" on:click=move |ev| {
+                    <div class="title-text" style="font-size:20px;" on:click=move |ev| {
                     ev.stop_propagation();
                     action.dispatch((book_id, shelf.id));
 
                     set_show_shelves.set(false);
                     }>{shelf.name}</div>
+                    <div class="divider-horizontal" style="margin-bottom:5px; margin-top:5px;"></div>
 
                  }
             }
@@ -127,7 +128,10 @@ pub fn book_info(book: Book, is_library: bool, #[prop(optional)] refetch: Signal
                     style="margin-top: 20px; padding-bottom:20px; height: 316px; object-fit: cover; width: auto; object-fit: contain; " >
                 </img>
                 <div class="book-details">
-                    <h4 style = "max-width: 400px;     word-wrap: break-word; overflow-wrap: break-word;"><a href=format!("/books/details/{id}")>{title}</a></h4>
+                    <h4 style = "max-width: 400px;     word-wrap: break-word; overflow-wrap: break-word;"><a 
+                    href=format!("/books/details/{id}")
+                    style="color: inherit; text-decoration: none;"
+                    >{title}</a></h4>
                     <p style = "max-width: 400px;     word-wrap: break-word; overflow-wrap: break-word;">"by "{authors}</p>
                     <p style = "max-width: 400px;     word-wrap: break-word; overflow-wrap: break-word;">{format!("Published: {}", published_at)}</p>
                     <div class="body-text" style="color: #FFFFFF; margin-left:0px; font-size: 20px; margin-top:10px;">
