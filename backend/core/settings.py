@@ -149,11 +149,26 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
     "http://127.0.0.1:3000",
     "http://0.0.0.0:3000",
+    "http://localhost:8080",
+    "http://127.0.0.1:8080",
+    "http://0.0.0.0:8080",
+    "ws://localhost:8080",
+    "ws://0.0.0.0:8080",
+    "ws://localhost:3000",
+    "ws://0.0.0.0:3000",
 ]
 
 CSRF_TRUSTED_ORIGINS = [
     "ws://localhost:3000",
     "ws://0.0.0.0:3000",
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
+    "http://0.0.0.0:3000",
+    "ws://localhost:8080",
+    "ws://0.0.0.0:8080",
+    "http://localhost:8080",
+    "http://127.0.0.1:8080",
+    "http://0.0.0.0:8080",
 ]
 
 # REST Framework settings
@@ -176,10 +191,7 @@ REST_FRAMEWORK = {
         "rest_framework.filters.SearchFilter",
         "rest_framework.filters.OrderingFilter",
     ],
-    "DEFAULT_THROTTLE_RATES": {
-        "anon": "100/hour",
-        "comment_create": "100/hour"
-    },
+    "DEFAULT_THROTTLE_RATES": {"anon": "100/hour", "comment_create": "100/hour"},
 }
 
 SIMPLE_JWT = {
