@@ -3,7 +3,6 @@ use leptos::{prelude::*, tachys::view::error_boundary};
 use leptos_router::hooks::use_navigate;
 use log::Level;
 use serde::Serialize;
-
 use super::send_post_request;
 
 #[derive(Serialize, Clone, Copy, Default)]

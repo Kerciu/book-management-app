@@ -7,6 +7,7 @@ use serde::Deserialize;
 use crate::components::{handle_request, shelves_list::remove_book_from_shelf};
 
 use super::send_get_request;
+use crate::components::{get_shelves, Shelf, put_book_in_shelf};
 use serde::Serialize;
 
 #[allow(dead_code, reason = "Faithful representation of endpoint data")]
@@ -58,44 +59,35 @@ async fn get(request: String) -> anyhow::Result<BookResponse> {
     let res = send_get_request(&request).await?;
     Ok(res)
 }
-/// tempo
+//
 
-#[derive(Debug, Clone)]
-struct Shelf {
-    id: usize,
-    user: usize,
-    name: String,
-    is_default: bool,
-    shelf_type: String,
-}
 
-fn generate_example_shelves() -> Vec<Shelf> {
-
-    (1..=50)
-        .map(|i| Shelf {
-            id: i,
-            user: i % 10 + 1, // Just cycle user ids from 1 to 10
-            name: format!("Shelf {}", i),
-            is_default: i % 10 == 0, // Every 10th shelf is default
-            shelf_type: if i % 2 == 0 { "custom".to_string() } else { "default".to_string() },
-        })
-        .collect()
-}
 
 #[component]
 fn get_shelves_list(book_id: usize, set_show_shelves: WriteSignal<bool>) -> impl IntoView {
-    let shelves = generate_example_shelves();
-    view!{
-        {shelves.into_iter()
-            .map(|shelve| view!{
-                <div class="title-text" on:click=move |ev| {
+    let shelves = LocalResource::new(move || get_shelves());
+    let shelves = move || match &*shelves.read() {
+        Some(Ok(res)) => res.clone(),
+        _ => Default::default(),
+    };
+    let action = handle_request(&put_book_in_shelf);
+
+    view! {
+        <For
+            each=move || shelves()
+            key=|shelf| shelf.id
+            children=move |shelf| {
+                view! {
+                    <div class="title-text" on:click=move |ev| {
                     ev.stop_propagation();
-                    //put_book_in_shelf(book_id, shelve.id);
+                    action.dispatch((book_id, shelf.id));
+
                     set_show_shelves.set(false);
-                    }>{shelve.name}</div>
-            })
-            .collect_view()
-        }
+                    }>{shelf.name}</div>
+
+                 }
+            }
+        />
     }
 }
 
@@ -125,7 +117,7 @@ pub fn book_info(book: Book, is_library: bool, #[prop(optional)] refetch: Signal
 
     let genres = genres.into_iter().map(|Genre { name }| name).collect_view();
     let delete_book_from_collection = handle_request(&remove_book_from_shelf);
-
+    let (show_shelves, set_show_shelves) = signal(false);
     // TODO: Make costanat variable out of this "100"
     let short_description = description.chars().take(100).collect::<String>();
     view! {
@@ -154,9 +146,22 @@ pub fn book_info(book: Book, is_library: bool, #[prop(optional)] refetch: Signal
                             let navigate_collection = navigate_collection.clone(); 
                             (!is_library).then_some(view! {
                                 <div class="book-actions">
-                                    <button class="btn-small" on:click=move |_| navigate_collection(&format!("/books/select_collection/{id}"), Default::default())>"Add to the collection"</button>
+                                    <button class="btn-small" on:click=move |ev| {
+                                        ev.stop_propagation();
+                                        set_show_shelves(!show_shelves.get());
+                                    }>"Add to the collection"</button>
                                 </div>
-                            })
+                                <div class="shelf-list-container" class:hidden=move || !show_shelves.get()
+                                    style=move || {
+                                    if show_shelves.get() {
+                                        "position: absolute; z-index: 1000; background: #250633; max-height: 200px; overflow-y: auto; transition: max-height 0.3s ease; margin-top: 10px; border: 1px solid #ccc; border-radius: 8px; padding: 10px; width: 250px; box-shadow: 0 4px 12px rgba(0,0,0,0.15);".to_string()
+                                    } else {
+                                        "display: none;".to_string()
+                                    }
+                                }>
+                                        <GetShelvesList book_id=id set_show_shelves=set_show_shelves/>
+                                </div>
+                                })
                         }}
                         {move || is_library.then_some(view!{<div class="book-actions">
                             <button class="btn-small btn-danger" on:click=move |_| { delete_book_from_collection.dispatch((id, shelf_id)); set_timeout(move || refetch(), Duration::from_millis(500));}>"Remove from the collection"</button>
