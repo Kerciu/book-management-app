@@ -32,6 +32,11 @@ class NotificationConsumer(AsyncWebsocketConsumer):
     async def notify(self, event):
         await self.send(text_data=json.dumps(event))
 
+    async def receive(self, text_data):
+        data = json.loads(text_data)
+        if data.get("action") == "mark_read":
+            await self.mark_as_read(data["notification_id"])
+
     @database_sync_to_async
     def mark_as_read(self, notification_id):
         notification = Notification.objects.get(id=notification_id)
