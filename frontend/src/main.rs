@@ -34,11 +34,13 @@ pub fn App() -> impl IntoView {
                 <Route path=path!("/account") view=AccountPage />
                 <Route path=path!("/sign") view=SignPage />
                 <Route path=path!("/verify") view=EmailVerificationForm />
-                <Route path=path!("/books/select_collection/:book_id") view=ShelfSelect />
+                <Route path=path!("/books/select_collection/:id") view=ShelfSelect />
+                <Route path=path!("/books/collections") view=ShelvesList />
             </Routes>
         </Router>
     }
 }
+
 
 fn main() {
     // better error logging

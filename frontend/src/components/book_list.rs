@@ -1,9 +1,11 @@
-use std::{collections::BTreeSet, iter};
+use std::{collections::BTreeSet, iter, time::Duration};
 
 use leptos::prelude::*;
 use leptos_router::hooks::*;
 use log::Level;
 use serde::Deserialize;
+use crate::components::{handle_request, shelves_list::remove_book_from_shelf};
+
 use super::send_get_request;
 use serde::Serialize;
 
@@ -100,7 +102,7 @@ fn get_shelves_list(book_id: usize, set_show_shelves: WriteSignal<bool>) -> impl
 /// 
 
 #[component]
-pub fn book_info(book: Book, is_library: bool) -> impl IntoView {
+pub fn book_info(book: Book, is_library: bool, #[prop(optional)] refetch: Signal<()>, #[prop(optional)] shelf_id: usize) -> impl IntoView {
     let Book {
         cover_image,
         genres,
@@ -122,22 +124,18 @@ pub fn book_info(book: Book, is_library: bool) -> impl IntoView {
         .collect_view();
 
     let genres = genres.into_iter().map(|Genre { name }| name).collect_view();
-    
-    let (show_shelves, set_show_shelves) = signal(false);
-
+    let delete_book_from_collection = handle_request(&remove_book_from_shelf);
 
     // TODO: Make costanat variable out of this "100"
     let short_description = description.chars().take(100).collect::<String>();
     view! {
 
-            <div class="book-item" style="margin-right: 20px; margin-left: 20px;" on:click=move |_| {
-                    navigate(&format!("/books/details/{id}"), Default::default());
-                    }>
-                <img src={cover_image} alt="Description"
+            <div class="book-item" style="margin-right: 20px; margin-left: 20px;">
+                <img src={cover_image} alt="Description" on:click=move |_| {navigate(&format!("/books/details/{id}"), Default::default());}
                     style="margin-top: 20px; padding-bottom:20px; height: 316px; object-fit: cover; width: auto; object-fit: contain; " >
                 </img>
                 <div class="book-details">
-                    <h4 style = "max-width: 400px;     word-wrap: break-word; overflow-wrap: break-word;">{title}</h4>
+                    <h4 style = "max-width: 400px;     word-wrap: break-word; overflow-wrap: break-word;"><a href=format!("/books/details/{id}")>{title}</a></h4>
                     <p style = "max-width: 400px;     word-wrap: break-word; overflow-wrap: break-word;">"by "{authors}</p>
                     <p style = "max-width: 400px;     word-wrap: break-word; overflow-wrap: break-word;">{format!("Published: {}", published_at)}</p>
                     <div class="body-text" style="color: #FFFFFF; margin-left:0px; font-size: 20px; margin-top:10px;">
@@ -161,7 +159,7 @@ pub fn book_info(book: Book, is_library: bool) -> impl IntoView {
                             })
                         }}
                         {move || is_library.then_some(view!{<div class="book-actions">
-                            <button class="btn-small btn-danger">"Remove from the collection"</button>
+                            <button class="btn-small btn-danger" on:click=move |_| { delete_book_from_collection.dispatch((id, shelf_id)); set_timeout(move || refetch(), Duration::from_secs(1));}>"Remove from the collection"</button>
                         </div>})}
                 </div>
             </div>

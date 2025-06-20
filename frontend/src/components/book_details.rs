@@ -94,6 +94,8 @@ pub fn book_details(id: impl Fn() -> usize + Send + Sync + Copy + 'static) -> im
             .collect_view()
     };
 
+    let rerun= RwSignal::new(false);
+
     view! {
         <div class="container-flex-row" style="padding: 0px;">
             <div>
@@ -119,13 +121,13 @@ pub fn book_details(id: impl Fn() -> usize + Send + Sync + Copy + 'static) -> im
                 <div class="test-book-description" style = "max-width: 800px; word-wrap: break-word; overflow-wrap: break-word; margin-left:20px;">
                     {move || book().description}
                 </div>
-                <ReviewInput book_id=id/>
+                <ReviewInput book_id=id refetch=rerun />
 
             </div>
             <div class="divider"></div>
             <div style="flex-grow: 1; margin-right:20px;">
                <div class="text-title" style="color: #FFFFFF; margin-left:0px; margin-top:30px;">"Reviews"</div>
-               <ReviewList book_id=Signal::derive(move || id())/>
+               <ReviewList book_id=Signal::derive(move || id()) refetch=rerun/>
             </div>
         </div>
 

@@ -107,7 +107,7 @@ pub fn login_form() -> impl IntoView {
 
     Effect::new(move || {
         if let LoginResponse::Token(token) = response() {
-            provide_context(token.clone());
+            provide_context(Some(token.clone()));
             let _ = web_sys::window()
                 .unwrap()
                 .local_storage()

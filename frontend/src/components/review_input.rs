@@ -1,4 +1,7 @@
+use std::{default, time::Duration};
+
 use leptos::prelude::*;
+use leptos_router::hooks::use_navigate;
 use serde::Serialize;
 use web_sys::window;
 
@@ -23,7 +26,7 @@ async fn post((book_id, data): (usize, ReviewPostRequest)) -> anyhow::Result<()>
 }
 
 #[component]
-pub fn review_input(book_id: impl Fn() -> usize + 'static) -> impl IntoView {
+pub fn review_input(book_id: impl Fn() -> usize + 'static, refetch: RwSignal<bool>) -> impl IntoView {
     let text = RwSignal::new(String::new());
     let rating = RwSignal::new(0);
     let has_spoilers = RwSignal::new(false);
@@ -37,11 +40,10 @@ pub fn review_input(book_id: impl Fn() -> usize + 'static) -> impl IntoView {
     };
 
     let send_request = handle_request(&post);
+    let navigate = use_navigate();
 
-    let reload = move |ev: leptos::ev::MouseEvent| {
-        if let Some(win) = window() {
-            win.location().reload().unwrap();
-        }
+    let reload = move || {
+        refetch(true);
     };
 
     view! {
@@ -69,15 +71,16 @@ pub fn review_input(book_id: impl Fn() -> usize + 'static) -> impl IntoView {
                     bind:value=has_spoilers id="spoilers"></input>
                 <div class="checkmark"></div>
             </label>
-            <label for="public" style="display: flex; align-items: center;  margin-left:20px; margin-top:5px;">"Is public:"</label>
-            <label class="container-checkbox" style="margin-top:5px; margin-left:10px;">
-                <input type="checkbox"
-                    bind:value=is_public id="public"></input>
-                <div class="checkmark"></div>
-            </label>
-            <button class="btn-small" style="margin-left:10px; text-align: start; width:fit-content;  margin-top: 5px; margin-left:20px;" on:click=move |ev| { 
-                send_request.dispatch((book_id(), request())); 
-                reload(ev);
+            //<label for="public" style="display: flex; align-items: center;  margin-left:20px; margin-top:5px;">"Is public:"</label>
+            // <label class="container-checkbox" style="margin-top:5px; margin-left:10px;">
+            //     <input type="checkbox"
+            //         bind:value=is_public id="public"></input>
+            //     <div class="checkmark"></div>
+            // </label>
+            <button class="btn-small" style="margin-left:10px; text-align: start; width:fit-content;  margin-top: 5px; margin-left:20px;" on:click=move |ev| {
+                let book_id = book_id();
+                send_request.dispatch((book_id, request()));
+                set_timeout(reload, Duration::from_secs(1));
             }>"Submit"</button>
         </div>
         <div style="display: flex;   flex-direction: row; align-items:center; margin-left:20px; padding-bottom:100px;">

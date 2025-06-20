@@ -1,3 +1,5 @@
+use std::time::Duration;
+
 use leptos::prelude::*;
 use log::Level;
 use serde::Deserialize;
@@ -99,7 +101,7 @@ pub fn comment(data: Signal<Comment>) -> impl IntoView {
                 <div style="width:fit-content;">
                     //user name
                     <h4 style="text-align: start; margin-top: 0px; margin-left:10px; font-size: 20px;  margin-bottom: 0px;">{move || data().user}</h4>
-                    <button class="btn-small" style="margin-left:10px; text-align: start; width:fit-content;  margin-top: 3px;">"View Collection"</button>
+                    //<button class="btn-small" style="margin-left:10px; text-align: start; width:fit-content;  margin-top: 3px;">"View Collection"</button>
                 </div>
             </div>
             //comment
@@ -128,8 +130,8 @@ pub fn review(book_id: Signal<usize>, data: Signal<Review>, refetch_handle: Sign
     let do_like = handle_request(&like_review);
     let do_dislike = handle_request(&dislike_review);
 
-    let res = LocalResource::new(move || get_comments(data().id));
-    let res = move || match &*res.read() {
+    let response_handle = LocalResource::new(move || get_comments(data().id));
+    let res = move || match &*response_handle.read() {
         Some(Ok(data)) => Some(data.clone()),
         Some(Err(err)) => {
             log::log!(Level::Error, "{err}");
@@ -140,7 +142,7 @@ pub fn review(book_id: Signal<usize>, data: Signal<Review>, refetch_handle: Sign
 
     let comments = move || res().map(|CommentResponse {results, ..}| results).unwrap_or_default();
 
-
+    let spoils = RwSignal::new(data().has_spoilers);
 
     let initials = move || name().split_whitespace()
         .take(2)
@@ -163,7 +165,7 @@ pub fn review(book_id: Signal<usize>, data: Signal<Review>, refetch_handle: Sign
                 </div>
                 <label for="spoilers" style="display: flex; align-items: center;  margin-left:20px; margin-top:5px;">"Has spoilers:"</label>
                 <label class="container-checkbox" style="margin-top:5px; margin-left:20px;">
-                    <input type="checkbox" checked disabled id="spoilers" />
+                    <input type="checkbox" bind:checked=spoils disabled id="spoilers" />
                     <div class="checkmark"></div>
                 </label>
             </div>
@@ -190,6 +192,7 @@ pub fn review(book_id: Signal<usize>, data: Signal<Review>, refetch_handle: Sign
                 </textarea>
                 <button class="btn-small" style="margin-left:10px; text-align: start; width:fit-content;  margin-top: 0px;" on:click=move |_| { 
                     send_request.dispatch((review_id(), request()));
+                    set_timeout(move || response_handle.refetch(), Duration::from_secs(1));
                 }>"Write"</button>
             </div>
             //Coments

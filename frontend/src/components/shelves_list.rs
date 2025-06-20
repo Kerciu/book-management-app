@@ -15,7 +15,7 @@ struct ShelvesResponse {
 }
 
 #[derive(Debug, Default, Deserialize, Clone)]
-struct Shelf {
+pub struct Shelf {
     id: usize,
     user: usize,
     name: String,
@@ -50,9 +50,9 @@ pub async fn put_book_in_shelf((book_id, shelf_id): (usize, usize)) -> anyhow::R
         Err(anyhow!(response.text().await?))
     }
 }
-pub async fn remove_book_from_shelf(book_id: usize, shelf_id: usize) -> anyhow::Result<()> {
+pub async fn remove_book_from_shelf((book_id, shelf_id): (usize, usize)) -> anyhow::Result<()> {
     let endpoint= format!("/api/shelf/shelves/{shelf_id}/remove_book/");
-    let request = json!({"id": book_id});
+    let request = json!({"book_id": book_id});
 
     let response = send_post_request(request, &endpoint).await?;
 
@@ -123,7 +123,7 @@ pub fn shelves_list() -> impl IntoView {
 #[component]
 pub fn shelf_select() -> impl IntoView {
     let navigate = use_navigate();
-    let book_id = move || use_params_map().read().get("book_id").unwrap().parse::<usize>().unwrap();
+    let book_id = move || use_params_map().read().get("id").unwrap().parse::<usize>().unwrap();
     let shelves = LocalResource::new(move || get_shelves());
     let shelves = move || match &*shelves.read() {
         Some(Ok(res)) => res.clone(),
@@ -140,7 +140,12 @@ pub fn shelf_select() -> impl IntoView {
                 let navigate = navigate.clone();
                 view! {
                     
-                    <button on:click=move |_| { action.dispatch((book_id, shelf.id.clone())); navigate("/main", Default::default()); }>{move || shelf.name.clone()}</button>
+                    <button on:click=move |_| { action.dispatch((book_id, shelf.id.clone())); let _ = web_sys::window()
+                .unwrap()
+                .local_storage()
+                .unwrap()
+                .unwrap()
+                .set_item("main_section", "my_books"); navigate("/main", Default::default()); }>{move || shelf.name.clone()}</button>
                 }
             }
         />
@@ -148,9 +153,17 @@ pub fn shelf_select() -> impl IntoView {
 } 
 
 #[component]
+pub fn shelf_book_list_proxy() -> impl IntoView {
+    let id = move || use_params_map().read().get("id").unwrap().parse::<usize>().unwrap();
+    return view! {
+        <ShelfBookList shelf_id=Signal::derive(move || id()) />
+    }
+}
+
+#[component]
 pub fn shelf_book_list(shelf_id: Signal<usize>) -> impl IntoView {
-    let books = LocalResource::new(move || get_books_from_shelf(shelf_id()));
-    let books = move || match &*books.read() {
+    let books_request = LocalResource::new(move || get_books_from_shelf(shelf_id()));
+    let books = move || match &*books_request.read() {
         Some(res) => match res {
             Ok(vec) => vec.clone(),
             Err(err) => {
@@ -166,7 +179,7 @@ pub fn shelf_book_list(shelf_id: Signal<usize>) -> impl IntoView {
             key=|book| book.id
             children=move |book| {
                 view! {
-                     <BookInfo book=book is_library=true/>
+                     <BookInfo book=book is_library=true shelf_id=shelf_id() refetch=Signal::derive(move || books_request.refetch())/>
             }
         }
          />
