@@ -159,7 +159,7 @@ pub fn book_info(book: Book, is_library: bool, #[prop(optional)] refetch: Signal
                             })
                         }}
                         {move || is_library.then_some(view!{<div class="book-actions">
-                            <button class="btn-small btn-danger" on:click=move |_| { delete_book_from_collection.dispatch((id, shelf_id)); set_timeout(move || refetch(), Duration::from_secs(1));}>"Remove from the collection"</button>
+                            <button class="btn-small btn-danger" on:click=move |_| { delete_book_from_collection.dispatch((id, shelf_id)); set_timeout(move || refetch(), Duration::from_millis(500));}>"Remove from the collection"</button>
                         </div>})}
                 </div>
             </div>

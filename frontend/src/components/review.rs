@@ -192,7 +192,7 @@ pub fn review(book_id: Signal<usize>, data: Signal<Review>, refetch_handle: Sign
                 </textarea>
                 <button class="btn-small" style="margin-left:10px; text-align: start; width:fit-content;  margin-top: 0px;" on:click=move |_| { 
                     send_request.dispatch((review_id(), request()));
-                    set_timeout(move || response_handle.refetch(), Duration::from_secs(1));
+                    set_timeout(move || response_handle.refetch(), Duration::from_millis(500));
                 }>"Write"</button>
             </div>
             //Coments

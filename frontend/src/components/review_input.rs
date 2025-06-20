@@ -80,7 +80,7 @@ pub fn review_input(book_id: impl Fn() -> usize + 'static, refetch: RwSignal<boo
             <button class="btn-small" style="margin-left:10px; text-align: start; width:fit-content;  margin-top: 5px; margin-left:20px;" on:click=move |ev| {
                 let book_id = book_id();
                 send_request.dispatch((book_id, request()));
-                set_timeout(reload, Duration::from_secs(1));
+                set_timeout(reload, Duration::from_millis(500));
             }>"Submit"</button>
         </div>
         <div style="display: flex;   flex-direction: row; align-items:center; margin-left:20px; padding-bottom:100px;">
