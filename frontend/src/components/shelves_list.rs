@@ -15,10 +15,10 @@ struct ShelvesResponse {
 }
 
 #[derive(Debug, Default, Deserialize, Clone)]
-struct Shelf {
-    id: usize,
+pub struct Shelf {
+    pub id: usize,
     user: usize,
-    name: String,
+    pub name: String,
     is_default: bool,
     shelf_type: String,
     created_at: String,

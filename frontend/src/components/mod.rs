@@ -23,7 +23,7 @@ pub use recommendation_list::BookReccomendationList;
 pub use registraction_form::RegistractionForm;
 pub use review_input::ReviewInput;
 pub use review_list::ReviewList;
-pub use shelves_list::ShelvesList;
+pub use shelves_list::{ShelvesList, get_shelves, Shelf, put_book_in_shelf};
 pub use shelves_list::ShelfSelect;
 pub use google_auth::GoogleAuthHandler;
 
