@@ -68,21 +68,29 @@ pub fn EmailVerificationForm() -> impl IntoView {
     };
 
     view! {
-        <form>
-            <div>
-                <label>"E-mail"</label>
-                <input type="email" bind:value=request.email required />
+        <div class="container">
+            <div class="centered-box-email">
+               <div class="form-wrapper">
+             
+                    <form>
+                        <div>
+                            <label>"E-mail"</label>
+                            <input type="email" bind:value=request.email placeholder="Email" required  class="input-email"/>
+                        </div>
+                        <div>
+                            <label>"Code"</label>
+                            <input type="number" bind:value=request.otp placeholder="Code" required class="input-email" />
+                        </div>
+                        <input type="button" on:click=move |_| {
+                            send_request.dispatch(request);
+                        } value="Submit" />
+
+                    </form>
+                    <p>
+                        {response_display}
+                    </p>
+                </div>
             </div>
-            <div>
-                <label>"Code"</label>
-                <input type="number" bind:value=request.otp required />
-            </div>
-            <input type="button" on:click=move |_| {
-                send_request.dispatch(request);
-            } value="Submit" />
-        </form>
-        <p>
-            {response_display}
-        </p>
+        </div>
     }
 }
