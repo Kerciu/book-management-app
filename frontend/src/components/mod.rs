@@ -14,10 +14,11 @@ mod review_list;
 mod shelves_list;
 
 pub use book_details::BookDetails;
-pub use book_list::{BookList, BookInfo};
+pub use book_list::{BookInfo, BookList};
 pub use email_verify_form::EmailVerificationForm;
 pub use friends_list::FriendList;
-pub use github_auth::{GithubAuthButton, GithubAuthHandler};
+pub use github_auth::GithubAuthHandler;
+pub use google_auth::GoogleAuthHandler;
 pub use login_form::LoginForm;
 pub use recommendation_list::BookReccomendationList;
 pub use registraction_form::RegistractionForm;
@@ -25,7 +26,6 @@ pub use review_input::ReviewInput;
 pub use review_list::ReviewList;
 pub use shelves_list::{ShelvesList, get_shelves, Shelf, put_book_in_shelf};
 pub use shelves_list::ShelfSelect;
-pub use google_auth::GoogleAuthHandler;
 
 use crate::{BACKEND, auth};
 use gloo_net::http::{Request, Response};

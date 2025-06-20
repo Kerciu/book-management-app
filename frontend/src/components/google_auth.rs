@@ -49,9 +49,14 @@ async fn post(code: String) -> anyhow::Result<AuthResponse> {
     if !res.ok() {
         return Err(anyhow::anyhow!("{}", res.status_text()));
     }
-    Ok(AuthResponse {
-        access_token: res.json::<serde_json::Value>().await?["access_token"].to_string(),
-    })
+    let access_token = res.json::<serde_json::Value>().await?["access"].to_string().trim_matches('"').to_string();
+    let _ = web_sys::window()
+        .unwrap()
+        .local_storage()
+        .unwrap()
+        .unwrap()
+        .set_item("access_token", &access_token.clone());
+    Ok(AuthResponse { access_token })
 }
 
 async fn get_id_token(code: String) -> anyhow::Result<Token> {
@@ -64,10 +69,16 @@ async fn get_id_token(code: String) -> anyhow::Result<Token> {
     );
 
     let endpoint = env!("GOOGLE_TOKEN_GET_URL");
-    let res = Request::post(endpoint).header("content-type", "application/x-www-form-urlencoded").body(data)?.send().await?;
-    Ok(Token::new(
-        res.json::<serde_json::Value>().await?["id_token"].to_string(),
-    ))
+    let res = Request::post(endpoint)
+        .header("content-type", "application/x-www-form-urlencoded")
+        .body(data)?
+        .send()
+        .await?;
+    let mut code = res.json::<serde_json::Value>().await?["id_token"].to_string();
+    code = code.replace('-', "+");
+    code = code.replace('_', "/");
+    code = code.trim_matches('"').to_string();
+    Ok(Token::new(code))
 }
 
 #[component]
@@ -107,7 +118,6 @@ pub fn google_auth_handler() -> impl IntoView {
             use_navigate()("/main", Default::default());
         }
     });
-    Effect::new(move || log::log!(Level::Debug, "{:?}", use_context::<auth::github::Token>()));
 
     view! {}
 }

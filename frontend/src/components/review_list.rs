@@ -22,7 +22,7 @@ async fn get(book_id: usize) -> anyhow::Result<ReviewResponse> {
 
 
 #[component]
-pub fn review_list(book_id: Signal<usize>) -> impl IntoView {
+pub fn review_list(book_id: Signal<usize>, refetch: RwSignal<bool>) -> impl IntoView {
     let response_handle = LocalResource::new(move || get(book_id()));
     let response = move || match &*response_handle.read() {
         Some(Ok(res)) => Some(res.clone()),
@@ -33,7 +33,10 @@ pub fn review_list(book_id: Signal<usize>) -> impl IntoView {
         None => None
     };
     let reviews = move || response().map(|ReviewResponse {results, ..}| results).unwrap_or_default();
-
+    Effect::new(move || if refetch() {
+        refetch(false);
+        response_handle.refetch();
+    });
 
     view! {
         <For
@@ -43,7 +46,7 @@ pub fn review_list(book_id: Signal<usize>) -> impl IntoView {
                                         <Review 
                                             book_id=Signal::derive(move || book_id()) 
                                             data=Signal::derive(move || review.clone()) 
-                                            refetch_handle=Signal::derive(move || response_handle.refetch()) 
+                                            refetch_handle=Signal::derive(move || refetch(true)) 
                                         /> 
                                     }
        />
