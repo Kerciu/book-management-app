@@ -31,8 +31,7 @@ class AuthorViewSetTest(APITestCase):
         )
 
         self.author = Author.objects.create(
-            first_name="Sigmund",
-            last_name="Freud",
+            name="Sigmund Freud",
             birth_date="1900-01-01",
             death_date="1950-01-01",
         )
@@ -41,8 +40,7 @@ class AuthorViewSetTest(APITestCase):
         self.client.force_authenticate(self.admin)
         url = reverse("authors-list")
         data = {
-            "first_name": "Ernest",
-            "last_name": "Hemingway",
+            "name": "Ernest Hemingway",
             "birth_date": "1899-07-21",
             "death_date": "1961-07-02",
         }
@@ -54,16 +52,16 @@ class AuthorViewSetTest(APITestCase):
         url = reverse("authors-detail", args=[self.author.id])
         response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data["last_name"], "Freud")
+        self.assertEqual(response.data["name"], "Sigmund Freud")
 
     def test_update_author_admin(self):
         self.client.force_authenticate(self.admin)
         url = reverse("authors-detail", args=[self.author.id])
-        data = {"middle_name": "Edgar"}
+        data = {"name": "Edgar"}
         response = self.client.patch(url, data)
         self.author.refresh_from_db()
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(self.author.middle_name, "Edgar")
+        self.assertEqual(self.author.name, "Edgar")
 
     def test_delete_author_admin(self):
         self.client.force_authenticate(self.admin)
@@ -75,14 +73,14 @@ class AuthorViewSetTest(APITestCase):
     def test_create_author_regular_user(self):
         self.client.force_authenticate(self.user)
         url = reverse("authors-list")
-        data = {"first_name": "New", "last_name": "Author"}
+        data = {"name": "New Author"}
         response = self.client.post(url, data)
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
     def test_update_author_regular_user(self):
         self.client.force_authenticate(self.user)
         url = reverse("authors-list")
-        data = {"first_name": "Updated", "last_name": "Author"}
+        data = {"name": "Updated Author"}
         response = self.client.patch(url, data)
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
@@ -96,8 +94,7 @@ class AuthorViewSetTest(APITestCase):
         self.client.force_authenticate(self.admin)
         url = reverse("authors-list")
         data = {
-            "first_name": "Invalid",
-            "last_name": "Dates",
+            "name": "Invalid Dates",
             "birth_date": "2000-01-01",
             "death_date": "1999-01-01",
         }
@@ -115,7 +112,7 @@ class AuthorViewSetTest(APITestCase):
     def test_optional_fields(self):
         self.client.force_authenticate(self.admin)
         url = reverse("authors-list")
-        data = {"first_name": "Fyodor", "last_name": "Dostoevsky"}
+        data = {"name": "Fyodor Dostoevsky"}
         response = self.client.post(url, data)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertIsNone(response.data["death_date"])
@@ -124,8 +121,7 @@ class AuthorViewSetTest(APITestCase):
         self.client.force_authenticate(self.admin)
         url = reverse("authors-list")
         data = {
-            "first_name": "A" * 101,
-            "last_name": "Doe",
+            "name": "A" * 101 + "Doe",
         }
         response = self.client.post(url, data)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)

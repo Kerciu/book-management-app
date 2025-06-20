@@ -13,7 +13,7 @@ from .serializers import (
     PublisherSerializer,
     GenreSerializer,
 )
-from .filters import BookFilter
+from .filters import BookFilter, GenreFilter
 
 # Create your views here.
 
@@ -23,7 +23,7 @@ class IsAdminOrReadOnly(BasePermission):
         if request.method in SAFE_METHODS:
             return True
 
-        return request.user.is_staff
+        return request.user and request.user.is_staff ### ? to powinno byc tak @Kacper
 
 
 class BookViewSet(viewsets.ModelViewSet):
@@ -49,7 +49,7 @@ class BookViewSet(viewsets.ModelViewSet):
         "title",
         "description",
         "isbn",
-        "authors__last_name",
+        "authors__name",
         "genres__name",
     ]
 
@@ -84,6 +84,7 @@ class GenreViewSet(viewsets.ModelViewSet):
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
     permission_classes = [IsAdminOrReadOnly]
+    filterset_class = GenreFilter
 
     def destroy(self, request, *args, **kwargs):
         instance = self.get_object()

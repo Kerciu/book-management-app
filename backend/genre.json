@@ -1,0 +1,34 @@
+{
+  "book_categories": [
+    {
+      "name": "Book"
+    },
+    {
+      "name": "Novella"
+    },
+    {
+      "name": "Short Story"
+    },
+    {
+      "name": "Graphic Novel"
+    },
+    {
+      "name": "Fan Fiction"
+    },
+    {
+      "name": "Research Paper"
+    },
+    {
+      "name": "Poetry"
+    },
+    {
+      "name": "Collection"
+    },
+    {
+      "name": "Web Novel"
+    },
+    {
+      "name": "Light Novel"
+    }
+  ]
+}

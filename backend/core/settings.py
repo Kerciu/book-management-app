@@ -30,6 +30,7 @@ INSTALLED_APPS = [
     "django.contrib.sites",
     "django_extensions",
     "drf_spectacular",
+    "channels",
     # Add your apps here
     "authentication",
     "book",
@@ -38,6 +39,7 @@ INSTALLED_APPS = [
     "notification",
     "recommend",
     "statistic",
+    "review",
 ]
 
 SITE_ID = 1
@@ -71,6 +73,8 @@ TEMPLATES = [
     },
 ]
 
+ASGI_APPLICATION = "core.asgi.application"
+
 WSGI_APPLICATION = "core.wsgi.application"
 
 DATABASES = {
@@ -92,6 +96,16 @@ CACHES = {
         "LOCATION": os.environ.get("REDIS_LOCATION"),
         "OPTIONS": {
             "CLIENT_CLASS": "django_redis.client.DefaultClient",
+        },
+    }
+}
+
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [REDIS_LOCATION],
+            "symmetric_encryption_keys": [SECRET_KEY],
         },
     }
 }
@@ -137,6 +151,11 @@ CORS_ALLOWED_ORIGINS = [
     "http://0.0.0.0:3000",
 ]
 
+CSRF_TRUSTED_ORIGINS = [
+    "ws://localhost:3000",
+    "ws://0.0.0.0:3000",
+]
+
 # REST Framework settings
 REST_FRAMEWORK = {
     "DEFAULT_PERMISSION_CLASSES": [
@@ -146,6 +165,10 @@ REST_FRAMEWORK = {
         "rest_framework_simplejwt.authentication.JWTAuthentication",
     ],
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
+    "DEFAULT_RENDERER_CLASSES": [
+        "rest_framework.renderers.JSONRenderer",
+        "rest_framework.renderers.BrowsableAPIRenderer",
+    ],
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
     "PAGE_SIZE": 10,
     "DEFAULT_FILTER_BACKENDS": [
@@ -155,11 +178,12 @@ REST_FRAMEWORK = {
     ],
     "DEFAULT_THROTTLE_RATES": {
         "anon": "100/hour",
+        "comment_create": "100/hour"
     },
 }
 
 SIMPLE_JWT = {
-    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=10),
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=120),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
     "AUTH_HEADER_TYPES": ("Bearer",),
     "BLACKLIST_AFTER_ROTATION": True,
@@ -167,6 +191,8 @@ SIMPLE_JWT = {
 }
 
 DOMAIN_NAME = os.getenv("DOMAIN_NAME", "0.0.0.0:8000")
+
+SOCIAL_AUTH_PASSWORD = os.getenv("SOCIAL_AUTH_PASSWORD", "social_auth_password")
 
 EMAIL_BACKEND = os.getenv("EMAIL_BACKEND")
 EMAIL_HOST = os.getenv("EMAIL_HOST")

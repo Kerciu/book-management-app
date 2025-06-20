@@ -6,7 +6,7 @@ from ...models import Author, Publisher, Genre, Book
 
 class BookModelTest(TestCase):
     def setUp(self):
-        self.author = Author.objects.create(first_name="John", last_name="Doe")
+        self.author = Author.objects.create(name="John Doe")
         self.genre = Genre.objects.create(name="Science Fiction")
         self.publisher = Publisher.objects.create(
             name="SciPub", website="https://sci.pub"
@@ -32,15 +32,3 @@ class BookModelTest(TestCase):
         self.assertIn(self.genre, book.genres.all())
         self.assertIn(self.publisher, book.publishers.all())
 
-    def test_update_search_vector(self):
-        if connection.vendor != "postgresql":
-            self.skipTest("SearchVector is only supported in PostgreSQL.")
-
-        book = Book.objects.create(
-            title="REST APIs with Django",
-            description="Learn to build APIs",
-            isbn="1112223334",
-        )
-        Book.update_search_vector()
-        book.refresh_from_db()
-        self.assertIsNotNone(book.search_vector)
