@@ -21,7 +21,7 @@ class SingleFileHandler(BaseHTTPRequestHandler):
         if path.endswith(".css"):
             self.send_header("Content-Type", "text/css")
         if path.endswith(".wasm"):
-            self.send_header("Content-Type", "text/wasm")
+            self.send_header("Content-Type", "application/wasm")
         self.send_header("Content-Length", str(len(content)))
         self.end_headers()
         self.wfile.write(content)
