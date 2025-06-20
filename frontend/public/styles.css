@@ -558,13 +558,14 @@ nav {
   padding: 6px 12px;
   font-size: 18px;
   background: transparent;
-  color: #8B5A96;
-  border: 1px solid #8B5A96;
+  color: #ffffff;
+  border: 1px solid #ffffff;
 }
 
 .btn-small:hover {
-  background: #8B5A96;
-  color: white;
+  background: #ffffff;
+  color: #8B5A96;
+  border: 1px solid #8B5A96;
 }
 
 .btn-danger {
@@ -935,7 +936,7 @@ input::-webkit-input-placeholder { color: #cac1ce; }
 
 .styled-textarea {
   padding: 12px 16px;
-  border: 2px solid #8B5A96;
+  border: 2px solid #ffffff;
   border-radius: 25px;
   background: rgba(139, 90, 150, 0.1);
   color: white;
