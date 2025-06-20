@@ -43,7 +43,14 @@ async fn post(code: String) -> anyhow::Result<AuthResponse> {
         return Err(anyhow!("{}", res.status_text()))
     }
     let res: serde_json::Value = serde_json::from_str(&res.text().await?)?;
-    Ok(AuthResponse { code: res["user"]["access"].to_string() })
+    let code = res["code"]["access"].to_string().trim_matches('"').to_string();
+    let _ = web_sys::window()
+        .unwrap()
+        .local_storage()
+        .unwrap()
+        .unwrap()
+        .set_item("access_token", &code.clone());
+    Ok(AuthResponse { code })
 }
 
 #[component]
