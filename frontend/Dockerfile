@@ -24,3 +24,4 @@ CMD rm .env
 
 FROM python:latest AS runtime
 COPY --from=builder /usr/src/app/dist /
+COPY server.py /
