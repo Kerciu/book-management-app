@@ -112,13 +112,14 @@ pub fn comment(data: Signal<Comment>) -> impl IntoView {
     }
 }
 
+#[allow(unused, reason="can't prefix due to macro expansion")]
 #[component]
 pub fn review(book_id: Signal<usize>, data: Signal<Review>, refetch_handle: Signal<()>) -> impl IntoView {
 
     let name = move || data().user;
     let rating = move || data().rating;
     let text = move || data().text;
-    let likes = move || data().likes_count;
+    let _likes = move || data().likes_count;
     let review_id = move || data().id;
 
     let comment_text = RwSignal::new(String::new());
@@ -127,8 +128,8 @@ pub fn review(book_id: Signal<usize>, data: Signal<Review>, refetch_handle: Sign
         text: comment_text(),
     };
 
-    let do_like = handle_request(&like_review);
-    let do_dislike = handle_request(&dislike_review);
+    let _do_like = handle_request(&like_review);
+    let _do_dislike = handle_request(&dislike_review);
 
     let response_handle = LocalResource::new(move || get_comments(data().id));
     let res = move || match &*response_handle.read() {

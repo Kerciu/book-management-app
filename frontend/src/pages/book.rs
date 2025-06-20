@@ -1,13 +1,12 @@
 use crate::components::BookDetails;
 use leptos::html::*;
 use leptos::prelude::*;
-use leptos::*;
 use leptos_router::hooks::*;
 
 #[component]
 pub fn BookPage() -> impl IntoView {
     let navigate = use_navigate();
-    let account_nav = navigate.clone();
+    let _account_nav = navigate.clone();
     let main_nav = navigate.clone();
 
     let id = move || use_params_map().read().get("id");

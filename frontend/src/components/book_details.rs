@@ -2,57 +2,6 @@ use super::book_list::{Author, Book, Genre};
 use crate::components::{ReviewInput, ReviewList, send_get_request};
 use leptos::prelude::*;
 use log::Level;
-use serde::{Deserialize, Serialize};
-
-// //temporary solution for testing
-// pub fn get_example_book() -> Book {
-//     Book {
-//         id: 1,
-//         genres: get_example_genres(),
-//         authors: get_example_authors(),
-//         page_count: Some(523),
-//         title: "The Rust Programming Language".to_string(),
-//         description: "The official book on Rust, written by the Rust development team at Mozilla. This book will teach you about Rust's unique features and how to use them effectively.".to_string(),
-//         isbn: "978-1593278281".to_string(),
-//         published_at: "2018-05-15".to_string(),
-//         language: "English".to_string(),
-//     }
-// }
-
-// fn get_example_genres() -> Vec<Genre> {
-//     vec![
-//         Genre {
-//             name: "Programming".to_string(),
-//         },
-//         Genre {
-//             name: "Technology".to_string(),
-//         },
-//         Genre {
-//             name: "Computer Science".to_string(),
-//         },
-//     ]
-// }
-
-// fn get_example_authors() -> Vec<Author> {
-//     vec![
-//         Author {
-//             first_name: "Steve".to_string(),
-//             middle_name: "".to_string(),
-//             last_name: "Klabnik".to_string(),
-//             bio: "Steve Klabnik is a member of the Rust core team and has been involved in Rust documentation.".to_string(),
-//             birth_date: "1985-02-02".to_string(),
-//             death_date: "".to_string(),
-//         },
-//         Author {
-//             first_name: "Carol".to_string(),
-//             middle_name: "".to_string(),
-//             last_name: "Nichols".to_string(),
-//             bio: "Carol Nichols is a Rust developer and educator.".to_string(),
-//             birth_date: "1984-05-08".to_string(),
-//             death_date: "".to_string(),
-//         },
-//     ]
-// }
 
 async fn get(book_id: usize) -> anyhow::Result<Book> {
     const ENDPOINT: &'static str = "/api/book/books/";

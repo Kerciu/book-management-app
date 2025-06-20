@@ -1,17 +1,16 @@
 #![feature(iter_intersperse)]
 
 use leptos::prelude::*;
-use leptos::*;
-use leptos_meta::*;
 use leptos_router::{components::*, path};
+
+#[allow(unused_imports, reason="Fixes trunk error")]
 use web_sys::*;
 
 mod auth;
 mod components;
 mod pages;
 use crate::pages::{
-    about::AboutPage, account::AccountPage, book::BookPage, home::HomePage, main_page::MainPage,
-    not_found::NotFound, sign::SignPage,
+    about::AboutPage, account::AccountPage, book::BookPage, home::HomePage, main_page::MainPage, sign::SignPage,
 };
 use components::*;
 

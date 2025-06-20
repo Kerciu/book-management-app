@@ -1,11 +1,12 @@
 use leptos::prelude::*;
-use leptos_router::hooks::{use_navigate, use_params, use_params_map};
+use leptos_router::hooks::{use_navigate, use_params_map};
 use serde::Deserialize;
 use serde_json::json;
 use anyhow::anyhow;
 use crate::components::{book_list::Book, handle_request, send_get_request, send_post_request, BookInfo};
 use log::Level;
 
+#[allow(dead_code, reason = "Faithful representation of endpoint data")]
 #[derive(Debug, Default, Deserialize, Clone)]
 struct ShelvesResponse {
     count: usize,
@@ -14,6 +15,7 @@ struct ShelvesResponse {
     results: Vec<Shelf>
 }
 
+#[allow(dead_code, reason = "Faithful representation of endpoint data")]
 #[derive(Debug, Default, Deserialize, Clone)]
 pub struct Shelf {
     pub id: usize,

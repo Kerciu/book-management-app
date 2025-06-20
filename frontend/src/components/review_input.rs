@@ -1,18 +1,15 @@
-use std::{default, time::Duration};
-
+use crate::components::{handle_request, send_post_request};
 use leptos::prelude::*;
 use leptos_router::hooks::use_navigate;
 use serde::Serialize;
-use web_sys::window;
-
-use crate::components::{handle_request, send_post_request};
+use std::time::Duration;
 
 #[derive(Serialize, Default, Debug, Clone)]
 struct ReviewPostRequest {
     rating: Option<usize>,
     text: String,
     has_spoilers: bool,
-    is_public: bool
+    is_public: bool,
 }
 
 async fn post((book_id, data): (usize, ReviewPostRequest)) -> anyhow::Result<()> {
@@ -26,21 +23,24 @@ async fn post((book_id, data): (usize, ReviewPostRequest)) -> anyhow::Result<()>
 }
 
 #[component]
-pub fn review_input(book_id: impl Fn() -> usize + 'static, refetch: RwSignal<bool>) -> impl IntoView {
+pub fn review_input(
+    book_id: impl Fn() -> usize + 'static,
+    refetch: RwSignal<bool>,
+) -> impl IntoView {
     let text = RwSignal::new(String::new());
     let rating = RwSignal::new(0);
     let has_spoilers = RwSignal::new(false);
     let is_public = RwSignal::new(false);
 
-    let request =  move || ReviewPostRequest {
+    let request = move || ReviewPostRequest {
         text: text(),
         rating: Some(rating()).filter(|val| (1..=5).contains(val)),
         has_spoilers: has_spoilers(),
-        is_public: is_public()
+        is_public: is_public(),
     };
 
     let send_request = handle_request(&post);
-    let navigate = use_navigate();
+    let _navigate = use_navigate();
 
     let reload = move || {
         refetch(true);
@@ -77,14 +77,14 @@ pub fn review_input(book_id: impl Fn() -> usize + 'static, refetch: RwSignal<boo
             //         bind:value=is_public id="public"></input>
             //     <div class="checkmark"></div>
             // </label>
-            <button class="btn-small" style="margin-left:10px; text-align: start; width:fit-content;  margin-top: 5px; margin-left:20px;" on:click=move |ev| {
+            <button class="btn-small" style="margin-left:10px; text-align: start; width:fit-content;  margin-top: 5px; margin-left:20px;" on:click=move |_| {
                 let book_id = book_id();
                 send_request.dispatch((book_id, request()));
                 set_timeout(reload, Duration::from_millis(500));
             }>"Submit"</button>
         </div>
         <div style="display: flex;   flex-direction: row; align-items:center; margin-left:20px; padding-bottom:100px;">
-            <textarea placeholder="Write comment..." 
+            <textarea placeholder="Write comment..."
                 class="styled-textarea"
                 style="width:800px; margin-top:20px; resize: vertical; min-height: 40px; overflow-wrap: break-word;"
                 oninput="this.style.height = ''; this.style.height = this.scrollHeight + 'px'"

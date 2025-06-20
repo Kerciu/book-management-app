@@ -1,6 +1,5 @@
 use leptos::*;
 use leptos::prelude::*;
-use leptos::html::*;
 use leptos_router::hooks::*;
 #[component]
 pub fn HomePage() -> impl IntoView {

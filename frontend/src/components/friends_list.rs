@@ -1,6 +1,7 @@
 use leptos::prelude::*;
 
 
+#[allow(unused)]
 struct Friend {
     id: usize,
     name: String,
@@ -10,9 +11,9 @@ struct Friend {
 #[component]
 fn friend_info(friend: Friend) -> impl IntoView {
     let Friend {
-        id,
         name,
-        collection_num
+        collection_num,
+        ..
     } = friend;
     let initials = name.split_whitespace()
         .take(2)

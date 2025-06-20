@@ -1,10 +1,10 @@
 use leptos::prelude::*;
-use leptos_router::hooks::*;
 use serde::Deserialize;
 use std::sync::Arc;
 
 
 //Copied !!!
+#[allow(dead_code, reason = "Faithful representation of endpoint data")]
 #[derive(Deserialize, Debug, Clone)]
 struct Author {
     first_name: String,
@@ -20,8 +20,9 @@ struct Genre {
     name: String,
 }
 
+#[allow(dead_code, reason = "Faithful representation of endpoint data")]
 #[derive(Deserialize, Debug, Clone)]
-struct Book {
+pub struct Book {
     id: usize,
     genres: Vec<Genre>,
     authors: Vec<Author>,
@@ -130,7 +131,6 @@ fn book_info(book:Book, is_first:bool) -> impl IntoView {
         }
     };
     
-    let navigate = use_navigate();
     let title = Arc::new(book.title.clone());
     let published = Arc::new(book.published_at.clone());
 

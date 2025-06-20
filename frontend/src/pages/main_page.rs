@@ -1,17 +1,16 @@
-use crate::components::{BookList, FriendList, BookReccomendationList, ShelvesList};
+use crate::components::{BookList, BookReccomendationList, ShelvesList};
 use leptos::html::*;
 use leptos::prelude::*;
 use leptos::*;
 use leptos_router::hooks::*;
 use web_sys::window;
-use leptos::mount::*;
 
 
 #[component]
 pub fn MainPage() -> impl IntoView {
     let navigate = use_navigate();
-    let account_nav = navigate.clone();
-    let book_nav_temp = navigate.clone();
+    let _account_nav = navigate.clone();
+    let _book_nav_temp = navigate.clone();
     let (show_recommendations, set_recommendations) = signal(true);
     let (show_books, set_books) = signal(false);
     let (show_my_books, set_my_books) = signal(false);
@@ -39,7 +38,7 @@ pub fn MainPage() -> impl IntoView {
             "nav-btn"
         }
     };
-    let button_style_friends = move || {
+    let _button_style_friends = move || {
         if !show_books() && !show_recommendations() && !show_my_books() {
             "nav-btn active"
 
@@ -48,7 +47,7 @@ pub fn MainPage() -> impl IntoView {
         }
     };
 
-    let (section, set_section) = signal("recommendations".to_string());
+    let (_section, _set_section) = signal("recommendations".to_string());
 
     let (did_init,set_did_init )= signal(false);
     Effect::new(move |_| {

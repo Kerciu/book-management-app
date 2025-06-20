@@ -665,6 +665,26 @@ input::placeholder {
 input::placeholder { opacity: 1; }
 input::-webkit-input-placeholder { color: #cac1ce; }
 
+.input-email {
+	background-color:   #2b083b;
+    color:#e1dce3;
+	border: 1px solid #e1dce3;
+    border-color: #e1dce3;
+    border-radius: 8px;
+	padding: 12px 15px;
+    margin-top: 8px;
+    margin-left: 25px;
+	width: 320px;
+}
+
+.input-email::placeholder {
+  color: #cac1ce;
+}
+
+.input-email::placeholder { opacity: 1; }
+.input-email::-webkit-input-placeholder { color: #cac1ce; }
+
+
 
 .divider {
     width: 1px;
@@ -1069,4 +1089,22 @@ input::-webkit-input-placeholder { color: #cac1ce; }
   max-height: fit-content;
   width: 100%;
   padding: 10px;
+}
+
+.centered-box-email {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+.form-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    padding: 2rem;
+    background-color: #2b083b;
+    border-radius: 34px;
+    border: 1px solid #260735;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }

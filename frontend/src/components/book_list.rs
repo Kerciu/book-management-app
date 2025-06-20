@@ -1,14 +1,12 @@
-use std::{collections::BTreeSet, iter, time::Duration};
-
+use super::send_get_request;
+use crate::components::{get_shelves, put_book_in_shelf};
+use crate::components::{handle_request, shelves_list::remove_book_from_shelf};
 use leptos::prelude::*;
 use leptos_router::hooks::*;
 use log::Level;
 use serde::Deserialize;
-use crate::components::{handle_request, shelves_list::remove_book_from_shelf};
-
-use super::send_get_request;
-use crate::components::{get_shelves, Shelf, put_book_in_shelf};
 use serde::Serialize;
+use std::{collections::BTreeSet, iter, time::Duration};
 
 #[allow(dead_code, reason = "Faithful representation of endpoint data")]
 #[derive(Deserialize, Debug, Clone)]
@@ -23,6 +21,7 @@ pub struct Genre {
     pub name: String,
 }
 
+#[allow(dead_code, reason = "Faithful representation of endpoint data")]
 #[derive(Deserialize, Debug, Clone, Default)]
 pub struct Book {
     pub id: usize,
@@ -61,8 +60,6 @@ async fn get(request: String) -> anyhow::Result<BookResponse> {
 }
 //
 
-
-
 #[component]
 fn get_shelves_list(book_id: usize, set_show_shelves: WriteSignal<bool>) -> impl IntoView {
     let shelves = LocalResource::new(move || get_shelves());
@@ -92,21 +89,24 @@ fn get_shelves_list(book_id: usize, set_show_shelves: WriteSignal<bool>) -> impl
     }
 }
 
-/// 
+///
 
 #[component]
-pub fn book_info(book: Book, is_library: bool, #[prop(optional)] refetch: Signal<()>, #[prop(optional)] shelf_id: usize) -> impl IntoView {
+pub fn book_info(
+    book: Book,
+    is_library: bool,
+    #[prop(optional)] refetch: Signal<()>,
+    #[prop(optional)] shelf_id: usize,
+) -> impl IntoView {
     let Book {
         cover_image,
         genres,
         authors,
-        page_count,
         title,
         description,
-        isbn,
         published_at,
-        language,
         id,
+        ..
     } = book;
     let navigate = use_navigate();
     let navigate_collection = navigate.clone();
@@ -128,7 +128,7 @@ pub fn book_info(book: Book, is_library: bool, #[prop(optional)] refetch: Signal
                     style="margin-top: 20px; padding-bottom:20px; height: 316px; object-fit: cover; width: auto; object-fit: contain; " >
                 </img>
                 <div class="book-details">
-                    <h4 style = "max-width: 400px;     word-wrap: break-word; overflow-wrap: break-word;"><a 
+                    <h4 style = "max-width: 400px;     word-wrap: break-word; overflow-wrap: break-word;"><a
                     href=format!("/books/details/{id}")
                     style="color: inherit; text-decoration: none;"
                     >{title}</a></h4>
@@ -145,9 +145,9 @@ pub fn book_info(book: Book, is_library: bool, #[prop(optional)] refetch: Signal
                                         })
                                         .collect_view()}
                                 </div>
-                    </div>  
-                        {move || { 
-                            let navigate_collection = navigate_collection.clone(); 
+                    </div>
+                        {move || {
+                            let _navigate_collection = navigate_collection.clone();
                             (!is_library).then_some(view! {
                                 <div class="book-actions">
                                     <button class="btn-small" on:click=move |ev| {
@@ -175,13 +175,14 @@ pub fn book_info(book: Book, is_library: bool, #[prop(optional)] refetch: Signal
     }
 }
 
+#[allow(unused, reason="can't prefix due to macro expansion")]
 #[component]
 pub fn book_list(is_library_page: bool) -> impl IntoView {
     const ENDPOINT: &'static str = "/api/book/books/";
     let (title, set_title) = signal(String::new());
     let (genre, set_genre) = signal(String::new());
-    let (isbn, set_isbn) = signal(String::new());
-    let (page, set_page) = signal(String::new());
+    let (isbn, _set_isbn) = signal(String::new());
+    let (page, _set_page) = signal(String::new());
     let (sort, set_sort) = signal(String::new());
 
     let request_url = move || {
@@ -215,7 +216,10 @@ pub fn book_list(is_library_page: bool) -> impl IntoView {
                     .any(move |Genre { name }| name.contains(&genre()) || genre() == "")
             })
             .filter(move |book| {
-                book.title.to_ascii_lowercase().contains(&title().to_ascii_lowercase()) || title() == ""
+                book.title
+                    .to_ascii_lowercase()
+                    .contains(&title().to_ascii_lowercase())
+                    || title() == ""
             })
             .collect::<Vec<_>>()
     };
@@ -225,8 +229,8 @@ pub fn book_list(is_library_page: bool) -> impl IntoView {
         books.sort_by_key(move |book| match &sort() as &str {
             "title" => book.title.clone(),
             "author" => book.authors[0].name.clone(),
-            "date" =>  book.published_at.clone(),
-            _ => book.title.clone()
+            "date" => book.published_at.clone(),
+            _ => book.title.clone(),
         });
         books
     };
@@ -236,7 +240,7 @@ pub fn book_list(is_library_page: bool) -> impl IntoView {
             .into_iter()
             .map(|BookResponse { results, .. }| results)
             .flatten()
-            .map(|Book {genres, ..}| genres)
+            .map(|Book { genres, .. }| genres)
             .flatten()
             .collect::<BTreeSet<_>>()
     };
@@ -244,11 +248,15 @@ pub fn book_list(is_library_page: bool) -> impl IntoView {
     let all_genres = move || {
         all_genres()
             .into_iter()
-            .map(|Genre { name }| view! {<option value=name.clone()>{name.clone()}</option>}.into_any())
-            .chain(iter::once(view! {<option value="">Select genre</option>}.into_any()))
+            .map(|Genre { name }| {
+                view! {<option value=name.clone()>{name.clone()}</option>}.into_any()
+            })
+            .chain(iter::once(
+                view! {<option value="">Select genre</option>}.into_any(),
+            ))
             .rev()
             .collect_view()
-        };
+    };
 
     view! {
         <div class="controls">

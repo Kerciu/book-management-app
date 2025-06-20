@@ -1,5 +1,5 @@
 use anyhow::anyhow;
-use leptos::{prelude::*, tachys::view::error_boundary};
+use leptos::prelude::*;
 use leptos_router::hooks::use_navigate;
 use log::Level;
 use serde::Serialize;
@@ -124,7 +124,7 @@ pub fn registraction_form() -> impl IntoView {
         }
     };
 
-    let response_display = move || match response() {
+    let _response_display = move || match response() {
         RegisterResponse::Ok => "Registration successful",
         RegisterResponse::NoResponse => "Something went wrong, try again",
         RegisterResponse::NoRequest => "",
