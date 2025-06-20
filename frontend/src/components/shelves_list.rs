@@ -3,7 +3,7 @@ use leptos_router::hooks::{use_navigate, use_params, use_params_map};
 use serde::Deserialize;
 use serde_json::json;
 use anyhow::anyhow;
-use crate::components::{book_list::Book, handle_request, send_get_request, send_post_request};
+use crate::components::{book_list::Book, handle_request, send_get_request, send_post_request, BookInfo};
 use log::Level;
 
 #[derive(Debug, Default, Deserialize, Clone)]
@@ -77,19 +77,46 @@ pub fn shelves_list() -> impl IntoView {
         _ => Default::default(),
     };
 
-    let (shelf_id, set_shelf_id) = signal(None);
-
     view! {
         <For
             each=move || shelves()
             key=|shelf| shelf.id
             children=move |shelf| {
+                let (expanded, set_expanded) = signal(false);
+                let toggle = move |_| {
+                    set_expanded(!expanded.get());
+                };
                 view! {
-                    <button on:click=move |_| set_shelf_id(Some(shelf.id))></button>
-                }
+                    <div class="expandable-container">
+                        <div style="display: flex;   flex-direction: row; align-items:center; margin-left:20px;">
+                            <div class="text-title-home-page" style="color: #FFFFFF; margin-left:0px; margin-top:10px;">{shelf.name}</div>
+                            <button class="toggle-button" style="margin-left: 20px; border-radius: 100px;" on:click=toggle>
+                                {move || if expanded() { "▲" } else { "▼" }}
+                            </button>
+                        </div>
+                        <div class={move || {
+                            if expanded() {
+                                "expandable-content expanded"
+                            } else {
+                                "expandable-content"
+                            }
+                        }}>
+                            <div>
+                                {move || if expanded() {
+                                    Some(view! {
+                                        <ShelfBookList shelf_id=shelf.id.into() />
+                                    })
+                                } else {
+                                    None
+                                }}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="divider-horizontal"></div>
+
+                 }
             }
         />
-        {move || shelf_id().map(|id| view! { <ShelfBookList shelf_id=id.into() />})}
     }
 }
 
@@ -105,7 +132,6 @@ pub fn shelf_select() -> impl IntoView {
     };
     let shelves = move || shelves().into_iter().map(move |s| (book_id(), s));
     let action = handle_request(&put_book_in_shelf);
-
     view! {
         <For
             each=move || shelves()
@@ -113,6 +139,7 @@ pub fn shelf_select() -> impl IntoView {
             children=move |(book_id, shelf)| {
                 let navigate = navigate.clone();
                 view! {
+                    
                     <button on:click=move |_| { action.dispatch((book_id, shelf.id.clone())); navigate("/main", Default::default()); }>{move || shelf.name.clone()}</button>
                 }
             }
@@ -133,4 +160,15 @@ pub fn shelf_book_list(shelf_id: Signal<usize>) -> impl IntoView {
         },
         None => Default::default(),
     };
+    view!{
+        <For
+            each=move || books()
+            key=|book| book.id
+            children=move |book| {
+                view! {
+                     <BookInfo book=book is_library=true/>
+            }
+        }
+         />
+    }
 }

@@ -1,5 +1,6 @@
 use leptos::prelude::*;
 use serde::Serialize;
+use web_sys::window;
 
 use crate::components::{handle_request, send_post_request};
 
@@ -37,6 +38,12 @@ pub fn review_input(book_id: impl Fn() -> usize + 'static) -> impl IntoView {
 
     let send_request = handle_request(&post);
 
+    let reload = move |ev: leptos::ev::MouseEvent| {
+        if let Some(win) = window() {
+            win.location().reload().unwrap();
+        }
+    };
+
     view! {
         <div style="display: flex;   flex-direction: row; align-items:center; margin-left:20px;">
             <div class="rating" style="align-items: center;">
@@ -68,11 +75,12 @@ pub fn review_input(book_id: impl Fn() -> usize + 'static) -> impl IntoView {
                     bind:value=is_public id="public"></input>
                 <div class="checkmark"></div>
             </label>
-            <button class="btn-small" style="margin-left:10px; text-align: start; width:fit-content;  margin-top: 5px; margin-left:20px;" on:click=move |_| { 
+            <button class="btn-small" style="margin-left:10px; text-align: start; width:fit-content;  margin-top: 5px; margin-left:20px;" on:click=move |ev| { 
                 send_request.dispatch((book_id(), request())); 
+                reload(ev);
             }>"Submit"</button>
         </div>
-        <div style="display: flex;   flex-direction: row; align-items:center; margin-left:20px;">
+        <div style="display: flex;   flex-direction: row; align-items:center; margin-left:20px; padding-bottom:100px;">
             <textarea placeholder="Write comment..." 
                 class="styled-textarea"
                 style="width:800px; margin-top:20px; resize: vertical; min-height: 40px; overflow-wrap: break-word;"

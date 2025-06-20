@@ -124,28 +124,28 @@ pub fn MainPage() -> impl IntoView {
                 >
                     "My Books"
                 </button>
-                <button  class=button_style_friends on:click=move |_| {
-                        set_books(false); 
-                        set_my_books(false);
-                        set_recommendations(false);
-                        if let Some(storage) = window().and_then(|w| w.local_storage().ok().flatten()) {
-                            let _ = storage.set_item("main_section", "friends");
-                        }
-                    }
-                >
-                    "Friends"
-                </button>
+                //<button  class=button_style_friends on:click=move |_| {
+                 //       set_books(false); 
+                //        set_my_books(false);
+                //        set_recommendations(false);
+                //        if let Some(storage) = window().and_then(|w| w.local_storage().ok().flatten()) {
+                //            let _ = storage.set_item("main_section", "friends");
+                //        }
+                //    }
+               // >
+               //     "Friends"
+               // </button>
             </nav>
             
             <div style="display: flex; justify-content: flex-end; flex: 1;">
-                <button 
-                    class="button-login" 
-                    on:click=move |_| {
-                        account_nav("/account", Default::default());
-                    }
-                >
-                    "Account"
-                </button>
+                //<button 
+                //    class="button-login" 
+                //    on:click=move |_| {
+                //        account_nav("/account", Default::default());
+                //    }
+                //>
+                //    "Account"
+                //</button>
             </div>
         </header>
         <div class="section active">
@@ -184,8 +184,8 @@ pub fn MainPage() -> impl IntoView {
                     > 
                         //Friends section
                         <div class="section-header">
-                                <h2>"Friends"</h2>
-                                <FriendList/>
+                                //<h2>"Friends"</h2>
+                                //<FriendList/>
                         </div>
                     </Show>
                 </Show>

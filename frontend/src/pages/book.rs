@@ -33,16 +33,16 @@ pub fn BookPage() -> impl IntoView {
                 </button>
             </nav>
             
-            <div style="display: flex; justify-content: flex-end; flex: 1;">
-                <button 
-                    class="button-login" 
-                    on:click=move |_| {
-                        account_nav("/account", Default::default());
-                    }
-                >
-                    "Account"
-                </button>
-            </div>
+            //<div style="display: flex; justify-content: flex-end; flex: 1;">
+            //    <button 
+            //        class="button-login" 
+             //       on:click=move |_| {
+            //            account_nav("/account", Default::default());
+            //        }
+            //    >
+            //        "Account"
+            //    </button>
+            //</div>
         </header>
         <BookDetails id=move || id()/>
 

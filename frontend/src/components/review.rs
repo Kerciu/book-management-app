@@ -140,6 +140,8 @@ pub fn review(book_id: Signal<usize>, data: Signal<Review>, refetch_handle: Sign
 
     let comments = move || res().map(|CommentResponse {results, ..}| results).unwrap_or_default();
 
+
+
     let initials = move || name().split_whitespace()
         .take(2)
         .map(|word| word.chars().take(1).collect::<String>()) 
@@ -153,24 +155,29 @@ pub fn review(book_id: Signal<usize>, data: Signal<Review>, refetch_handle: Sign
                 <div style="width:fit-content;">
                     //user name
                     <h4 style="text-align: start; margin-top: 0px; margin-left:10px; font-size: 20px;  margin-bottom: 0px;">{move || name()}</h4>
-                    <button class="btn-small" style="margin-left:10px; text-align: start; width:fit-content;  margin-top: 3px;">"View Collection"</button>
+                    //<button class="btn-small" style="margin-left:10px; text-align: start; width:fit-content;  margin-top: 3px;">"View Collection"</button>
                 </div>
                 //rating
                 <div class="text-title" style= "font-size: 32px; color: #FFFFFF; place-items: start center;  margin-top: 0px;">
                     {move || rating()}"/5"
                 </div>
+                <label for="spoilers" style="display: flex; align-items: center;  margin-left:20px; margin-top:5px;">"Has spoilers:"</label>
+                <label class="container-checkbox" style="margin-top:5px; margin-left:20px;">
+                    <input type="checkbox" checked disabled id="spoilers" />
+                    <div class="checkmark"></div>
+                </label>
             </div>
             //review text
             <div class="test-book-description" style = "max-width: 100%; word-wrap: break-word; overflow-wrap: break-word; margin-left:0px; text-align: start;">
                 {move || text()}
             </div>
             //Likes
-            <div>
-                <button on:click=move |_| { do_like.dispatch(LikeData { book_id: book_id(), review_id: review_id(), refetch_handle }); }>"+"</button>
-                {move || likes()}
-                <button on:click=move |_| { do_dislike.dispatch(LikeData { book_id: book_id(), review_id: review_id(), refetch_handle }); }>"-"</button>
-
-            </div>
+            //<div>
+            //    <button on:click=move |_| { do_like.dispatch(LikeData { book_id: book_id(), review_id: review_id(), refetch_handle }); }>"+"</button>
+            //    {move || likes()}
+            //    <button on:click=move |_| { do_dislike.dispatch(LikeData { book_id: book_id(), review_id: review_id(), refetch_handle }); }>"-"</button>
+            //
+            //</div>
             //Coments section
             
             //Write comment

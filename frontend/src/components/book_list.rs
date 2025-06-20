@@ -23,6 +23,7 @@ pub struct Genre {
 #[derive(Deserialize, Debug, Clone, Default)]
 pub struct Book {
     pub id: usize,
+    pub cover_image: String,
     pub genres: Vec<Genre>,
     pub authors: Vec<Author>,
     pub page_count: Option<usize>,
@@ -99,8 +100,9 @@ fn get_shelves_list(book_id: usize, set_show_shelves: WriteSignal<bool>) -> impl
 /// 
 
 #[component]
-fn book_info(book: Book, is_library: bool) -> impl IntoView {
+pub fn book_info(book: Book, is_library: bool) -> impl IntoView {
     let Book {
+        cover_image,
         genres,
         authors,
         page_count,
@@ -128,14 +130,14 @@ fn book_info(book: Book, is_library: bool) -> impl IntoView {
     let short_description = description.chars().take(100).collect::<String>();
     view! {
 
-            <div class="book-item" style="margin-right: 20px; margin-left: 20px;">
-                <img src="https://ecsmedia.pl/cdn-cgi/image/format=webp,/c/the-rust-programming-language-2nd-edition-b-iext138640655.jpg" alt="Description"
-                    style="margin-top: 20px; padding-bottom:20px; height: 316px; object-fit: cover; width: auto; object-fit: contain; " on:click=move |_| {
+            <div class="book-item" style="margin-right: 20px; margin-left: 20px;" on:click=move |_| {
                     navigate(&format!("/books/details/{id}"), Default::default());
                     }>
+                <img src={cover_image} alt="Description"
+                    style="margin-top: 20px; padding-bottom:20px; height: 316px; object-fit: cover; width: auto; object-fit: contain; " >
                 </img>
                 <div class="book-details">
-                    <h4 style = "max-width: 400px;     word-wrap: break-word; overflow-wrap: break-word;"><a href=format!("/books/details/{id}")>{title}</a></h4>
+                    <h4 style = "max-width: 400px;     word-wrap: break-word; overflow-wrap: break-word;">{title}</h4>
                     <p style = "max-width: 400px;     word-wrap: break-word; overflow-wrap: break-word;">"by "{authors}</p>
                     <p style = "max-width: 400px;     word-wrap: break-word; overflow-wrap: break-word;">{format!("Published: {}", published_at)}</p>
                     <div class="body-text" style="color: #FFFFFF; margin-left:0px; font-size: 20px; margin-top:10px;">

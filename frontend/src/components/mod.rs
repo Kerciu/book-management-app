@@ -14,7 +14,7 @@ mod review_list;
 mod shelves_list;
 
 pub use book_details::BookDetails;
-pub use book_list::BookList;
+pub use book_list::{BookList, BookInfo};
 pub use email_verify_form::EmailVerificationForm;
 pub use friends_list::FriendList;
 pub use github_auth::{GithubAuthButton, GithubAuthHandler};

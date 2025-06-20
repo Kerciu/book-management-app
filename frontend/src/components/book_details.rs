@@ -99,7 +99,7 @@ pub fn book_details(id: impl Fn() -> usize + Send + Sync + Copy + 'static) -> im
             <div>
                 <div class="container-flex-row" style="padding: 0px;">
                     //image url
-                    <img src="https://ecsmedia.pl/cdn-cgi/image/format=webp,width=544,height=544,/c/the-rust-programming-language-2nd-edition-b-iext138640655.jpg" alt="Description"  style="margin-top: 20px; margin-left:20px; padding-bottom:20px; height:500px;"></img>
+                    <img src={move || book().cover_image} alt="Description"  style="margin-top: 20px; margin-left:20px; padding-bottom:20px; height:500px;"></img>
                     <div class="text-side" style="margin-top: 20px;">
                         <div class="text-title" style="color: #FFFFFF; margin-left:0px; margin-top:10px;">{move || book().title}</div>
                         <div class="body-text" style="color: #cac1ce; margin-left:0px; margin-top:10px;">{move || authors()}</div>

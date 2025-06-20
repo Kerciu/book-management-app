@@ -1,5 +1,5 @@
 body {
-background: linear-gradient(315deg, hsla(281, 64%, 14%, 1) 0%, hsla(281, 64%, 14%, 1) 10%, hsla(291, 19%, 43%, 1) 15%, hsla(281, 64%, 14%, 1) 35%, hsla(281, 64%, 14%, 1) 65%, hsla(291, 19%, 43%, 1) 85%, hsla(281, 64%, 14%, 1) 90%, hsla(280, 77%, 12%, 1) 100%);    margin: 0;
+background: linear-gradient(315deg, hsla(281, 64%, 14%, 1) 0%, hsla(281, 64%, 14%, 1) 10%, rgb(91, 56, 97) 15%, hsla(281, 64%, 14%, 1) 35%, hsla(281, 64%, 14%, 1) 65%, rgb(86, 51, 92) 85%, hsla(281, 64%, 14%, 1) 90%, hsla(280, 77%, 12%, 1) 100%);    margin: 0;
     height: 100%;
     min-height: 100vh;
     color: white;
@@ -670,6 +670,11 @@ input::-webkit-input-placeholder { color: #cac1ce; }
     width: 1px;
     background-color: #cac1ce;
     height: auto;
+}
+.divider-horizontal {
+    height: 1px;
+    width: auto;
+    background-color: #cac1ce;
 }
 
 .book-display {

@@ -1,5 +1,5 @@
 use anyhow::anyhow;
-use leptos::prelude::*;
+use leptos::{prelude::*, tachys::view::error_boundary};
 use log::Level;
 use serde::Serialize;
 
@@ -97,6 +97,7 @@ async fn post(data: RegisterRequest) -> anyhow::Result<RegisterResponse> {
 #[component]
 pub fn registraction_form() -> impl IntoView {
     let request = RegisterRequest::default();
+    let navigate = use_navigate();
 
     let send_request = move |request: &RegisterRequest| {
         let request = request.clone();
@@ -111,7 +112,9 @@ pub fn registraction_form() -> impl IntoView {
         let maybe_result = &*send_request.value().read();
         match maybe_result {
             Some(result) => match result {
-                Ok(response) => response.clone(),
+                Ok(response) => {
+                    response.clone()
+                },
                 Err(err) => {
                     log::log!(Level::Error, "{err}");
                     RegisterResponse::NoResponse
@@ -129,6 +132,9 @@ pub fn registraction_form() -> impl IntoView {
         RegisterResponse::Err(_) => "Registration failed",
     };
 
+    let (error_msg, set_error_msg): (ReadSignal<String>, WriteSignal<String>) = signal("".to_string());
+    let (show_error_msg, set_show_error_msg) = signal(false);
+
     // TODO: Can we write a macro to not repeat the form's fields?
     //       Should we?
     view! {
@@ -141,10 +147,10 @@ pub fn registraction_form() -> impl IntoView {
                     && let Some(ValidationError::Username(error)) = arr
                         .iter()
                         .find(|i| matches!(i, ValidationError::Username(_))) {
-                        error.clone()
+                        set_error_msg(format!("Username: {}", error.to_string()));
+                        set_show_error_msg(true);
                     } else {
-                        "".to_string()
-                    }
+                     }
                 }
                 </p>
             </div>
@@ -156,9 +162,9 @@ pub fn registraction_form() -> impl IntoView {
                     && let Some(ValidationError::Email(error)) = arr
                         .iter()
                         .find(|i| matches!(i, ValidationError::Email(_))) {
-                        error.clone()
+                        set_error_msg(format!("Email: {}", error.to_string()));
+                        set_show_error_msg(true);
                     } else {
-                        "".to_string()
                     }
                 }
                 </p>
@@ -171,9 +177,9 @@ pub fn registraction_form() -> impl IntoView {
                     && let Some(ValidationError::FirstName(error)) = arr
                         .iter()
                         .find(|i| matches!(i, ValidationError::FirstName(_))) {
-                        error.clone()
+                        set_error_msg(format!("First name: {}", error.to_string()));
+                        set_show_error_msg(true);
                     } else {
-                        "".to_string()
                     }
                 }
                 </p>
@@ -186,9 +192,9 @@ pub fn registraction_form() -> impl IntoView {
                     && let Some(ValidationError::LastName(error)) = arr
                         .iter()
                         .find(|i| matches!(i, ValidationError::LastName(_))) {
-                        error.clone()
+                        set_error_msg(format!("Last name: {}", error.to_string()));
+                        set_show_error_msg(true);
                     } else {
-                        "".to_string()
                     }
                 }
                 </p>
@@ -201,9 +207,9 @@ pub fn registraction_form() -> impl IntoView {
                     && let Some(ValidationError::Password(error)) = arr
                         .iter()
                         .find(|i| matches!(i, ValidationError::Password(_))) {
-                        error.clone()
+                        set_error_msg(format!("Password: {}", error.to_string()));
+                        set_show_error_msg(true);
                     } else {
-                        "".to_string()
                     }
                 }
                 </p>
@@ -216,9 +222,9 @@ pub fn registraction_form() -> impl IntoView {
                     && let Some(ValidationError::RePassword(error)) = arr
                         .iter()
                         .find(|i| matches!(i, ValidationError::RePassword(_))) {
-                        error.clone()
+                        set_error_msg(format!("Repeat Password: {}", error.to_string()));
+                        set_show_error_msg(true);
                     } else {
-                        "".to_string()
                     }
                 }
                 </p>
@@ -228,11 +234,14 @@ pub fn registraction_form() -> impl IntoView {
                     send_request.dispatch(request);
                 } value="Register" />
             </div>
+            <Show when=move || !show_error_msg.get() fallback=move || 
+                    view! {
+                        <div class="body-text" style="color: #d6b5dc; text-align: center; margin-top: 10px">{error_msg.get()}</div>
+                    }
+                > 
+                <div></div>
+            </Show>
         </form>
-        <div class="container-flex" style="padding: 0px; align-items: center; justify-content: center;">
-            <div class="body-text" style="color: #d6b5dc; text-align: center; margin-top: 10px;">
-                {response_display}
-            </div>
-        </div>
+
     }
 }
