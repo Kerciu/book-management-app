@@ -132,6 +132,10 @@ pub fn registraction_form() -> impl IntoView {
         RegisterResponse::Err(_) => "Registration failed",
     };
 
+    Effect::new(move || if matches!(response(), RegisterResponse::Ok) {
+        navigate("/verify_email", Default::default());
+    });
+
     let (error_msg, set_error_msg): (ReadSignal<String>, WriteSignal<String>) = signal("".to_string());
     let (show_error_msg, set_show_error_msg) = signal(false);
 

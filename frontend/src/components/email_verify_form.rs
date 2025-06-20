@@ -1,4 +1,5 @@
 use leptos::prelude::*;
+use leptos_router::hooks::use_navigate;
 use log::Level;
 use serde::Serialize;
 
@@ -40,6 +41,7 @@ async fn post(request: EmailVerifyRequest) -> anyhow::Result<EmailVerifyResponse
 pub fn EmailVerificationForm() -> impl IntoView {
     let request = EmailVerifyRequest::default();
     let send_request = handle_request(&post);
+    let navigate = use_navigate();
     let response = move || {
         if send_request.pending().get() {
             return EmailVerifyResponse::Waiting;
@@ -67,7 +69,12 @@ pub fn EmailVerificationForm() -> impl IntoView {
         EmailVerifyResponse::NoResponse => "Something went wrong, try again",
     };
 
+    Effect::new(move || if matches!(response(), EmailVerifyResponse::Ok) {
+        navigate("/sign", Default::default());
+    });
+
     view! {
+        <div>"Verify your email here"</div>
         <form>
             <div>
                 <label>"E-mail"</label>
