@@ -38,7 +38,6 @@ INSTALLED_APPS = [
     "social",
     "notification",
     "recommend",
-    "statistic",
     "review",
 ]
 
