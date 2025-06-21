@@ -45,6 +45,23 @@ jobs:
 
         # Redis settings
         REDIS_LOCATION=redis://redis:6379/1
+        # FIXME: Backend can't get oauth code
+        GOOGLE_OAUTH_URL=https://accounts.google.com/o/oauth2/v2/auth
+        GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }}
+        GOOGLE_CLIENT_SECRET=${{ secrets.GOOGLE_CLIENT_SECRET }}
+        GOOGLE_REDIRECT_URI_SIMPLE=http://localhost:8080/google_auth
+        GOOGLE_REDIRECT_URI=${{ secrets.GOOGLE_REDIRECT_URI }}
+        GOOGLE_SCOPES="https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.openid"
+        
+        GITHUB_OAUTH_URL=https://github.com/login/oauth/authorize
+        GITHUB_CLIENT_ID=${{ secrets.GITHUB_CLIENT_ID }}
+        GITHUB_CLIENT_SECRET=${{ secrets.GITHUB_CLIENT_SECRET }}
+        GITHUB_REDIRECT_URI_SIMPLE=http://127.0.0.1:8080/github_auth
+        GITHUB_TOKEN_URL=https://github.com/login/oauth/access_token
+        GITHUB_USER_URL=https://api.github.com/user
+        
+        SOCIAL_AUTH_PASSWORD=${{ secrets.SOCIAL_AUTH_PASSWORD }}
+
         EOF
       
     - name: Copy .env to frontend
