@@ -20,14 +20,50 @@ jobs:
     - name: Create .env file
       run: |
         cat > .env << EOF
-        DB_NAME=testdb
-        DB_USER=testuser
-        DB_PASSWORD=testpassword
-        DB_HOST=db
         DEBUG=True
-        EOF
-        cat .env
+        SECRET_KEY=django-insecure-key-for-testing
+        ALLOWED_HOSTS=localhost,127.0.0.1
 
+        # Database settings
+        DB_NAME=test_db
+        DB_USER=postgres
+        DB_PASSWORD=postgres
+        DB_HOST=db
+        DB_PORT=5432
+        POSTGRES_PASSWORD=postgres
+        POSTGRES_USER=postgres
+        POSTGRES_DB=test_db
+
+        # Email settings (placeholder values for testing)
+        EMAIL_BACKEND=django.core.mail.backends.console.EmailBackend
+        EMAIL_HOST=smtp.example.com
+        EMAIL_PORT=587
+        EMAIL_USE_TLS=True
+        EMAIL_HOST_USER=test@example.com
+        EMAIL_HOST_PASSWORD=testpassword
+        DEFAULT_FROM_EMAIL=test@example.com
+
+        # Redis settings
+        REDIS_LOCATION=redis://redis:6379/1
+        # FIXME: Backend can't get oauth code
+        GOOGLE_OAUTH_URL=https://accounts.google.com/o/oauth2/v2/auth
+        GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }}
+        GOOGLE_CLIENT_SECRET=${{ secrets.GOOGLE_CLIENT_SECRET }}
+        GOOGLE_REDIRECT_URI_SIMPLE=http://localhost:8080/google_auth
+        GOOGLE_REDIRECT_URI=${{ secrets.GOOGLE_REDIRECT_URI }}
+        GOOGLE_SCOPES="https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.openid"
+        
+        GITHUB_OAUTH_URL=https://github.com/login/oauth/authorize
+        GITHUB_CLIENT_ID=${{ secrets.GITHUB_CLIENT_ID }}
+        GITHUB_CLIENT_SECRET=${{ secrets.GITHUB_CLIENT_SECRET }}
+        GITHUB_REDIRECT_URI_SIMPLE=http://127.0.0.1:8080/github_auth
+        GITHUB_TOKEN_URL=https://github.com/login/oauth/access_token
+        GITHUB_USER_URL=https://api.github.com/user
+        
+        SOCIAL_AUTH_PASSWORD=${{ secrets.SOCIAL_AUTH_PASSWORD }}
+
+        EOF
+      
     - name: Copy .env to frontend
       run: |
         cp .env frontend/.env
