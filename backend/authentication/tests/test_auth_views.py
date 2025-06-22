@@ -311,7 +311,7 @@ class GoogleSignInViewTest(TestCase):
         }
         self.client = APIClient()
         url = reverse("google-auth")
-        response = self.client.post(url, {"access_token": "valid_token"})
+        response = self.client.post(url, {"id_token": "valid_token"})
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertIn("access", response.data)
 
@@ -336,7 +336,7 @@ class GithubSignInViewTest(TestCase):
         url = reverse("github-auth")
         response = self.client.post(url, {"code": "valid_code"})
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertIn("access", response.data)
+        self.assertIn("access", response.data["code"])
 
     @patch("authentication.providers.GithubAuth.exchange_code_for_token")
     def test_invalid_github_code(self, mock_exchange):

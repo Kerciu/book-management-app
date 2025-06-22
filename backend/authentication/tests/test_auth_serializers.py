@@ -301,20 +301,21 @@ class GoogleSignInSerializerTests(TestCase):
             "sub": "1234567890",
         }
 
-        data = {"access_token": "valid_google_token"}
+        data = {"id_token": "valid_google_token"}
         serializer = GoogleSignInSerializer(data=data)
         self.assertTrue(serializer.is_valid())
 
-        user_data = serializer.validate_access_token("valid_google_token")
+        user_data = serializer.validate(data)
         self.assertEqual(user_data["email"], "google@example.com")
 
     @patch("authentication.providers.GoogleAuth.validate")
     def test_invalid_client_id(self, mock_validate):
-        mock_validate.return_value = {"aud": "wrong_client_id"}
-        data = {"access_token": "valid_token"}
+        mock_validate.return_value = None
+        data = {"id_token": "wrong_client_id"}
         serializer = GoogleSignInSerializer(data=data)
-        with self.assertRaises(AuthenticationFailed):
-            serializer.validate_access_token("valid_token")
+        serializer.is_valid(raise_exception=False)
+        with self.assertRaises(serializers.ValidationError):
+            serializer.validate({"id_token": "valid_token"})
 
 
 class GithubSignInSerializerTests(TestCase):
