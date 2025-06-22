@@ -1,6 +1,5 @@
 from django.test import TestCase
 from django.utils import timezone
-from django.db import connection
 from ...models import Author, Publisher, Genre, Book
 
 
@@ -31,4 +30,3 @@ class BookModelTest(TestCase):
         self.assertIn(self.author, book.authors.all())
         self.assertIn(self.genre, book.genres.all())
         self.assertIn(self.publisher, book.publishers.all())
-
