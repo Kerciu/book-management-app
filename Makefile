@@ -20,6 +20,8 @@ init:
 	docker compose exec backend python manage.py migrate review
 	docker compose exec backend python manage.py makemigrations social
 	docker compose exec backend python manage.py migrate social
+	docker compose exec backend python manage.py makemigrations statistics
+	docker compose exec backend python manage.py migrate statistics
 	make makemigrations
 	make migrate
 	make fillDB
@@ -83,6 +85,8 @@ runmigrations:
 	docker compose exec backend python manage.py migrate review
 	docker compose exec backend python manage.py makemigrations social
 	docker compose exec backend python manage.py migrate social
+	docker compose exec backend python manage.py makemigrations statistics
+	docker compose exec backend python manage.py migrate statistics
 	make makemigrations
 	make migrate
 
