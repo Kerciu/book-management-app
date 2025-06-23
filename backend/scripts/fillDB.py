@@ -33,13 +33,12 @@ def readGenres(path):
             Genre.objects.create(name=name)
 
 def readBooks(path):
-    data_cnt = 200
     maxPublisher = Publisher.objects.count()
     maxAuthor = Author.objects.count()
     maxGenre = Genre.objects.count()
     with open(path, 'r+') as f:
         data = json.load(f)
-        for book in data["editions"][:200]: 
+        for book in data["editions"][:500]: 
             isbn = book["isbn_10"]
             title = book["title"]
             page_count = book["pages"]
