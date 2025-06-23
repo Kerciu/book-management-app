@@ -45,8 +45,6 @@ class UserStatisticsTests(APITestCase):
         self.stats_url = "/api/v1/users/me/stats/"
 
     def test_statistics_flow(self):
-        """Dodajemy książki → sprawdzamy liczby → przenosimy na \"read\" → ponownie sprawdzamy."""
-
         self.want.books.add(self.book1)
         self.current.books.add(self.book2)
 
