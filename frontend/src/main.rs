@@ -3,14 +3,15 @@
 use leptos::prelude::*;
 use leptos_router::{components::*, path};
 
-#[allow(unused_imports, reason="Fixes trunk error")]
+#[allow(unused_imports, reason = "Fixes trunk error")]
 use web_sys::*;
 
 mod auth;
 mod components;
 mod pages;
 use crate::pages::{
-    about::AboutPage, account::AccountPage, book::BookPage, home::HomePage, main_page::MainPage, sign::SignPage,
+    about::AboutPage, account::AccountPage, book::BookPage, home::HomePage, main_page::MainPage,
+    sign::SignPage,
 };
 use components::*;
 
@@ -39,7 +40,6 @@ pub fn App() -> impl IntoView {
         </Router>
     }
 }
-
 
 fn main() {
     // better error logging

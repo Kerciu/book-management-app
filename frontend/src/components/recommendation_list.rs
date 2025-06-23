@@ -2,7 +2,6 @@ use leptos::prelude::*;
 use serde::Deserialize;
 use std::sync::Arc;
 
-
 //Copied !!!
 #[allow(dead_code, reason = "Faithful representation of endpoint data")]
 #[derive(Deserialize, Debug, Clone)]
@@ -86,7 +85,13 @@ fn get_example_authors() -> Vec<Author> {
 // INFO: ^^^^^ COPIED ^^^^^
 
 #[component]
-fn BookDetails(title: String, authors: String, published: String, genres: Vec<String>, description:String) -> impl IntoView {
+fn BookDetails(
+    title: String,
+    authors: String,
+    published: String,
+    genres: Vec<String>,
+    description: String,
+) -> impl IntoView {
     let is_des = description != "";
 
     view! {
@@ -95,7 +100,7 @@ fn BookDetails(title: String, authors: String, published: String, genres: Vec<St
             <p class="author">{format!("by {}", authors)}</p>
             <Show
                 when=move || is_des
-                fallback=move || 
+                fallback=move ||
                     view! {
                         <div></div>
                     }
@@ -103,7 +108,7 @@ fn BookDetails(title: String, authors: String, published: String, genres: Vec<St
                 <p class="author">{format!("Published: {}", published)}</p>
                 <div class="body-text" style="color: #FFFFFF; margin-left:0px; font-size: 20px; margin-top:10px;">
                             {description.clone()}
-                </div>     
+                </div>
             </Show>
             <div class="categories-container" style="margin-top:20px;">
                 <div class="chips-container">
@@ -120,17 +125,15 @@ fn BookDetails(title: String, authors: String, published: String, genres: Vec<St
 }
 
 #[component]
-fn book_info(book:Book, is_first:bool) -> impl IntoView {
-    
+fn book_info(book: Book, is_first: bool) -> impl IntoView {
     let card_class = move || {
         if is_first {
             "book-card featured"
-
         } else {
             "book-card"
         }
     };
-    
+
     let title = Arc::new(book.title.clone());
     let published = Arc::new(book.published_at.clone());
 
@@ -138,9 +141,14 @@ fn book_info(book:Book, is_first:bool) -> impl IntoView {
         book.authors
             .clone()
             .into_iter()
-            .map(|Author { first_name, middle_name, last_name, .. }| {
-                format!("{first_name} {middle_name} {last_name}")
-            })
+            .map(
+                |Author {
+                     first_name,
+                     middle_name,
+                     last_name,
+                     ..
+                 }| { format!("{first_name} {middle_name} {last_name}") },
+            )
             .collect::<Vec<_>>()
             .join(", ")
             .clone(),
@@ -163,7 +171,7 @@ fn book_info(book:Book, is_first:bool) -> impl IntoView {
         <div class=card_class>
             <Show
                 when=move || !is_first
-                fallback=move || 
+                fallback=move ||
                     view! {
                         <div class="book-item-rec">
                             <img src="https://ecsmedia.pl/cdn-cgi/image/format=webp,/c/the-rust-programming-language-2nd-edition-b-iext138640655.jpg" alt="Description"
@@ -174,7 +182,7 @@ fn book_info(book:Book, is_first:bool) -> impl IntoView {
                             </div>
                         </div>
                     }
-                
+
             >
                 <img
                     src="https://ecsmedia.pl/cdn-cgi/image/format=webp,/c/the-rust-programming-language-2nd-edition-b-iext138640655.jpg"
@@ -190,12 +198,12 @@ fn book_info(book:Book, is_first:bool) -> impl IntoView {
 }
 
 //Temp solution for testing
-fn get_example_recommended_book_list() -> Vec<Book>{
+fn get_example_recommended_book_list() -> Vec<Book> {
     vec![
         get_example_book(),
         get_example_book(),
         get_example_book(),
-        get_example_book()
+        get_example_book(),
     ]
 }
 

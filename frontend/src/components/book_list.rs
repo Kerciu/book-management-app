@@ -6,7 +6,7 @@ use leptos_router::hooks::*;
 use log::Level;
 use serde::Deserialize;
 use serde::Serialize;
-use std::{collections::BTreeSet, iter, time::Duration};
+use std::{iter, time::Duration};
 
 #[allow(dead_code, reason = "Faithful representation of endpoint data")]
 #[derive(Deserialize, Debug, Clone)]
@@ -16,16 +16,11 @@ pub struct Author {
     pub death_date: Option<String>,
 }
 
-#[derive(Deserialize, Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
-pub struct Genre {
-    pub name: String,
-}
-
 #[allow(dead_code, reason = "Faithful representation of endpoint data")]
 #[derive(Deserialize, Debug, Clone, Default)]
 pub struct Book {
     pub id: usize,
-    pub cover_image: String,
+    pub cover_image: Option<String>,
     pub genres: Vec<Genre>,
     pub authors: Vec<Author>,
     pub page_count: Option<usize>,
@@ -89,7 +84,57 @@ fn get_shelves_list(book_id: usize, set_show_shelves: WriteSignal<bool>) -> impl
     }
 }
 
-///
+#[derive(Deserialize, Clone, Debug, Default)]
+pub struct Genre {
+    pub id: usize,
+    pub name: String,
+}
+
+impl PartialEq for Genre {
+    fn eq(&self, other: &Self) -> bool {
+        self.id == other.id
+    }
+}
+
+impl PartialOrd for Genre {
+    fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
+        self.name.partial_cmp(&other.name)
+    }
+}
+
+impl Eq for Genre {}
+
+impl Ord for Genre {
+    fn cmp(&self, other: &Self) -> std::cmp::Ordering {
+        self.name.cmp(&other.name)
+    }
+}
+
+#[allow(dead_code, reason = "Faithful representation of endpoint data")]
+#[derive(Deserialize, Clone, Debug, Default)]
+struct GenreResponse {
+    count: usize,
+    next: Option<String>,
+    previous: Option<String>,
+    results: Vec<Genre>,
+}
+
+async fn get_categories() -> anyhow::Result<Vec<Genre>> {
+    const ENDPOINT: &str = "/api/book/genres/";
+    let mut res: GenreResponse = send_get_request(&ENDPOINT).await?;
+    let mut ret = vec![res];
+
+    while let Some(ref endpoint) = ret.last().unwrap().next {
+        res = send_get_request(endpoint).await?;
+        ret.push(res);
+    }
+
+    Ok(ret
+        .into_iter()
+        .map(|GenreResponse { results, .. }| results)
+        .flatten()
+        .collect())
+}
 
 #[component]
 pub fn book_info(
@@ -106,6 +151,7 @@ pub fn book_info(
         description,
         published_at,
         id,
+        page_count,
         ..
     } = book;
     let navigate = use_navigate();
@@ -116,7 +162,10 @@ pub fn book_info(
         .intersperse(", ".to_string())
         .collect_view();
 
-    let genres = genres.into_iter().map(|Genre { name }| name).collect_view();
+    let genres = genres
+        .into_iter()
+        .map(|Genre { name, .. }| name)
+        .collect_view();
     let delete_book_from_collection = handle_request(&remove_book_from_shelf);
     let (show_shelves, set_show_shelves) = signal(false);
     // TODO: Make costanat variable out of this "100"
@@ -134,6 +183,7 @@ pub fn book_info(
                     >{title}</a></h4>
                     <p style = "max-width: 400px;     word-wrap: break-word; overflow-wrap: break-word;">"by "{authors}</p>
                     <p style = "max-width: 400px;     word-wrap: break-word; overflow-wrap: break-word;">{format!("Published: {}", published_at)}</p>
+                    <p style = "max-width: 400px;     word-wrap: break-word; overflow-wrap: break-word;">{format!("Page count: {}", page_count.map(|v: usize| ToString::to_string(&v)).unwrap_or("unknown".to_string()))}</p>
                     <div class="body-text" style="color: #FFFFFF; margin-left:0px; font-size: 20px; margin-top:10px;">
                         {short_description}"..."
                     </div>
@@ -175,23 +225,22 @@ pub fn book_info(
     }
 }
 
-#[allow(unused, reason="can't prefix due to macro expansion")]
+#[allow(unused, reason = "can't prefix due to macro expansion")]
 #[component]
 pub fn book_list(is_library_page: bool) -> impl IntoView {
     const ENDPOINT: &'static str = "/api/book/books/";
     let (title, set_title) = signal(String::new());
     let (genre, set_genre) = signal(String::new());
-    let (isbn, _set_isbn) = signal(String::new());
-    let (page, _set_page) = signal(String::new());
+    let (page, set_page) = signal(1 as usize);
     let (sort, set_sort) = signal(String::new());
 
     let request_url = move || {
         format!(
-            "{ENDPOINT}?title={}&genre={}&isbn={}&page={}",
+            "{ENDPOINT}?title={}&genres__name={}&page={}&ordering={}",
             title.read(),
             genre.read(),
-            isbn.read(),
-            page.read()
+            page.read(),
+            sort.read()
         )
     };
     let request = LocalResource::new(move || get(request_url()));
@@ -210,49 +259,39 @@ pub fn book_list(is_library_page: bool) -> impl IntoView {
             .into_iter()
             .map(|BookResponse { results, .. }| results)
             .flatten()
-            .filter(move |Book { genres, .. }| {
-                genres
-                    .iter()
-                    .any(move |Genre { name }| name.contains(&genre()) || genre() == "")
-            })
-            .filter(move |book| {
-                book.title
-                    .to_ascii_lowercase()
-                    .contains(&title().to_ascii_lowercase())
-                    || title() == ""
-            })
+            // .filter(move |Book { genres, .. }| {
+            //     genres
+            //         .iter()
+            //         .any(move |Genre { name, .. }| name.contains(&genre()) || genre() == "")
+            // })
+            // .filter(move |book| {
+            //     book.title
+            //         .to_ascii_lowercase()
+            //         .contains(&title().to_ascii_lowercase())
+            //         || title() == ""
+            // })
             .collect::<Vec<_>>()
     };
 
-    let books = move || {
-        let mut books = books();
-        books.sort_by_key(move |book| match &sort() as &str {
-            "title" => book.title.clone(),
-            "author" => book.authors[0].name.clone(),
-            "date" => book.published_at.clone(),
-            _ => book.title.clone(),
-        });
-        books
-    };
+    let genre_request = LocalResource::new(move || get_categories());
 
     let all_genres = move || {
-        request()
-            .into_iter()
-            .map(|BookResponse { results, .. }| results)
-            .flatten()
-            .map(|Book { genres, .. }| genres)
-            .flatten()
-            .collect::<BTreeSet<_>>()
+        let mut ret = match &*genre_request.read() {
+            Some(Ok(vec)) => vec.clone(),
+            _ => Default::default(),
+        };
+        ret.sort();
+        ret
     };
 
     let all_genres = move || {
         all_genres()
             .into_iter()
-            .map(|Genre { name }| {
-                view! {<option value=name.clone()>{name.clone()}</option>}.into_any()
+            .map(|Genre { name, .. }| {
+                view! {<option value=name.clone() on:click=move |_| set_page(1)>{name.clone()}</option>}.into_any()
             })
             .chain(iter::once(
-                view! {<option value="">Select genre</option>}.into_any(),
+                view! {<option value="" on:click=move |_| set_page(1)>Select genre</option>}.into_any(),
             ))
             .rev()
             .collect_view()
@@ -265,9 +304,9 @@ pub fn book_list(is_library_page: bool) -> impl IntoView {
                 {move || all_genres()}
             </select>
             <select id="sort-books" class="sort-select" style="align-items: center;" bind:value=(sort, set_sort)>
-                <option value="title">Sort by Title</option>
-                <option value="author">Sort by Author</option>
-                <option value="date">Sort by Date Added</option>
+                <option value="title" on:click=move |_| set_page(1)>Sort by Title</option>
+                <option value="page_count" on:click=move |_| set_page(1)>Sort by Page Count</option>
+                <option value="published_at" on:click=move |_| set_page(1)>Sort by Date Added</option>
             </select>
         </div>
         <div class="books-grid" id="books-grid">
@@ -280,6 +319,11 @@ pub fn book_list(is_library_page: bool) -> impl IntoView {
                     }
                 }
             />
+        </div>
+        <div>
+            <button class="btn-small" on:click=move |_| set_page.update(|v| *v = (*v-1).max(1))>"←"</button>
+            "   "{move || page()}"   "
+            <button class="btn-small" on:click=move |_| set_page.update(|v| *v = (*v+1).max(1))>"→"</button>
         </div>
     }
 }

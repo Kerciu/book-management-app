@@ -48,11 +48,11 @@ services:
       timeout: 10s
       retries: 3
 
-  frontend:
-    build: ./frontend
-    ports:
-     - 8080:8080
-    command: python3 ./server.py
+  # frontend:
+  #   build: ./frontend
+  #   ports:
+  #    - 8080:8080
+  #   command: python3 ./server.py
 
 volumes:
   postgres_data:

@@ -21,9 +21,9 @@ pub fn BookPage() -> impl IntoView {
 
     view! {
         <header style="display: flex; align-items: center; justify-content: space-between; padding: 1rem;">
-            
+
             <nav style="display: flex; justify-content: start; flex: 1;">
-                
+
                 <button class="nav-btn" on:click=move |_| {
                         main_nav("/main", Default::default());
                     }
@@ -31,10 +31,10 @@ pub fn BookPage() -> impl IntoView {
                     "Back"
                 </button>
             </nav>
-            
+
             //<div style="display: flex; justify-content: flex-end; flex: 1;">
-            //    <button 
-            //        class="button-login" 
+            //    <button
+            //        class="button-login"
              //       on:click=move |_| {
             //            account_nav("/account", Default::default());
             //        }

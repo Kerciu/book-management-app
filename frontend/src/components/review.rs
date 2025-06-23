@@ -7,7 +7,7 @@ use serde::Serialize;
 
 use crate::components::{handle_request, send_delete_request, send_get_request, send_post_request};
 
-#[allow(dead_code, reason="Faithful representation of endpoint data")]
+#[allow(dead_code, reason = "Faithful representation of endpoint data")]
 #[derive(Deserialize, Clone, Debug)]
 pub struct Review {
     id: usize,
@@ -20,7 +20,7 @@ pub struct Review {
     comments_count: usize,
     has_liked: bool,
     created_at: String,
-    updated_at: String
+    updated_at: String,
 }
 
 impl Review {
@@ -34,7 +34,7 @@ struct CommentPostRequest {
     text: String,
 }
 
-#[allow(dead_code, reason="Faithful representation of endpoint data")]
+#[allow(dead_code, reason = "Faithful representation of endpoint data")]
 #[derive(Deserialize, Clone, Debug)]
 pub struct CommentResponse {
     count: usize,
@@ -43,7 +43,7 @@ pub struct CommentResponse {
     results: Vec<Comment>,
 }
 
-#[allow(dead_code, reason="Faithful representation of endpoint data")]
+#[allow(dead_code, reason = "Faithful representation of endpoint data")]
 #[derive(Deserialize, Clone, Debug)]
 pub struct Comment {
     id: usize,
@@ -52,14 +52,14 @@ pub struct Comment {
     text: String,
     created_at: String,
     updated_at: String,
-    can_edit: bool
+    can_edit: bool,
 }
 
 #[derive(Clone, Debug)]
 struct LikeData {
     book_id: usize,
     review_id: usize,
-    refetch_handle: Signal<()>
+    refetch_handle: Signal<()>,
 }
 
 async fn get_comments(review_id: usize) -> anyhow::Result<CommentResponse> {
@@ -73,25 +73,48 @@ async fn post_comment((review_id, data): (usize, CommentPostRequest)) -> anyhow:
     Ok(())
 }
 
-async fn like_review(LikeData { book_id, review_id , refetch_handle}: LikeData) {
+async fn like_review(
+    LikeData {
+        book_id,
+        review_id,
+        refetch_handle,
+    }: LikeData,
+) {
     // TODO: Error Handling
-    let _ = send_post_request("", &format!("/api/review/reviews/{book_id}/reviews/{review_id}/like/")).await;
+    let _ = send_post_request(
+        "",
+        &format!("/api/review/reviews/{book_id}/reviews/{review_id}/like/"),
+    )
+    .await;
     let _ = refetch_handle();
 }
 
-async fn dislike_review(LikeData { book_id, review_id, refetch_handle }: LikeData) {
+async fn dislike_review(
+    LikeData {
+        book_id,
+        review_id,
+        refetch_handle,
+    }: LikeData,
+) {
     // TODO: Error Handling
-    let _ = send_delete_request(&format!("/api/review/reviews/{book_id}/reviews/{review_id}/like/")).await;
+    let _ = send_delete_request(&format!(
+        "/api/review/reviews/{book_id}/reviews/{review_id}/like/"
+    ))
+    .await;
     let _ = refetch_handle();
 }
 
 #[component]
 pub fn comment(data: Signal<Comment>) -> impl IntoView {
-    let initials = move || data().user.split_whitespace()
-        .take(2)
-         .map(|word| word.chars().take(1).collect::<String>()) 
-         .collect::<Vec<_>>()
-        .join("");
+    let initials = move || {
+        data()
+            .user
+            .split_whitespace()
+            .take(2)
+            .map(|word| word.chars().take(1).collect::<String>())
+            .collect::<Vec<_>>()
+            .join("")
+    };
 
     view! {
         <div style="padding-top:20px; padding-left:40px; padding-right:20px; border-bottom: 2px solid #8B5A96;">
@@ -112,10 +135,13 @@ pub fn comment(data: Signal<Comment>) -> impl IntoView {
     }
 }
 
-#[allow(unused, reason="can't prefix due to macro expansion")]
+#[allow(unused, reason = "can't prefix due to macro expansion")]
 #[component]
-pub fn review(book_id: Signal<usize>, data: Signal<Review>, refetch_handle: Signal<()>) -> impl IntoView {
-
+pub fn review(
+    book_id: Signal<usize>,
+    data: Signal<Review>,
+    refetch_handle: Signal<()>,
+) -> impl IntoView {
     let name = move || data().user;
     let rating = move || data().rating;
     let text = move || data().text;
@@ -124,7 +150,7 @@ pub fn review(book_id: Signal<usize>, data: Signal<Review>, refetch_handle: Sign
 
     let comment_text = RwSignal::new(String::new());
     let send_request = handle_request(&post_comment);
-    let request =  move || CommentPostRequest {
+    let request = move || CommentPostRequest {
         text: comment_text(),
     };
 
@@ -138,18 +164,25 @@ pub fn review(book_id: Signal<usize>, data: Signal<Review>, refetch_handle: Sign
             log::log!(Level::Error, "{err}");
             None
         }
-        None => None
+        None => None,
     };
 
-    let comments = move || res().map(|CommentResponse {results, ..}| results).unwrap_or_default();
+    let comments = move || {
+        res()
+            .map(|CommentResponse { results, .. }| results)
+            .unwrap_or_default()
+    };
 
     let spoils = RwSignal::new(data().has_spoilers);
 
-    let initials = move || name().split_whitespace()
-        .take(2)
-        .map(|word| word.chars().take(1).collect::<String>()) 
-        .collect::<Vec<_>>()
-        .join("");
+    let initials = move || {
+        name()
+            .split_whitespace()
+            .take(2)
+            .map(|word| word.chars().take(1).collect::<String>())
+            .collect::<Vec<_>>()
+            .join("")
+    };
 
     view! {
         <div class="book-card" style="margin-top:10px; width=max-content; padding-bottom:20px;">
@@ -182,16 +215,16 @@ pub fn review(book_id: Signal<usize>, data: Signal<Review>, refetch_handle: Sign
             //
             //</div>
             //Coments section
-            
+
             //Write comment
             <div style="display: flex;   flex-direction: row; align-items:center; margin-left:0px;">
-                <textarea placeholder="Write comment..." 
+                <textarea placeholder="Write comment..."
                     class="styled-textarea"
                     style="width:60%; margin-top:20px; resize: vertical; min-height: 40px; overflow-wrap: break-word;"
                     oninput="this.style.height = ''; this.style.height = this.scrollHeight + 'px'"
                     bind:value=comment_text>
                 </textarea>
-                <button class="btn-small" style="margin-left:10px; text-align: start; width:fit-content;  margin-top: 0px;" on:click=move |_| { 
+                <button class="btn-small" style="margin-left:10px; text-align: start; width:fit-content;  margin-top: 0px;" on:click=move |_| {
                     send_request.dispatch((review_id(), request()));
                     set_timeout(move || response_handle.refetch(), Duration::from_millis(500));
                 }>"Write"</button>

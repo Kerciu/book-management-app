@@ -49,7 +49,10 @@ async fn post(code: String) -> anyhow::Result<AuthResponse> {
     if !res.ok() {
         return Err(anyhow::anyhow!("{}", res.status_text()));
     }
-    let access_token = res.json::<serde_json::Value>().await?["access"].to_string().trim_matches('"').to_string();
+    let access_token = res.json::<serde_json::Value>().await?["access"]
+        .to_string()
+        .trim_matches('"')
+        .to_string();
     let _ = web_sys::window()
         .unwrap()
         .local_storage()

@@ -4,8 +4,8 @@ use leptos_router::hooks::*;
 use log::Level;
 use serde::Serialize;
 
-use crate::auth::email::Token as AuthToken;
 use crate::auth::Token;
+use crate::auth::email::Token as AuthToken;
 use crate::components::send_post_request;
 
 #[derive(Serialize, Clone, Copy, Default)]

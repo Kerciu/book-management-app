@@ -16,8 +16,7 @@ def recalculate_for(user):
     favourite = (
         Genre.objects
         .filter(book__shelves__user=user,
-                book__shelves__is_default=True,
-                book__shelves__shelf_type="read")
+                book__shelves__is_default=True)
         .annotate(cnt=Count("book"))
         .order_by("-cnt")
         .first()

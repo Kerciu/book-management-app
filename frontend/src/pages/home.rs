@@ -1,14 +1,11 @@
-use leptos::*;
 use leptos::prelude::*;
 use leptos_router::hooks::*;
 #[component]
 pub fn HomePage() -> impl IntoView {
-
     let navigate = use_navigate();
 
     let login_nav = navigate.clone();
     let signup_nav = navigate.clone();
-
 
     view! {
                 <main>
@@ -41,7 +38,7 @@ pub fn HomePage() -> impl IntoView {
                                 <div class="body-text">"BookUp is an app designed for book enthusiasts. Our platform makes it easy to add books to your personal collection, rate them, write reviews, and share recommendations with friends. With BookUp, you can discover new titles and share your favorite reads with others."</div>
                                 <button class="button-pop-reverse" onclick="window.location.href='about'">"Learn more about us!"</button>
                             </div>
-                            
+
                             <img src="https://static.wixstatic.com/media/117514_947e901d593448e98241dfe06415d791~mv2.png" alt="Description" class="image-side"></img>
                         </div>
                         <div class="text-title">"Our features"</div>

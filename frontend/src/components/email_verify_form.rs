@@ -69,15 +69,17 @@ pub fn EmailVerificationForm() -> impl IntoView {
         EmailVerifyResponse::NoResponse => "Something went wrong, try again",
     };
 
-    Effect::new(move || if matches!(response(), EmailVerifyResponse::Ok) {
-        navigate("/sign", Default::default());
+    Effect::new(move || {
+        if matches!(response(), EmailVerifyResponse::Ok) {
+            navigate("/sign", Default::default());
+        }
     });
 
     view! {
         <div class="container">
             <div class="centered-box-email">
                <div class="form-wrapper">
-             
+
                     <form>
                         <div>
                             <label>"E-mail"</label>

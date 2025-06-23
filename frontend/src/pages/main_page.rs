@@ -5,7 +5,6 @@ use leptos::*;
 use leptos_router::hooks::*;
 use web_sys::window;
 
-
 #[component]
 pub fn MainPage() -> impl IntoView {
     let navigate = use_navigate();
@@ -17,7 +16,6 @@ pub fn MainPage() -> impl IntoView {
     let button_style_rec = move || {
         if show_recommendations() {
             "nav-btn active"
-
         } else {
             "nav-btn"
         }
@@ -25,7 +23,6 @@ pub fn MainPage() -> impl IntoView {
     let button_style_book_list = move || {
         if show_books() {
             "nav-btn active"
-
         } else {
             "nav-btn"
         }
@@ -33,7 +30,6 @@ pub fn MainPage() -> impl IntoView {
     let button_style_books = move || {
         if show_my_books() {
             "nav-btn active"
-
         } else {
             "nav-btn"
         }
@@ -41,7 +37,6 @@ pub fn MainPage() -> impl IntoView {
     let _button_style_friends = move || {
         if !show_books() && !show_recommendations() && !show_my_books() {
             "nav-btn active"
-
         } else {
             "nav-btn"
         }
@@ -49,7 +44,7 @@ pub fn MainPage() -> impl IntoView {
 
     let (_section, _set_section) = signal("recommendations".to_string());
 
-    let (did_init,set_did_init )= signal(false);
+    let (did_init, set_did_init) = signal(false);
     Effect::new(move |_| {
         if !did_init.get() {
             set_did_init(true);
@@ -58,23 +53,23 @@ pub fn MainPage() -> impl IntoView {
                 if let Ok(Some(saved)) = storage.get_item("main_section") {
                     match saved.as_str() {
                         "recommendations" => {
-                            set_books(false); 
-                            set_my_books(false); 
+                            set_books(false);
+                            set_my_books(false);
                             set_recommendations(true);
                         }
                         "book_list" => {
-                            set_books(true); 
-                            set_my_books(false); 
+                            set_books(true);
+                            set_my_books(false);
                             set_recommendations(false);
                         }
                         "my_books" => {
-                            set_books(false); 
-                            set_my_books(true); 
+                            set_books(false);
+                            set_my_books(true);
                             set_recommendations(false);
                         }
                         "friends" => {
-                            set_books(false); 
-                            set_my_books(false); 
+                            set_books(false);
+                            set_my_books(false);
                             set_recommendations(false);
                         }
                         _ => {}
@@ -87,11 +82,11 @@ pub fn MainPage() -> impl IntoView {
     view! {
         <header style="display: flex; align-items: center; justify-content: space-between; padding: 1rem;">
             <div class="text-title" style="margin-top: 0px; flex: 1;">"BookUp"</div>
-            
+
             <nav style="display: flex; justify-content: center; flex: 1;">
-                
+
                 <button class=button_style_rec on:click=move |_| {
-                        set_books(false); 
+                        set_books(false);
                         set_my_books(false);
                         set_recommendations(true);
                         if let Some(storage) = window().and_then(|w| w.local_storage().ok().flatten()) {
@@ -102,7 +97,7 @@ pub fn MainPage() -> impl IntoView {
                     "Recommendations"
                 </button>
                 <button class=button_style_book_list on:click=move |_| {
-                        set_books(true); 
+                        set_books(true);
                         set_my_books(false);
                         set_recommendations(false);
                         if let Some(storage) = window().and_then(|w| w.local_storage().ok().flatten()) {
@@ -113,7 +108,7 @@ pub fn MainPage() -> impl IntoView {
                     "Book List"
                 </button>
                 <button class=button_style_books on:click=move |_| {
-                        set_books(false); 
+                        set_books(false);
                         set_my_books(true);
                         set_recommendations(false);
                         if let Some(storage) = window().and_then(|w| w.local_storage().ok().flatten()) {
@@ -124,7 +119,7 @@ pub fn MainPage() -> impl IntoView {
                     "My Books"
                 </button>
                 //<button  class=button_style_friends on:click=move |_| {
-                 //       set_books(false); 
+                 //       set_books(false);
                 //        set_my_books(false);
                 //        set_recommendations(false);
                 //        if let Some(storage) = window().and_then(|w| w.local_storage().ok().flatten()) {
@@ -135,10 +130,10 @@ pub fn MainPage() -> impl IntoView {
                //     "Friends"
                // </button>
             </nav>
-            
+
             <div style="display: flex; justify-content: flex-end; flex: 1;">
-                //<button 
-                //    class="button-login" 
+                //<button
+                //    class="button-login"
                 //    on:click=move |_| {
                 //        account_nav("/account", Default::default());
                 //    }
@@ -148,7 +143,7 @@ pub fn MainPage() -> impl IntoView {
             </div>
         </header>
         <div class="section active">
-            <Show when=move || !show_recommendations.get() fallback=move || 
+            <Show when=move || !show_recommendations.get() fallback=move ||
                     //Recomendation section
                     view! {
                         <div class="section-header">
@@ -158,8 +153,8 @@ pub fn MainPage() -> impl IntoView {
                         </div>
 
                     }
-            > 
-                <Show when=move || !show_books.get() fallback=move || 
+            >
+                <Show when=move || !show_books.get() fallback=move ||
                     //Book List section
                     view! {
                         <div class="section-header">
@@ -169,8 +164,8 @@ pub fn MainPage() -> impl IntoView {
                         </div>
 
                     }
-                > 
-                    <Show when=move || !show_my_books.get() fallback=move || 
+                >
+                    <Show when=move || !show_my_books.get() fallback=move ||
                         //My books section
                         view! {
                             <div class="section-header">
@@ -180,7 +175,7 @@ pub fn MainPage() -> impl IntoView {
                             </div>
 
                         }
-                    > 
+                    >
                         //Friends section
                         <div class="section-header">
                                 //<h2>"Friends"</h2>

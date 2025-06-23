@@ -31,7 +31,7 @@ pub fn book_details(id: impl Fn() -> usize + Send + Sync + Copy + 'static) -> im
         book()
             .genres
             .into_iter()
-            .map(|Genre { name }| name)
+            .map(|Genre { name, .. }| name)
             .collect_view()
     };
     let authors = move || {
@@ -43,7 +43,7 @@ pub fn book_details(id: impl Fn() -> usize + Send + Sync + Copy + 'static) -> im
             .collect_view()
     };
 
-    let rerun= RwSignal::new(false);
+    let rerun = RwSignal::new(false);
 
     view! {
         <div class="container-flex-row" style="padding: 0px;">

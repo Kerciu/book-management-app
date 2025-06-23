@@ -1,9 +1,9 @@
+use super::send_post_request;
 use anyhow::anyhow;
 use leptos::prelude::*;
 use leptos_router::hooks::use_navigate;
 use log::Level;
 use serde::Serialize;
-use super::send_post_request;
 
 #[derive(Serialize, Clone, Copy, Default)]
 /// contains items necesary to send request
@@ -112,9 +112,7 @@ pub fn registraction_form() -> impl IntoView {
         let maybe_result = &*send_request.value().read();
         match maybe_result {
             Some(result) => match result {
-                Ok(response) => {
-                    response.clone()
-                },
+                Ok(response) => response.clone(),
                 Err(err) => {
                     log::log!(Level::Error, "{err}");
                     RegisterResponse::NoResponse
@@ -132,11 +130,14 @@ pub fn registraction_form() -> impl IntoView {
         RegisterResponse::Err(_) => "Registration failed",
     };
 
-    Effect::new(move || if matches!(response(), RegisterResponse::Ok) {
-        navigate("/verify_email", Default::default());
+    Effect::new(move || {
+        if matches!(response(), RegisterResponse::Ok) {
+            navigate("/verify_email", Default::default());
+        }
     });
 
-    let (error_msg, set_error_msg): (ReadSignal<String>, WriteSignal<String>) = signal("".to_string());
+    let (error_msg, set_error_msg): (ReadSignal<String>, WriteSignal<String>) =
+        signal("".to_string());
     let (show_error_msg, set_show_error_msg) = signal(false);
 
     // TODO: Can we write a macro to not repeat the form's fields?
@@ -238,11 +239,11 @@ pub fn registraction_form() -> impl IntoView {
                     send_request.dispatch(request);
                 } value="Register" />
             </div>
-            <Show when=move || !show_error_msg.get() fallback=move || 
+            <Show when=move || !show_error_msg.get() fallback=move ||
                     view! {
                         <div class="body-text" style="color: #d6b5dc; text-align: center; margin-top: 10px">{error_msg.get()}</div>
                     }
-                > 
+                >
                 <div></div>
             </Show>
         </form>
